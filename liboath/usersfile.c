@@ -118,7 +118,7 @@ compute_timestamp (char timestamp[])
  * @window: how many past/future OTPs to search
  * @passwd: string with password, or NULL if password checking is disabled
  * @usersfile_fd: input file descriptor for usersfile
- * @last_otp_timestamp: output variable holding last successful authentication timestamp
+ * @parameter_last_otp_timestamp: output variable holding last successful authentication timestamp
  * @old_log_start: output variable holding the file position of the beginning of the "log" of the validation line
  * @old_log_end: output variable holding the file position of the end of the "log" of the validation line
  *
@@ -135,7 +135,7 @@ parse_usersfile (const char *username,
 		 const size_t window,
 		 const char *passwd,
 		 FILE * usersfile_fd,
-		 time_t * last_otp_timestamp,
+		 time_t * parameter_last_otp_timestamp,
 		 off_t * old_log_start,
 		 off_t * old_log_end, char *new_log_buffer)
 {
@@ -257,23 +257,46 @@ parse_usersfile (const char *username,
       // record the size of the "log" of the current line
       long old_log_size = line_size - strlen (p) - (p - line_buffer);
 
-      // read (optional) moving factor
+      // read (optional)
+      // if HOTP : moving factor
       unsigned long long start_moving_factor = 0;
+      // if TOTP : search position in search windowa
+      int last_totp_position = 0;
 
       p = strtok_r (NULL, whitespace, &saveptr);
       if (p)
 	{
-	  // the current line contain a moving factor
+	  // the current line contain a moving factor/search position
 
-	  // convert the string to unsigned long long
-	  char *endptr;
-	  start_moving_factor = strtoull (p, &endptr, 10);
-	  if (endptr && *endptr != '\0')
+	  if (totpstepsize == 0)
 	    {
-	      // the moving factor is bad formated and
-	      // can't be converted to unsigned long long
-	      rc = OATH_INVALID_COUNTER;
-	      break;
+	      // token type algorithm is HOTP
+
+	      // convert the string to unsigned long long
+	      char *endptr;
+	      start_moving_factor = strtoull (p, &endptr, 10);
+	      if (endptr && *endptr != '\0')
+		{
+		  // the moving factor is bad formated and
+		  // can't be converted to unsigned long long
+		  rc = OATH_INVALID_COUNTER;
+		  break;
+		}
+	    }
+	  else
+	    {
+	      // token type algorithm is TOTP
+
+	      // convert the string to long
+	      char *endptr;
+	      last_totp_position = strtol (p, &endptr, 10);
+	      if (endptr && *endptr != '\0')
+		{
+		  // the search position is bad formated and
+		  // can't be converted to long
+		  rc = OATH_INVALID_COUNTER;
+		  break;
+		}
 	    }
 	}
 
@@ -282,11 +305,11 @@ parse_usersfile (const char *username,
       last_otp = strtok_r (NULL, whitespace, &saveptr);
 
       // Read (optional) last OTP timestamp
+      time_t last_otp_timestamp = (time_t) - 1;
       p = strtok_r (NULL, whitespace, &saveptr);
-      if (p && last_otp_timestamp)
+      if (p)
 	{
 	  // the current line contain a timestamp
-	  // and the caller off the function want to get it
 
 	  // we convert it to tm
 	  struct tm tm;
@@ -302,12 +325,20 @@ parse_usersfile (const char *username,
 
 	  // convert the tm into time_t and
 	  // store it in last_otp_timestamp
-	  *last_otp_timestamp = mktime (&tm);
-	  if (*last_otp_timestamp == (time_t) - 1)
+	  last_otp_timestamp = mktime (&tm);
+	  if (last_otp_timestamp == (time_t) - 1)
 	    {
 	      // the tm is wrong
 	      rc = OATH_INVALID_TIMESTAMP;
 	      break;
+	    }
+
+	  if (parameter_last_otp_timestamp)
+	    {
+	      // if the caller off the function want to record
+	      // the last OTP timestamp
+
+	      *parameter_last_otp_timestamp = last_otp_timestamp;
 	    }
 	}
 
@@ -319,6 +350,7 @@ parse_usersfile (const char *username,
 	  break;
 	}
 
+      int totp_position = 0;
       if (totpstepsize == 0)
 	{
 	  // token type algorithm is HOTP
@@ -333,7 +365,6 @@ parse_usersfile (const char *username,
 	  // and the current line contain a "log"
 
 	  // check if the suppied OTP is valid
-	  int totp_position;
 	  rc = oath_totp_validate2 (secret, secret_length,
 				    time (NULL), totpstepsize, 0, window,
 				    &totp_position, otp);
@@ -341,7 +372,7 @@ parse_usersfile (const char *username,
 	  if (rc >= OATH_OK)
 	    {
 	      // the supplied OTP is valide
-	      // but it may have been already by played
+	      // but it may have been already be played
 	      // since it's valide for a periode of time in which a new
 	      // OTP could have been played :
 	      //
@@ -350,18 +381,38 @@ parse_usersfile (const char *username,
 	      //
 	      // in that case OTP1(replay) should be rejected
 
-	      // get the time validity of the last recorded OTP
-	      int last_totp_position, tmprc;
-	      tmprc = oath_totp_validate2 (secret, secret_length,
-					   time (NULL), totpstepsize, 0,
-					   window, &last_totp_position,
-					   last_otp);
-
-	      if (tmprc >= 0 && last_totp_position >= totp_position)
+	      if (last_otp_timestamp != (time_t) - 1)
 		{
-		  // last recorded otp is newer than the one supplied by the user
-		  rc = OATH_REPLAYED_OTP;
-		  break;
+		  unsigned long long totp_time_step_number,
+		    last_totp_time_step_number;
+		  totp_time_step_number =
+		    (time (NULL) / totpstepsize) + totp_position;
+		  last_totp_time_step_number =
+		    (last_otp_timestamp / totpstepsize) + last_totp_position;
+
+		  if (last_totp_time_step_number >= totp_time_step_number)
+		    {
+		      // last recorded otp is newer than the one supplied by the user
+		      rc = OATH_REPLAYED_OTP;
+		      break;
+		    }
+		}
+	      else
+		{
+		  // get the time validity of the last recorded OTP
+		  int tmprc;
+		  tmprc = oath_totp_validate2 (secret, secret_length,
+					       time (NULL), totpstepsize, 0,
+					       window, &last_totp_position,
+					       last_otp);
+
+		  if (tmprc >= 0 && last_totp_position >= totp_position)
+		    {
+		      // last recorded otp is newer than the one supplied by the user
+		      rc = OATH_REPLAYED_OTP;
+		      break;
+		    }
+
 		}
 	    }
 	}
@@ -392,6 +443,9 @@ parse_usersfile (const char *username,
 
       // OTP is valide
 
+      // compute the new moving factor
+      unsigned long long new_moving_factor = start_moving_factor + rc;
+
       // compute the current timestamp
       char timestamp_buffer[TIME_BUFFER_SIZE];
       rc = compute_timestamp (timestamp_buffer);
@@ -400,13 +454,23 @@ parse_usersfile (const char *username,
 	// timestamp can't be generated
 	break;
 
-      // compute the new moving factor
-      unsigned long long new_moving_factor = start_moving_factor + rc;
-
       // record the new "log" in new_log_buffer
-      rc =
-	snprintf (new_log_buffer, BUFFER_SIZE, "\t%llu\t%s\t%s\n",
-		  new_moving_factor, otp, timestamp_buffer);
+      if (totpstepsize == 0)
+	{
+	  // token type algorithm is HOTP
+
+	  rc =
+	    snprintf (new_log_buffer, BUFFER_SIZE, "\t%llu\t%s\t%s\n",
+		      new_moving_factor, otp, timestamp_buffer);
+	}
+      else
+	{
+	  // token type algorithm is TOTP
+
+	  rc =
+	    snprintf (new_log_buffer, BUFFER_SIZE, "\t%d\t%s\t%s\n",
+		      totp_position, otp, timestamp_buffer);
+	}
 
       if (rc < 0)
 	{
