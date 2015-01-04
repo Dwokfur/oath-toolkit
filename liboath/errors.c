@@ -40,6 +40,7 @@ static const err_t errors[] = {
   ERR (OATH_REPLAYED_OTP, " The OTP has been replayed"),
   ERR (OATH_BAD_PASSWORD, " The password does not match"),
   ERR (OATH_INVALID_COUNTER, " The counter value is corrupt"),
+  ERR (OATH_INVALID_LAST_OTP, " The last OTP value is corrupt"),
   ERR (OATH_INVALID_TIMESTAMP, " The timestamp is corrupt"),
   ERR (OATH_UNKNOWN_USER, " Cannot find information about user"),
   ERR (OATH_WRONG_TOKEN_TYPE, " Bad formated token type"),
