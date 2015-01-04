@@ -162,8 +162,10 @@ oath_totp_validate (const char *secret,
 		    unsigned time_step_size,
 		    time_t start_offset, size_t window, const char *otp)
 {
-  return oath_totp_validate3 (secret, secret_length, now, time_step_size,
-			      start_offset, window, NULL, NULL, otp);
+  return oath_totp_validate4_callback (secret, secret_length, now,
+				       time_step_size, start_offset,
+				       strlen (otp), window, NULL, NULL, 0,
+				       _oath_strcmp_callback, (void *) otp);
 }
 
 /**

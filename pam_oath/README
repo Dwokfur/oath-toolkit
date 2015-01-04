@@ -34,7 +34,7 @@ file:
 ---------
 # cat>/etc/users.oath
 HOTP root - 00
-# chmod go-rw /etc/users.oath
+# chmod 600 /etc/users.oath
 #
 ---------
 

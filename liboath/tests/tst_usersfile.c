@@ -53,7 +53,7 @@ main (void)
 
   rc = oath_authenticate_usersfile ("no-such-file", "joe", "755224",
 				    0, "1234", &last_otp);
-  if (rc != OATH_NO_SUCH_FILE)
+  if (rc != OATH_FILE_OPEN_ERROR)
     {
       printf ("oath_authenticate_usersfile[1]: %s (%d)\n",
 	      oath_strerror_name (rc), rc);
