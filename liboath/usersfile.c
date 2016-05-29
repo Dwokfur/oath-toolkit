@@ -151,7 +151,7 @@ parse_usersfile (const char *username,
   size_t line_buffer_size = 0;
   ssize_t line_size = 0;
 
-  // for each line of userfile
+  // for each line of usersfile
   while ((line_size =
 	  getline (&line_buffer, &line_buffer_size, usersfile_fd)) != -1)
     {

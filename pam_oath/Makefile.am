@@ -17,14 +17,21 @@ SUBDIRS = . tests
 
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CPPFLAGS = -I$(builddir)/../liboath
+AM_CPPFLAGS = -I$(builddir)/../liboath -DOATH_USERSFILE=\"$(sbindir)/oath_usersfile\"
 
 EXTRA_DIST = README
 
 pammoddir = $(PAMDIR)
 pammod_LTLIBRARIES = pam_oath.la
 
+sbin_PROGRAMS = oath_usersfile
+
 pam_oath_la_SOURCES = pam_oath.c
 # XXX add -Wl,-x too?  PAM documentation suggests it.
-pam_oath_la_LIBADD = ../liboath/liboath.la
 pam_oath_la_LDFLAGS = -module -avoid-version
+
+oath_usersfile_SOURCES = oath_usersfile.c
+oath_usersfile_LDADD = ../liboath/liboath.la
+
+install-exec-hook:
+	chmod u+s $(DESTDIR)/$(sbindir)/oath_usersfile

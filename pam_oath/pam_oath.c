@@ -22,10 +22,13 @@
 
 #include "oath.h"
 
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <errno.h>
+#include <sys/wait.h>
 
 /* Libtool defines PIC for shared objects */
 #ifndef PIC
@@ -44,6 +47,7 @@
 #ifdef HAVE_SECURITY_PAM_MODULES_H
 #include <security/pam_modules.h>
 #endif
+#include <security/pam_modutil.h>
 
 #define D(x) do {							\
     printf ("[%s:%s(%d)] ", __FILE__, __FUNCTION__, __LINE__);		\
@@ -133,7 +137,7 @@ PAM_EXTERN int
 pam_sm_authenticate (pam_handle_t * pamh,
 		     int flags, int argc, const char **argv)
 {
-  int retval, rc;
+  int retval, rc, child, fds[2];
   const char *user = NULL;
   const char *password = NULL;
   char otp[MAX_OTP_LEN + 1];
@@ -144,15 +148,16 @@ pam_sm_authenticate (pam_handle_t * pamh,
   int nargs = 1;
   struct cfg cfg;
   char *query_prompt = NULL;
-  char *onlypasswd = strdup ("");	/* empty passwords never match */
-
-  if (!onlypasswd)
-    {
-      retval = PAM_BUF_ERR;
-      goto done;
-    }
+  char *onlypasswd = NULL;
 
   parse_cfg (flags, argc, argv, &cfg);
+
+  // create a pipe for the password
+  if (pipe(fds) != 0)
+    {
+      DBG (("could not make pipe"));
+      goto done;
+    }
 
   retval = pam_get_user (pamh, &user, NULL);
   if (retval != PAM_SUCCESS)
@@ -178,14 +183,6 @@ pam_sm_authenticate (pam_handle_t * pamh,
     {
       DBG (("use_first_pass set and no password, giving up"));
       retval = PAM_AUTH_ERR;
-      goto done;
-    }
-
-  rc = oath_init ();
-  if (rc != OATH_OK)
-    {
-      DBG (("oath_init() failed (%d)", rc));
-      retval = PAM_AUTHINFO_UNAVAIL;
       goto done;
     }
 
@@ -269,7 +266,6 @@ pam_sm_authenticate (pam_handle_t * pamh,
     }
   else if (cfg.digits != 0 && password_len > cfg.digits)
     {
-      free (onlypasswd);
       onlypasswd = strdup (password);
       if (!onlypasswd)
         {
@@ -281,36 +277,133 @@ pam_sm_authenticate (pam_handle_t * pamh,
 
       onlypasswd[password_len - cfg.digits] = '\0';
 
-      DBG (("Password: %s ", onlypasswd));
+      DBG (("Password: %s", onlypasswd));
 
       memcpy (otp, password + password_len - cfg.digits, cfg.digits);
       otp[cfg.digits] = '\0';
 
       retval = pam_set_item (pamh, PAM_AUTHTOK, onlypasswd);
       if (retval != PAM_SUCCESS)
-	{
-	  DBG (("set_item returned error: %s", pam_strerror (pamh, retval)));
-	  goto done;
-	}
+        {
+          DBG (("set_item returned error: %s", pam_strerror (pamh, retval)));
+          goto done;
+        }
     }
   else
     {
       strcpy (otp, password);
       password = NULL;
+      // empty passwords never match
+      onlypasswd = strdup ("");
+      if (!onlypasswd)
+        {
+          retval = PAM_BUF_ERR;
+          goto done;
+        }
     }
 
   DBG (("OTP: %s", otp ? otp : "(null)"));
 
-  {
-    time_t last_otp;
+  /* fork */
+  child = fork();
+  if (child == 0)
+    {
+      static char *envp[] = { NULL };
+      char cfg_window[255];
+      char * const args[] = {
+              "oath_usersfile",
+              cfg.usersfile,
+              (char*)user,
+              otp,
+              cfg_window,
+              cfg.debug ? "1" : "0",
+              NULL };
 
-    rc = oath_authenticate_usersfile (cfg.usersfile,
-				      user,
-				      otp, cfg.window, onlypasswd, &last_otp);
-    DBG (("authenticate rc %d (%s: %s) last otp %s", rc,
-	  oath_strerror_name (rc) ? oath_strerror_name (rc) : "UNKNOWN",
-	  oath_strerror (rc), ctime (&last_otp)));
-  }
+      if (snprintf(cfg_window, 255, "%u", cfg.window) >= 255)
+        {
+          retval = PAM_AUTH_ERR;
+          DBG(("window representation in over 255 characters"));
+          goto done;
+        }
+
+      close(fds[1]);
+
+      // reopen stdin as pipe
+      if (dup2(fds[0], STDIN_FILENO) != STDIN_FILENO)
+        {
+          retval = PAM_AUTH_ERR;
+          DBG(("dup2 of stdin failed"));
+          goto done;
+        }
+
+      /* must set the real uid to 0 so the helper will not error
+       * out if pam is called from setuid binary (su, sudo...) */
+      if (geteuid() == 0 && setuid(0) == -1)
+        {
+          DBG(("setuid failed"));
+          retval = PAM_AUTH_ERR;
+          goto done;
+        }
+
+      /* exec binary helper */
+      DBG(("calling : %s %s %s %s %s %s", OATH_USERSFILE,
+                                       args[1], args[2],
+                                       args[3], args[4], args[5]));
+      execve(OATH_USERSFILE, args, envp);
+
+      /* should not get here: exit with error */
+      DBG(("helper binary is not available"));
+      retval = PAM_AUTH_ERR;
+      goto done;
+    }
+  else if (child > 0)
+    {
+      /* send the password to the child */
+      int len_left = strlen(onlypasswd) + 1;
+      int len_written = 0;
+      rc = write(fds[1], onlypasswd + len_written, len_left);
+      while (rc != len_left)
+        {
+          if (rc == -1)
+            {
+              DBG(("unable to write the passwd to the pipe"));
+              retval = PAM_AUTH_ERR;
+              goto done;
+            }
+          len_left -= rc;
+          len_written += rc;
+          rc = write(fds[1], onlypasswd + len_written, len_left);
+        }
+
+      close(fds[0]);
+      close(fds[1]);
+
+      /* wait for helper to complete: */
+      while ((rc = waitpid(child, &retval, 0)) < 0 && errno == EINTR);
+
+      if (rc<0)
+        {
+          DBG (("oath_usersfile waitpid returned %d: %m", rc));
+          retval = PAM_AUTH_ERR;
+          goto done;
+        }
+      else if (!WIFEXITED(retval))
+        {
+          DBG (("oath_usersfile abnormal exit: %d", retval));
+          retval = PAM_AUTH_ERR;
+          goto done;
+        }
+      else
+        {
+          rc = WEXITSTATUS(retval);
+        }
+    }
+  else
+    {
+      DBG(("fork failed"));
+      retval = PAM_AUTH_ERR;
+      goto done;
+    }
 
   if (rc != OATH_OK)
     {
@@ -322,7 +415,6 @@ pam_sm_authenticate (pam_handle_t * pamh,
   retval = PAM_SUCCESS;
 
 done:
-  oath_done ();
   free (query_prompt);
   free (onlypasswd);
   if (cfg.alwaysok && retval != PAM_SUCCESS)

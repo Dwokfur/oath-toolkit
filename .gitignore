@@ -629,6 +629,7 @@ pam_oath/m4/ltoptions.m4
 pam_oath/m4/ltsugar.m4
 pam_oath/m4/ltversion.m4
 pam_oath/m4/lt~obsolete.m4
+pam_oath/oath_usersfile
 pam_oath/pam_oath.la
 pam_oath/stamp-h1
 pam_oath/tests/.deps/

@@ -59,7 +59,8 @@ static const err_t errors[] = {
   ERR (OATH_STRCMP_ERROR, " A strcmp callback returned an error"),
   ERR (OATH_INVALID_BASE32, " Base32 string is invalid"),
   ERR (OATH_BASE32_OVERFLOW, " Base32 encoding would overflow"),
-  ERR (OATH_MALLOC_ERROR, " Memory allocation failed")
+  ERR (OATH_MALLOC_ERROR, " Memory allocation failed"),
+  ERR (OATH_USERFILE_BIN_ERROR, "Error in the oath_usersfile helper binary")
 };
 
 /**
