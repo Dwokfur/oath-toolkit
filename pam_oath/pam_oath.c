@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <unistd.h>
+#include <sys/types.h>
 
 /* Libtool defines PIC for shared objects */
 #ifndef PIC
@@ -43,6 +45,9 @@
 #endif
 #ifdef HAVE_SECURITY_PAM_MODULES_H
 #include <security/pam_modules.h>
+#endif
+#ifdef HAVE_SECURITY_PAM_MODUTIL_H
+#include <security/pam_modutil.h>
 #endif
 
 #define D(x) do {							\
@@ -69,6 +74,7 @@ struct cfg
   int alwaysok;
   int try_first_pass;
   int use_first_pass;
+  int use_uid;
   char *usersfile;
   unsigned digits;
   unsigned window;
@@ -86,6 +92,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
   cfg->usersfile = NULL;
   cfg->digits = -1;
   cfg->window = 5;
+  cfg->use_uid = 0;
 
   for (i = 0; i < argc; i++)
     {
@@ -103,6 +110,8 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
 	cfg->digits = atoi (argv[i] + 7);
       if (strncmp (argv[i], "window=", 7) == 0)
 	cfg->window = atoi (argv[i] + 7);
+      if (strcmp (argv[i], "use_uid") == 0)
+	cfg->use_uid = 1;
     }
 
   if (cfg->digits != 6 && cfg->digits != 7 && cfg->digits != 8)
@@ -126,6 +135,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
       D (("usersfile=%s", cfg->usersfile ? cfg->usersfile : "(null)"));
       D (("digits=%d", cfg->digits));
       D (("window=%d", cfg->window));
+      D (("use_uid=%d", cfg->use_uid));
     }
 }
 
@@ -145,6 +155,7 @@ pam_sm_authenticate (pam_handle_t * pamh,
   struct cfg cfg;
   char *query_prompt = NULL;
   char *onlypasswd = strdup ("");	/* empty passwords never match */
+  struct passwd *pwd;
 
   if (!onlypasswd)
     {
@@ -154,13 +165,25 @@ pam_sm_authenticate (pam_handle_t * pamh,
 
   parse_cfg (flags, argc, argv, &cfg);
 
-  retval = pam_get_user (pamh, &user, NULL);
-  if (retval != PAM_SUCCESS)
+  if (cfg.use_uid) 
     {
-      DBG (("get user returned error: %s", pam_strerror (pamh, retval)));
-      goto done;
+	pwd = pam_modutil_getpwuid (pamh, getuid());
+	if (pwd == NULL)
+	  {
+	    goto done;
+	  }
+	user = pwd->pw_name;
+    } 
+  else 
+    {
+      retval = pam_get_user (pamh, &user, NULL);
+      if (retval != PAM_SUCCESS)
+	{
+          DBG (("get user returned error: %s", pam_strerror (pamh, retval)));
+	  goto done;
+        }
+      DBG (("get user returned: %s", user));
     }
-  DBG (("get user returned: %s", user));
 
   if (cfg.try_first_pass || cfg.use_first_pass)
     {
