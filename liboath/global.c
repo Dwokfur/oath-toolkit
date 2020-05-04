@@ -25,8 +25,11 @@
 
 #include <stdio.h>		/* For snprintf, getline. */
 #include <string.h>		/* For strverscmp. */
+#include <stdlib.h>		/* For free. */
 
 #include "gc.h"
+
+char *oath_lockfile_path = NULL;
 
 /**
  * oath_init:
@@ -52,6 +55,8 @@ oath_init (void)
   if (gc_init () != GC_OK)
     return OATH_CRYPTO_ERROR;
 
+  oath_lockfile_path = NULL;
+
   return OATH_OK;
 }
 
@@ -71,6 +76,11 @@ oath_done (void)
 {
   gc_done ();
 
+  if (oath_lockfile_path)
+  {
+    free(oath_lockfile_path);
+    oath_lockfile_path = NULL;
+  }
   return OATH_OK;
 }
 
@@ -98,4 +108,21 @@ oath_check_version (const char *req_version)
     return OATH_VERSION;
 
   return NULL;
+}
+
+int
+oath_global_set_lockfile_path(const char *lockfile)
+{
+  if (oath_lockfile_path)
+  {
+    free(oath_lockfile_path);
+    oath_lockfile_path = NULL;
+  }
+
+  if (lockfile)
+  {
+    if ((oath_lockfile_path = strdup(lockfile)) == NULL)
+        return OATH_MALLOC_ERROR;
+  }
+  return OATH_OK;
 }

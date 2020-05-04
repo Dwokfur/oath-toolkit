@@ -75,6 +75,7 @@ struct cfg
   int try_first_pass;
   int use_first_pass;
   char *usersfile;
+  char *lockfile;
   unsigned digits;
   unsigned window;
 };
@@ -89,6 +90,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
   cfg->try_first_pass = 0;
   cfg->use_first_pass = 0;
   cfg->usersfile = NULL;
+  cfg->lockfile = NULL;
   cfg->digits = -1;
   cfg->window = 5;
 
@@ -104,6 +106,8 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
 	cfg->use_first_pass = 1;
       if (strncmp (argv[i], "usersfile=", 10) == 0)
 	cfg->usersfile = (char *) argv[i] + 10;
+      if (strncmp (argv[i], "lockfile=", 9) == 0)
+	cfg->lockfile = (char *) argv[i] + 9;
       if (strncmp (argv[i], "digits=", 7) == 0)
 	cfg->digits = atoi (argv[i] + 7);
       if (strncmp (argv[i], "window=", 7) == 0)
@@ -129,6 +133,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
       D (("try_first_pass=%d", cfg->try_first_pass));
       D (("use_first_pass=%d", cfg->use_first_pass));
       D (("usersfile=%s", cfg->usersfile ? cfg->usersfile : "(null)"));
+      D (("lockfile=%s", cfg->lockfile ? cfg->lockfile : "(null)"));
       D (("digits=%d", cfg->digits));
       D (("window=%d", cfg->window));
     }
@@ -326,6 +331,17 @@ pam_sm_authenticate (pam_handle_t * pamh,
       retval = PAM_AUTHINFO_UNAVAIL;
       goto done;
     }
+
+  if (cfg.lockfile)
+  {
+    rc = oath_global_set_lockfile_path(cfg.lockfile);
+    if (rc != OATH_OK)
+      {
+        DBG (("oath_global_set_lockfile_path() failed (%d)", rc));
+        retval = PAM_AUTHINFO_UNAVAIL;
+        goto done;
+      }
+  }
 
   if (password == NULL)
     {

@@ -159,10 +159,14 @@ typedef enum
 
 /* Global */
 
+extern char *oath_lockfile_path;
+
 extern OATHAPI int oath_init (void);
 extern OATHAPI int oath_done (void);
 
 extern OATHAPI const char *oath_check_version (const char *req_version);
+
+extern OATHAPI int oath_global_set_lockfile_path(const char *lockfile);
 
 /* Error handling */
 
