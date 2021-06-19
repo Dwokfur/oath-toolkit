@@ -26,7 +26,7 @@ Ubuntu-coverage:
   script:
   - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
   - make autoreconf
-  - ./configure --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests CFLAGS="-g --coverage" || (cat config.log; exit 1)
+  - ./configure --enable-gcc-warnings --enable-valgrind-tests CFLAGS="-g --coverage" || (cat config.log; exit 1)
   - lcov --directory . --zerocounters
   - make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
   - mkdir coverage
