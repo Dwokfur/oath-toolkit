@@ -59,8 +59,11 @@ else
     rc=$?
 fi
 
+# Truncate timestamps to 10s precision for checking to avoid spurious failures
+sed 's/2006-12-07T00:00:0[0-9]L/2006-12-07T00:00:00L/g' <"${usrcfg}" >"${usrcfg}~"
+
 if test "$rc" != "77"; then
-    diff -u "${srcdir}/expect.oath" "${usrcfg}" || rc=1
+    diff -u "${srcdir}/expect.oath" "${usrcfg}~" || rc=1
 fi
 
 exit $rc
