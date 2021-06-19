@@ -37,6 +37,7 @@ We rely on several tools to build the software, including:
 - Git <https://git-scm.com/>
 - Valgrind <https://valgrind.org/> (optional)
 - PAM library/headers (optional, required for PAM module)
+- pam_wrapper <https://cwrap.org/pam_wrapper.html> (optional, for testing PAM module)
 - XMLSec <https://www.aleksey.com/xmlsec/> (optional, for libpskc)
 
 The software is typically distributed with your operating system, and
@@ -47,6 +48,7 @@ the instructions for installing them differ.  Here are some hints:
 apt-get install make git autoconf automake libtool bison gengetopt valgrind
 apt-get install libpam0g-dev libxmlsec1-dev libxml2-utils
 apt-get install help2man gtk-doc-tools libglib2.0-dev dblatex
+apt-get install datefudge libpam-wrapper
 -----
 
 If you have hints on how to install the required dependencies on other

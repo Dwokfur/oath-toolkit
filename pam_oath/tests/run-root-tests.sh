@@ -37,18 +37,7 @@ if test -f $ETCUSRCFG; then
     exit 1
 fi
 
-so_path_rel="${srcdir}/../.libs/pam_oath.so"
-so_path="$(readlink -f "${so_path_rel}")"
-if test -z "${so_path}"; then
-    echo "Unable to resolve path to pam_oath.so: ${so_path_rel}"
-    exit 1
-fi
-if ! test -f "${so_path}"; then
-    echo "pam_oath.so not found at: ${so_path}"
-    exit 1
-fi
-
-echo "auth requisite [${so_path}] debug usersfile=$ETCUSRCFG window=20 digits=6" > $ETCPAMCFG
+echo "auth requisite pam_oath.so debug usersfile=$ETCUSRCFG window=20 digits=6" > $ETCPAMCFG
 echo "HOTP user1 - 00" > $ETCUSRCFG
 echo "HOTP user2 pw 00" >> $ETCUSRCFG
 echo "HOTP/T30 user3 - 00" >> $ETCUSRCFG
@@ -66,10 +55,10 @@ fi
 TSTAMP=`TZ=UTC datefudge "2006-09-23" date -u +%s`
 if test "$TSTAMP" != "1158969600"; then
     echo "Cannot fake timestamp, install datefudge to check better. ($TSTAMP)"
-    ./test-pam_oath-root user3
+    ./test-pam_oath-e2e user3
     rc=$?
 else
-    TZ=UTC datefudge "2006-12-07" ./test-pam_oath-root user3
+    TZ=UTC datefudge "2006-12-07" ./test-pam_oath-e2e user3
     rc=$?
 fi
 
