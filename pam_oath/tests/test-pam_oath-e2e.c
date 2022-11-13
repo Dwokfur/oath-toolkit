@@ -1,5 +1,5 @@
 /*
- * test-pam_oath-root.c - self-test PAM module as root
+ * test-pam_oath-e2e.c - self-test PAM module end-to-end
  * Copyright (C) 2011-2021 Simon Josefsson
  *
  * This program is free software: you can redistribute it and/or
@@ -150,7 +150,7 @@ main (int argc, char **argv)
       if (rc == PAM_MODULE_UNKNOWN)
 	{
 	  fprintf (stderr, "pam_oath.so not found.\n");
-	  return 77;
+	  return 1;
 	}
       if (rc != tv[loop].expectrc)
 	{

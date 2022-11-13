@@ -26,7 +26,7 @@ Ubuntu-coverage:
   script:
   - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
   - make autoreconf
-  - ./configure --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests CFLAGS="-g --coverage" || (cat config.log; exit 1)
+  - ./configure --enable-gcc-warnings --enable-valgrind-tests CFLAGS="-g --coverage" || (cat config.log; exit 1)
   - lcov --directory . --zerocounters
   - make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
   - mkdir coverage
@@ -75,7 +75,7 @@ Ubuntu-xmlsec:
   needs: [Debian]
   before_script:
     - apt-get update -qq
-    - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
+    - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge libpam-wrapper
   script:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`

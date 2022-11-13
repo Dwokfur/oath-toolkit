@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# run-e2e-tests.sh - Test pam_oath end-to-end
 # Copyright (C) 2011-2021 Simon Josefsson
 
 # This program is free software: you can redistribute it and/or modify
@@ -15,27 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-if test `id -u` != "0"; then
-    echo "Root access required to run this test, skipping..."
+if ! ldconfig -p | grep -q libpam_wrapper.so; then
+    echo "pam_wrapper not installed, skipping"
     exit 77
 fi
 
 srcdir=${srcdir:-.}
-
-ETCPAMCFG=/etc/pam.d/pam_oath1
-ETCUSRCFG=/etc/tst-pam_oath.users
-
-if test -f $ETCPAMCFG; then
-    echo "Test PAM configuration already exists?!"
-    echo "Remove $ETCPAMCFG and retry..."
-    exit 1
-fi
-
-if test -f $ETCUSRCFG; then
-    echo "Test pam_oath user configuration already exists?!"
-    echo "Remove $ETCUSRCFG and retry..."
-    exit 1
-fi
+pamcfgdir="${srcdir}/pam.d"
+pamcfg="${pamcfgdir}/pam_oath1"
+usrcfg="${srcdir}/tst-pam_oath.users"
 
 so_path_rel="${srcdir}/../.libs/pam_oath.so"
 so_path="$(readlink -f "${so_path_rel}")"
@@ -48,35 +37,33 @@ if ! test -f "${so_path}"; then
     exit 1
 fi
 
-echo "auth requisite [${so_path}] debug usersfile=$ETCUSRCFG window=20 digits=6" > $ETCPAMCFG
-echo "HOTP user1 - 00" > $ETCUSRCFG
-echo "HOTP user2 pw 00" >> $ETCUSRCFG
-echo "HOTP/T30 user3 - 00" >> $ETCUSRCFG
+mkdir -p "${pamcfgdir}"
+echo "auth requisite [${so_path}] debug [usersfile=${usrcfg}] window=20 digits=6" > "${pamcfg}"
 
-if ! test -f $ETCPAMCFG; then
-    echo "Writing to $ETCPAMCFG failed, skipping..."
-    exit 77
-fi
+echo "HOTP user1 - 00" > "${usrcfg}"
+echo "HOTP user2 pw 00" >> "${usrcfg}"
+echo "HOTP/T30 user3 - 00" >> "${usrcfg}"
 
-if ! test -f $ETCUSRCFG; then
-    echo "Writing to $ETCUSRCFG failed, skipping..."
-    exit 77
-fi
+export PAM_WRAPPER=1 \
+       PAM_WRAPPER_SERVICE_DIR="${pamcfgdir}" \
+       PAM_WRAPPER_DEBUGLEVEL=2
 
 TSTAMP=`TZ=UTC datefudge "2006-09-23" date -u +%s`
 if test "$TSTAMP" != "1158969600"; then
     echo "Cannot fake timestamp, install datefudge to check better. ($TSTAMP)"
-    ./test-pam_oath-root user3
+    LD_PRELOAD=libpam_wrapper.so "${srcdir}/test-pam_oath-e2e"
     rc=$?
 else
-    TZ=UTC datefudge "2006-12-07" ./test-pam_oath-root user3
+    LD_PRELOAD=libpam_wrapper.so TZ=UTC datefudge "2006-12-07" \
+        "${srcdir}/test-pam_oath-e2e"
     rc=$?
 fi
 
-if test "$rc" != "77"; then
-    diff -u "$srcdir/expect.oath" $ETCUSRCFG || rc=1
-fi
+# Truncate timestamps to 10s precision for checking to avoid spurious failures
+sed 's/2006-12-07T00:00:0[0-9]L/2006-12-07T00:00:00L/g' <"${usrcfg}" >"${usrcfg}~"
 
-rm -f $ETCPAMCFG $ETCUSRCFG
+if test "$rc" != "77"; then
+    diff -u "${srcdir}/expect.oath" "${usrcfg}~" || rc=1
+fi
 
 exit $rc

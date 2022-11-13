@@ -801,8 +801,10 @@
 /pam_oath/tests/.deps/
 /pam_oath/tests/Makefile
 /pam_oath/tests/Makefile.in
+/pam_oath/tests/pam.d/
 /pam_oath/tests/test-pam_oath
-/pam_oath/tests/test-pam_oath-root
+/pam_oath/tests/test-pam_oath-e2e
+/pam_oath/tests/tst-pam_oath.users
 /pskctool/.deps/
 /pskctool/.libs/
 /pskctool/aclocal.m4
@@ -967,7 +969,6 @@
 /pskctool/pskctool_cmd.h
 /pskctool/stamp-h1
 /scan.tmp/
-/tests/test-pam_oath-root
 /website/NEWS.txt
 /website/contrib.txt
 /website/html/

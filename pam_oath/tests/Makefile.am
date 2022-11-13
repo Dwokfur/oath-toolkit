@@ -19,10 +19,7 @@ LDADD = ../pam_oath.la -lpam
 
 EXTRA_DIST = expect.oath
 
-TESTS = test-pam_oath
-if ROOT_TESTS
-TESTS += run-root-tests.sh
-endif
+TESTS = test-pam_oath run-e2e-tests.sh
 
-check_PROGRAMS = test-pam_oath$(EXEEXT) test-pam_oath-root$(EXEEXT)
-dist_check_SCRIPTS = run-root-tests.sh
+check_PROGRAMS = test-pam_oath$(EXEEXT) test-pam_oath-e2e$(EXEEXT)
+dist_check_SCRIPTS = run-e2e-tests.sh
