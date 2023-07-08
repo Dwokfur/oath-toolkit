@@ -22,15 +22,20 @@ srcdir=${srcdir:-.}
 TZ=UTC
 export TZ
 
-TSTAMP=`datefudge "2006-09-23" date -u +%s`
+FAKETIME=datefudge
+TSTAMP=`$FAKETIME "2006-09-23" date -u +%s`
 if test "$TSTAMP" != "1158969600"; then
-    echo "Could not fake timestamps with datefudge."
-    exit 77
+    FAKETIME=faketime
+    TSTAMP=`$FAKETIME "2006-09-23" date -u +%s`
+    if test "$TSTAMP" != "1158969600"; then
+	echo "Could not fake timestamps with faketime or datefudge."
+	exit 77
+    fi
 fi
 
 cp $srcdir/users.oath tmp.oath
 
-datefudge 2006-12-07 ./tst_usersfile$EXEEXT
+$FAKETIME 2006-12-07 ./tst_usersfile$EXEEXT
 rc=$?
 sed 's/2006-12-07T00:00:0.L/2006-12-07T00:00:00L/g' < tmp.oath > tmp2.oath
 diff -ur $srcdir/expect.oath tmp2.oath || rc=1
