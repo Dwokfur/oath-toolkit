@@ -228,6 +228,9 @@ List of all parameters
   "window": Specify search depth, an integer typically from 5 to 50
             but other values can be useful too.
 
+  "lockfile": Specify lock filename, for example "/var/lock/pam_oath.lock".
+              If not specified, usersfile with the ".lock" suffix is used.
+
 SSH Configuration
 -----------------
 

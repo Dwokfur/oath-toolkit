@@ -325,9 +325,17 @@ update_usersfile (const char *usersfile,
   {
     int l;
 
-    l = asprintf (&lockfile, "%s.lock", usersfile);
-    if (lockfile == NULL || ((size_t) l) != strlen (usersfile) + 5)
-      return OATH_PRINTF_ERROR;
+    if (oath_lockfile_path)
+    {
+      if ((lockfile = strdup(oath_lockfile_path)) == NULL)
+        return OATH_MALLOC_ERROR;
+    }
+    else
+    {
+      l = asprintf (&lockfile, "%s.lock", usersfile);
+      if (lockfile == NULL || ((size_t) l) != strlen (usersfile) + 5)
+        return OATH_PRINTF_ERROR;
+    }
 
     lockfh = fopen (lockfile, "w");
     if (!lockfh)
