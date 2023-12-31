@@ -3,6 +3,8 @@ Copyright (C) 2009-2023 Simon Josefsson.  Licensed under the GPLv3+.
 
 * Version 2.6.10 (unreleased)
 
+** Build fixes for Arch Linux.
+
 * Version 2.6.9 (released 2023-07-09)
 
 ** Improve compatibility with recent libxmlsec.

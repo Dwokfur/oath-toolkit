@@ -24,6 +24,7 @@
 #include <pskc/pskc.h>
 
 #include <string.h>		/* memset */
+#include <stdlib.h>		/* realloc */
 
 #define INTERNAL_NEED_PSKC_STRUCT
 #define INTERNAL_NEED_PSKC_KEY_STRUCT

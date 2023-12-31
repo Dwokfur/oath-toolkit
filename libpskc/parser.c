@@ -28,6 +28,7 @@
 #include "internal.h"
 
 #include <string.h>
+#include <stdlib.h>		/* malloc, strtoul */
 #include "base64.h"
 
 static void
