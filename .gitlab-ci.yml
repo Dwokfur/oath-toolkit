@@ -1,3 +1,18 @@
+# Copyright (C) 2016-2023 Simon Josefsson
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 default:
   interruptible: true
   artifacts:
@@ -16,6 +31,36 @@ stages:
  - build
  - test
  - deploy
+
+gcc:
+  image: gcc:latest
+  stage: build
+  before_script:
+  - apt-get update -qq
+  - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt
+  script:
+  - gcc --version
+  - make autoreconf
+  - ./configure CC="gcc -std=gnu2x" --enable-gcc-warnings WARN_CFLAGS=-Werror
+  - make V=1
+  - make V=1 check VERBOSE=t
+  - git status
+  - git diff --exit-code
+
+clang:
+  image: silkeh/clang:latest
+  stage: build
+  before_script:
+  - apt-get update -qq
+  - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt
+  script:
+  - clang --version
+  - make autoreconf
+  - ./configure CC="clang -std=gnu2x" --enable-gcc-warnings WARN_CFLAGS=-Werror
+  - make V=1
+  - make V=1 check VERBOSE=t
+  - git status
+  - git diff --exit-code
 
 Trisquel11:
   image: registry.gitlab.com/oath-toolkit/build-images:Trisquel11
@@ -45,8 +90,8 @@ Debian12-coverage:
   - lcov --remove coverage/oath-toolkit.info '/usr/include/*' '*/liboath/gl/*' '*/liboath/tests/*' '*/libpskc/gl/*' '*/libpskc/tests/*' '*/oathtool/gl/*' '*/pam_oath/tests/*' '*/pskctool/gl/*' -o coverage/oath-toolkit_filtered.info
   - genhtml --output-directory coverage coverage/oath-toolkit_filtered.info --highlight --frames --legend --title "OATH Toolkit"
 
-Fedora38-clanganalyzer:
-  image: registry.gitlab.com/oath-toolkit/build-images:Fedora38-clanganalyzer
+Fedora39-clanganalyzer:
+  image: registry.gitlab.com/oath-toolkit/build-images:Fedora39-clanganalyzer
   stage: build
   script:
   - make autoreconf
@@ -58,8 +103,8 @@ Debian12:
   stage: test
   needs: [Trisquel11]
   before_script:
-    - apt-get update -qq
-    - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
+  - apt-get update -qq
+  - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
   script:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
@@ -73,8 +118,8 @@ Debian12:
   stage: test
   needs: [Trisquel11]
   before_script:
-    - apt-get update -qq
-    - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
+  - apt-get update -qq
+  - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
   script:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
@@ -87,9 +132,11 @@ Ubuntu-xmlsec:
   image: ubuntu:20.04
   stage: test
   needs: [Trisquel11]
+  variables:
+    DEBIAN_FRONTEND: noninteractive
   before_script:
-    - apt-get update -qq
-    - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
+  - apt-get update -qq
+  - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
   script:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
@@ -183,10 +230,10 @@ Mingw32:
   stage: test
   needs: [Trisquel11]
   before_script:
-    - dpkg --add-architecture i386
-    - apt-get update -qq
-    - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make mingw-w64 wine wine32 wine64 libwine libwine:i386 binfmt-support wine-binfmt
-    - update-binfmts --enable wine
+  - dpkg --add-architecture i386
+  - apt-get update -qq
+  - apt-get install -y -qq make mingw-w64 wine wine32 wine64 libwine libwine:i386 binfmt-support wine-binfmt
+  - update-binfmts --enable wine
   script:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
@@ -200,9 +247,9 @@ Mingw64:
   stage: test
   needs: [Trisquel11]
   before_script:
-    - apt-get update -qq
-    - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq make mingw-w64 wine wine64 binfmt-support wine-binfmt
-    - update-binfmts --enable wine
+  - apt-get update -qq
+  - apt-get install -y -qq make mingw-w64 wine wine64 binfmt-support wine-binfmt
+  - update-binfmts --enable wine
   script:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
@@ -213,12 +260,12 @@ Mingw64:
 
 .pages:
   stage: deploy
-  needs: ["Trisquel11", "Debian12-coverage", "Fedora38-clanganalyzer"]
+  needs: ["Trisquel11", "Debian12-coverage", "Fedora39-clanganalyzer"]
   script:
-    - mkdir public
-    - mv coverage/ public/
-    - mv clang-analyzer/* public/clang-analyzer
-    - mv website/html/* public/
+  - mkdir public
+  - mv coverage/ public/
+  - mv clang-analyzer/* public/clang-analyzer
+  - mv website/html/* public/
   artifacts:
     paths:
     - public
@@ -227,9 +274,9 @@ Mingw64:
 pages:
   extends: .pages
   only:
-    - master
+  - master
 
 pages-test:
   extends: .pages
   except:
-    - master
+  - master
