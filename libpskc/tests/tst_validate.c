@@ -31,7 +31,7 @@ const char *pskc_mini =
   "<KeyContainer xmlns=\"urn:ietf:params:xml:ns:keyprov:pskc\"\n"
   "              Version=\"1.0\">\n" "  <KeyPackage/>\n" "</KeyContainer>\n";
 
-void
+static void
 my_log (const char *msg)
 {
   puts (msg);
@@ -41,9 +41,6 @@ int
 main (void)
 {
   pskc_t *pskc;
-  pskc_key_t *pskc_key;
-  char *out;
-  size_t len;
   int isvalid;
   int rc;
 

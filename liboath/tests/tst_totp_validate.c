@@ -29,7 +29,7 @@
 const struct {
   time_t now;
   unsigned window;
-  char *otp;
+  const char *otp;
   int expected_rc;
   int otp_pos;
   uint64_t otp_counter;
@@ -63,8 +63,6 @@ main (void)
   size_t secretlen = sizeof (secret);
   unsigned time_step_size = 30;
   time_t start_offset = 0;
-  unsigned digits;
-  time_t now;
   size_t i;
 
   rc = oath_init ();
@@ -83,7 +81,7 @@ main (void)
 			       start_offset, tv[i].window, tv[i].otp);
       if (rc != tv[i].expected_rc)
 	{
-	  printf ("validate loop %ld failed (rc %d != %d)?!\n",
+	  printf ("validate loop %lu failed (rc %d != %d)?!\n",
 		  i, rc, tv[i].expected_rc);
 	  return 1;
 	}
@@ -94,7 +92,7 @@ main (void)
 					my_strcmp, (void *) tv[i].otp);
       if (rc != tv[i].expected_rc)
 	{
-	  printf ("validate_callback loop %ld failed (rc %d != %d)?!\n",
+	  printf ("validate_callback loop %lu failed (rc %d != %d)?!\n",
 		  i, rc, tv[i].expected_rc);
 	  return 1;
 	}
@@ -106,13 +104,13 @@ main (void)
 				tv[i].otp);
       if (rc != tv[i].expected_rc)
 	{
-	  printf ("validate2 loop %ld failed (rc %d != %d)?!\n",
+	  printf ("validate2 loop %lu failed (rc %d != %d)?!\n",
 		  i, rc, tv[i].expected_rc);
 	  return 1;
 	}
       if (otp_pos != tv[i].otp_pos)
 	{
-	  printf ("validate2 loop %ld failed (pos %d != %d)?!\n",
+	  printf ("validate2 loop %lu failed (pos %d != %d)?!\n",
 		  i, otp_pos, tv[i].otp_pos);
 	  return 1;
 	}
@@ -125,13 +123,13 @@ main (void)
 					 my_strcmp, (void *) tv[i].otp);
       if (rc != tv[i].expected_rc)
 	{
-	  printf ("validate2_callback loop %ld failed (rc %d != %d)?!\n",
+	  printf ("validate2_callback loop %lu failed (rc %d != %d)?!\n",
 		  i, rc, tv[i].expected_rc);
 	  return 1;
 	}
       if (otp_pos != tv[i].otp_pos)
 	{
-	  printf ("validate2_callback loop %ld failed (pos %d != %d)?!\n",
+	  printf ("validate2_callback loop %lu failed (pos %d != %d)?!\n",
 		  i, otp_pos, tv[i].otp_pos);
 	  return 1;
 	}
@@ -144,19 +142,19 @@ main (void)
 				&otp_counter, tv[i].otp);
       if (rc != tv[i].expected_rc)
 	{
-	  printf ("validate3 loop %ld failed (rc %d != %d)?!\n",
+	  printf ("validate3 loop %lu failed (rc %d != %d)?!\n",
 		  i, rc, tv[i].expected_rc);
 	  return 1;
 	}
       if (otp_pos != tv[i].otp_pos)
 	{
-	  printf ("validate3 loop %ld failed (pos %d != %d)?!\n",
+	  printf ("validate3 loop %lu failed (pos %d != %d)?!\n",
 		  i, otp_pos, tv[i].otp_pos);
 	  return 1;
 	}
       if (otp_counter != tv[i].otp_counter)
 	{
-	  printf ("validate3 loop %ld failed (counter %d != %d)?!\n",
+	  printf ("validate3 loop %lu failed (counter %lu != %lu)?!\n",
 		  i, otp_counter, tv[i].otp_counter);
 	  return 1;
 	}
@@ -172,20 +170,21 @@ main (void)
 
       if (rc != tv[i].expected_rc)
 	{
-	  printf ("validate3_callback loop %ld failed (rc %d != %d)?!\n",
+	  printf ("validate3_callback loop %lu failed (rc %d != %d)?!\n",
 		  i, rc, tv[i].expected_rc);
 	  return 1;
 	}
       if (otp_pos != tv[i].otp_pos)
 	{
-	  printf ("validate3_callback loop %ld failed (pos %d != %d)?!\n",
+	  printf ("validate3_callback loop %lu failed (pos %d != %d)?!\n",
 		  i, otp_pos, tv[i].otp_pos);
 	  return 1;
 	}
       if (otp_counter != tv[i].otp_counter)
 	{
-	  printf ("validate3_callback loop %ld failed (counter %d != %d)?!\n",
-		  i, otp_counter, tv[i].otp_counter);
+	  printf ("validate3_callback loop %lu failed"
+		  " (counter %lu != %lu)?!\n", i,
+		  otp_counter, tv[i].otp_counter);
 	  return 1;
 	}
     }

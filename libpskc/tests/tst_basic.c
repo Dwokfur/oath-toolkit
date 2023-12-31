@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void
+static void
 my_log (const char *msg)
 {
   if (msg == NULL)
@@ -41,7 +41,7 @@ int
 main (void)
 {
   pskc_rc rc;
-  int i;
+  unsigned i;
 
   /* Check version. */
 
@@ -126,14 +126,14 @@ main (void)
       str = pskc_pinusagemode2str (i);
       if (str == NULL)
 	{
-	  printf ("pskc_pinusagemode2str(%d) == NULL\n", i);
+	  printf ("pskc_pinusagemode2str(%u) == NULL\n", i);
 	  return 1;
 	}
 
       m = pskc_str2pinusagemode (str);
       if (m != i)
 	{
-	  printf ("pskc_str2pinusagemode(%s/%d) = %d\n", str, i, m);
+	  printf ("pskc_str2pinusagemode(%s/%u) = %u\n", str, i, m);
 	  return 1;
 	}
     }
@@ -146,14 +146,14 @@ main (void)
       str = pskc_valueformat2str (i);
       if (str == NULL)
 	{
-	  printf ("pskc_valueformat2str(%d) == NULL\n", i);
+	  printf ("pskc_valueformat2str(%u) == NULL\n", i);
 	  return 1;
 	}
 
       m = pskc_str2valueformat (str);
       if (m != i)
 	{
-	  printf ("pskc_str2valueformat(%s/%d) = %d\n", str, i, m);
+	  printf ("pskc_str2valueformat(%s/%u) = %u\n", str, i, m);
 	  return 1;
 	}
     }
@@ -166,14 +166,14 @@ main (void)
       str = pskc_keyusage2str (i);
       if (str == NULL)
 	{
-	  printf ("pskc_keyusage2str(%d) == NULL\n", i);
+	  printf ("pskc_keyusage2str(%u) == NULL\n", i);
 	  return 1;
 	}
 
       m = pskc_str2keyusage (str);
       if (m != i)
 	{
-	  printf ("pskc_str2keyusage(%d/%s) = %d\n", i, str, m);
+	  printf ("pskc_str2keyusage(%u/%s) = %u\n", i, str, m);
 	  return 1;
 	}
     }
@@ -188,7 +188,7 @@ main (void)
 
     if (pskc_str2keyusage ("foobar") != PSKC_KEYUSAGE_UNKNOWN)
       {
-	printf ("pskc_str2keyusage (\"foobar\") == %d\n",
+	printf ("pskc_str2keyusage (\"foobar\") == %u\n",
 		pskc_str2keyusage ("foobar"));
 	return 1;
       }

@@ -55,17 +55,17 @@ main (void)
       fprintf (stderr, "init error\n");
       return 1;
     }
-  printf ("Counter: %d\n", pskc_get_key_data_counter (key, NULL));
+  printf ("Counter: %lu\n", pskc_get_key_data_counter (key, NULL));
 
   pskc_set_key_data_counter (key, pskc_get_key_data_counter (key, NULL) + 1);
   pskc_output (container, PSKC_OUTPUT_XML, &buf, &s);
-  printf ("output: %.*s\n", s, buf);
+  printf ("output: %.*s\n", (int) s, buf);
   pskc_free (buf);
   pskc_build_xml (container, &buf, &s);
-  printf ("New XML: '%.*s'\n", s, buf);
+  printf ("New XML: '%.*s'\n", (int) s, buf);
   pskc_free (buf);
   pskc_build_xml (container, &buf, &s);
-  printf ("XML again: '%.*s'\n", s, buf);
+  printf ("XML again: '%.*s'\n", (int) s, buf);
   pskc_free (buf);
   pskc_done (container);
   pskc_global_done ();

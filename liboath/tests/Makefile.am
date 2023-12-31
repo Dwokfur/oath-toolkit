@@ -18,6 +18,8 @@
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = -no-install
 
+AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
+
 LDADD = ../liboath.la
 
 EXTRA_DIST = users.oath expect.oath

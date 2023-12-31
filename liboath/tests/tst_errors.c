@@ -46,7 +46,7 @@ main (void)
 	  return 1;
 	}
 
-      printf ("%d: %s: %s\n", i, name, err);
+      printf ("%d: %s: %s\n", i, name ? name : "NONAME", err ? err : "NOERR");
     }
 
   return 0;

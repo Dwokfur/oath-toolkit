@@ -165,14 +165,14 @@ main (void)
 
 	if (!expect[digits][moving_factor])
 	  {
-	    printf ("no test vector for digits %d counter %ld\n",
+	    printf ("no test vector for digits %u counter %ld\n",
 		    digits, (long) moving_factor);
 	    return 1;
 	  }
 
 	if (strcmp (otp, expect[digits][moving_factor]) != 0)
 	  {
-	    printf ("otp[%d][%ld] got %s expected %s\n",
+	    printf ("otp[%u][%ld] got %s expected %s\n",
 		    digits, (long) moving_factor, otp,
 		    expect[digits][moving_factor]);
 	    return 1;
@@ -195,7 +195,7 @@ main (void)
 			       otp);
       if (rc != OATH_INVALID_DIGITS)
 	{
-	  printf ("oath_hotp_generate %d digits %d\n", digits, rc);
+	  printf ("oath_hotp_generate %u digits %d\n", digits, rc);
 	  return 1;
 	}
     }
@@ -206,7 +206,7 @@ main (void)
 			       otp);
       if (rc != OATH_INVALID_DIGITS)
 	{
-	  printf ("oath_hotp_generate %d digits %d\n", digits, rc);
+	  printf ("oath_hotp_generate %u digits %d\n", digits, rc);
 	  return 1;
 	}
     }

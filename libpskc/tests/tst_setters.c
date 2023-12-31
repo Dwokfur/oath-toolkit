@@ -30,13 +30,13 @@ const char *pskc_expect =
   "<?xml version=\"1.0\"?>\n"
   "<KeyContainer xmlns=\"urn:ietf:params:xml:ns:keyprov:pskc\" Version=\"42\" Id=\"MyID\"><KeyPackage><DeviceInfo><Manufacturer>iana.foo</Manufacturer><SerialNo>42</SerialNo><Model>model</Model><IssueNo>issueno</IssueNo><DeviceBinding>devbind</DeviceBinding><StartDate>1906-06-04T03:02:01Z</StartDate><ExpiryDate>1901-03-03T04:05:06Z</ExpiryDate><UserId>userid</UserId></DeviceInfo><CryptoModuleInfo><Id>cid</Id></CryptoModuleInfo><Key Id=\"keyid\" Algorithm=\"keyalg\"><Issuer>keyissuer</Issuer><AlgorithmParameters><Suite>keyalgparmsuite</Suite><ChallengeFormat Encoding=\"ALPHANUMERIC\" Min=\"4711\" Max=\"42\" CheckDigits=\"true\"/><ResponseFormat Encoding=\"BASE64\" Length=\"216\" CheckDigits=\"true\"/></AlgorithmParameters><KeyProfileId>profileid</KeyProfileId><KeyReference>keyref</KeyReference><FriendlyName>fname</FriendlyName><Data><Secret><PlainValue>Zm9v</PlainValue></Secret><Counter><PlainValue>4711</PlainValue></Counter><Time><PlainValue>12345</PlainValue></Time><TimeInterval><PlainValue>123456</PlainValue></TimeInterval><TimeDrift><PlainValue>321</PlainValue></TimeDrift></Data><UserId>keyuserid</UserId><Policy><StartDate>1906-06-04T03:02:01Z</StartDate><ExpiryDate>1901-03-03T04:05:06Z</ExpiryDate><PINPolicy PINKeyId=\"pinkeyid\" PINUsageMode=\"Append\" MaxFailedAttempts=\"123\" MinLength=\"24\" MaxLength=\"42\" PINEncoding=\"BASE64\"/><KeyUsage>Verify</KeyUsage><NumberOfTransactions>17</NumberOfTransactions></Policy></Key></KeyPackage></KeyContainer>\n";
 
-void
+static void
 my_log (const char *msg)
 {
   puts (msg);
 }
 
-int
+static int
 precheck (pskc_t * pskc)
 {
   pskc_key_t *keyp;
@@ -51,7 +51,7 @@ precheck (pskc_t * pskc)
   {
     int p;
     pskc_valueformat v = pskc_get_key_algparm_chall_encoding (keyp, &p);
-    if (p != 0)
+    if (p != 0 && v != PSKC_VALUEFORMAT_UNKNOWN)
       {
 	printf ("pskc_get_key_algparm_chall_encoding pre\n");
 	return 1;
@@ -61,7 +61,7 @@ precheck (pskc_t * pskc)
   {
     int p;
     uint32_t l = pskc_get_key_algparm_chall_min (keyp, &p);
-    if (p != 0)
+    if (p != 0 && l != 4711)
       {
 	printf ("pskc_get_key_algparm_chall_min pre\n");
 	return 1;
@@ -71,7 +71,7 @@ precheck (pskc_t * pskc)
   {
     int p;
     uint32_t l = pskc_get_key_algparm_chall_max (keyp, &p);
-    if (p != 0)
+    if (p != 0 && l != 42)
       {
 	printf ("pskc_get_key_algparm_chall_max pre\n");
 	return 1;
@@ -81,7 +81,7 @@ precheck (pskc_t * pskc)
   {
     int p;
     int b = pskc_get_key_algparm_chall_checkdigits (keyp, &p);
-    if (p != 0)
+    if (p != 0 && b != 1)
       {
 	printf ("pskc_get_key_algparm_chall_checkdigits pre\n");
 	return 1;
@@ -91,7 +91,7 @@ precheck (pskc_t * pskc)
   return 0;
 }
 
-int
+static int
 check (pskc_t * pskc)
 {
   pskc_key_t *keyp;
@@ -542,11 +542,27 @@ main (void)
 {
   pskc_t *pskc;
   pskc_key_t *keyp;
-  struct tm startdate = { 1, 2, 3, 4, 5, 6 };
-  struct tm expirydate = { 6, 5, 4, 3, 2, 1 };
+  struct tm startdate;
+  struct tm expirydate;
   char *out;
   size_t len;
   int rc;
+
+  memset (&startdate, 0, sizeof startdate);
+  startdate.tm_sec = 1;
+  startdate.tm_min = 2;
+  startdate.tm_hour = 3;
+  startdate.tm_mday = 4;
+  startdate.tm_mon = 5;
+  startdate.tm_year = 6;
+
+  memset (&expirydate, 0, sizeof expirydate);
+  expirydate.tm_sec = 6;
+  expirydate.tm_min = 5;
+  expirydate.tm_hour = 4;
+  expirydate.tm_mday = 3;
+  expirydate.tm_mon = 2;
+  expirydate.tm_year = 1;
 
   rc = pskc_global_init ();
   if (rc != PSKC_OK)

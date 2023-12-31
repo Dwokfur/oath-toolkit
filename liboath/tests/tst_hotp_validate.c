@@ -143,9 +143,9 @@ main (void)
 
 	rc = oath_hotp_validate (secret, secretlen, 0, 20,
 				 expect[digits][moving_factor]);
-	if (rc != moving_factor)
+	if (rc != (int) moving_factor)
 	  {
-	    printf ("validate failed on digits %d moving factor %ld\n",
+	    printf ("validate failed on digits %u moving factor %ld\n",
 		    digits, (long) moving_factor);
 	    return 1;
 	  }
@@ -157,7 +157,7 @@ main (void)
 	    if (rc != OATH_INVALID_OTP)
 	      {
 		printf ("unexpected return code %d for "
-			"digits %d and iter %ld\n", rc, digits, i);
+			"digits %u and iter %lu\n", rc, digits, i);
 		return 1;
 	      }
 	  }
@@ -167,9 +167,9 @@ main (void)
 						  [moving_factor]), my_strcmp,
 					  (void *)
 					  expect[digits][moving_factor]);
-	if (rc != moving_factor)
+	if (rc != (int) moving_factor)
 	  {
-	    printf ("validate failed on digits %d moving factor %ld\n",
+	    printf ("validate failed on digits %u moving factor %ld\n",
 		    digits, (long) moving_factor);
 	    return 1;
 	  }
@@ -185,7 +185,7 @@ main (void)
 	    if (rc != OATH_INVALID_OTP)
 	      {
 		printf ("unexpected return code %d for "
-			"digits %d and iter %ld\n", rc, digits, i);
+			"digits %u and iter %lu\n", rc, digits, i);
 		return 1;
 	      }
 	  }

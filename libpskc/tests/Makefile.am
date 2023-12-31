@@ -18,6 +18,8 @@
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_builddir)/include
 AM_LDFLAGS = -no-install
 
+AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
+
 LDADD = ../libpskc.la
 
 EXTRA_DIST = libpskc.supp

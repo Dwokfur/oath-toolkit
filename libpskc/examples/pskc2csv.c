@@ -59,7 +59,7 @@ main (int argc, const char *argv[])
     }
 
   i = fread (buffer, 1, st.st_size, fh);
-  if (i != st.st_size)
+  if (i != (size_t) st.st_size)
     {
       fprintf (stderr, "short read\n");
       goto done;

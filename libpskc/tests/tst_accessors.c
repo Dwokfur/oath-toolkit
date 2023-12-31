@@ -245,7 +245,7 @@ const char *pskc_all =
   "        <Test/>"
   "      </Policy>" "    </Key>" "  </KeyPackage>" "</KeyContainerX>";
 
-void
+static void
 my_log (const char *msg)
 {
   puts (msg);

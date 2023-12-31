@@ -14,7 +14,7 @@
   }
 
 int
-main (int argc, const char *argv[])
+main (void)
 {
   size_t len;
   pskc_t *container;

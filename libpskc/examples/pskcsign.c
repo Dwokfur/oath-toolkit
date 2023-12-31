@@ -17,12 +17,24 @@ int
 main (int argc, const char *argv[])
 {
   char buffer[4096];
-  FILE *fh = fopen (argv[1], "r");
-  size_t len = fread (buffer, 1, sizeof (buffer), fh);
+  FILE *fh;
+  size_t len;
   pskc_t *container;
   char *out;
   int rc;
 
+  if (argc != 4)
+    {
+      printf ("Usage: %s <PSKCFILE> <X509KEY> <X509CERT>\n", argv[0]);
+      return 1;
+    }
+  fh = fopen (argv[1], "r");
+  if (!fh)
+    {
+      perror ("fopen");
+      return 1;
+    }
+  len = fread (buffer, 1, sizeof (buffer), fh);
   fclose (fh);
 
   rc = pskc_global_init ();

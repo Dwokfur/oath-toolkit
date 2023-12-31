@@ -30,9 +30,9 @@
 const struct {
   time_t secs;
   uint64_t T;
-  char *otp;
-  char *sha256otp;
-  char *sha512otp;
+  const char *otp;
+  const char *sha256otp;
+  const char *sha512otp;
 } tv[] = {
   /* From RFC 6238. */
   { 59, 0x0000000000000001, "94287082", "46119246", "90693936" },
@@ -86,12 +86,12 @@ main (void)
 	}
 
 #if DEBUG
-      printf ("otp[%ld]: %s\n", (unsigned long) tv[i].T, otp);
+      printf ("otp[%lu]: %s\n", (unsigned long) tv[i].T, otp);
 #endif
 
       if (strcmp (otp, tv[i].otp) != 0)
 	{
-	  printf ("otp[%ld] got %s expected %s\n", i, otp, tv[i].otp);
+	  printf ("otp[%lu] got %s expected %s\n", i, otp, tv[i].otp);
 	  if (strcmp (otp, "82762030") == 0
 	      && strcmp (tv[i].otp, "65353130") == 0)
 	    printf ("Mismatch due to 32-bit time_t...\n");
@@ -108,7 +108,7 @@ main (void)
 
       if (strcmp (otp, tv[i].otp) != 0)
 	{
-	  printf ("otp[%ld] got %s expected2 %s\n", i, otp, tv[i].otp);
+	  printf ("otp[%lu] got %s expected2 %s\n", i, otp, tv[i].otp);
 	  if (strcmp (otp, "82762030") == 0
 	      && strcmp (tv[i].otp, "65353130") == 0)
 	    printf ("Mismatch due to 32-bit time_t...\n");
@@ -125,12 +125,12 @@ main (void)
 	}
 
 #if DEBUG
-      printf ("otp[%ld]: %s\n", (unsigned long) tv[i].T, otp);
+      printf ("otp[%lu]: %s\n", (unsigned long) tv[i].T, otp);
 #endif
 
       if (strcmp (otp, tv[i].sha256otp) != 0)
 	{
-	  printf ("otp[%ld] got %s expected2 %s\n", i, otp, tv[i].sha256otp);
+	  printf ("otp[%lu] got %s expected2 %s\n", i, otp, tv[i].sha256otp);
 	  if (strcmp (otp, "11281421") == 0
 	      && strcmp (tv[i].sha256otp, "77737706") == 0)
 	    printf ("Mismatch due to 32-bit time_t...\n");
@@ -147,12 +147,12 @@ main (void)
 	}
 
 #if DEBUG
-      printf ("otp[%ld]: %s\n", (unsigned long) tv[i].T, otp);
+      printf ("otp[%lu]: %s\n", (unsigned long) tv[i].T, otp);
 #endif
 
       if (strcmp (otp, tv[i].sha512otp) != 0)
 	{
-	  printf ("otp[%ld] got %s expected2 %s\n", i, otp, tv[i].sha512otp);
+	  printf ("otp[%lu] got %s expected2 %s\n", i, otp, tv[i].sha512otp);
 	  if (strcmp (otp, "29833534") == 0
 	      && strcmp (tv[i].sha512otp, "47863826") == 0)
 	    printf ("Mismatch due to 32-bit time_t...\n");
