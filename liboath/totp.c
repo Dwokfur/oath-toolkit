@@ -22,8 +22,8 @@
 #include <config.h>
 
 #include "oath.h"
-#include "hotp.h"
-#include "aux.h"		/* _oath_strcmp_callback */
+#include "hotp.h"		/* _oath_hotp_generate2,
+				   _oath_strcmp_callback */
 
 /**
  * oath_totp_generate:

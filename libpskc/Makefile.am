@@ -19,7 +19,7 @@ AM_DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 SUBDIRS = gl schemas include . examples tests gtk-doc man
 
-ACLOCAL_AMFLAGS = -I m4 -I gl/m4
+ACLOCAL_AMFLAGS = -I m4 -I../m4 -I gl/m4
 
 AM_CPPFLAGS = -DPSKC_BUILDING
 AM_CPPFLAGS += -I$(srcdir)/gl -I$(builddir)/gl

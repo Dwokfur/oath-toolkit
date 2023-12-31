@@ -55,7 +55,8 @@ main (void)
       fprintf (stderr, "init error\n");
       return 1;
     }
-  printf ("Counter: %lu\n", pskc_get_key_data_counter (key, NULL));
+  printf ("Counter: %lu\n", (unsigned long)
+	  pskc_get_key_data_counter (key, NULL));
 
   pskc_set_key_data_counter (key, pskc_get_key_data_counter (key, NULL) + 1);
   pskc_output (container, PSKC_OUTPUT_XML, &buf, &s);

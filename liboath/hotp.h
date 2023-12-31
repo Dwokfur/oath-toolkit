@@ -30,4 +30,6 @@ _oath_hotp_generate2 (const char *secret,
 		      bool add_checksum,
 		      size_t truncation_offset, int flags, char *output_otp);
 
+extern int _oath_strcmp_callback (void *handle, const char *test_otp);
+
 #endif /* HOTP_H */

@@ -16,20 +16,7 @@
 CFGFLAGS = --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings	\
 	--enable-root-tests --enable-valgrind-tests
 
-ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
-.DEFAULT_GOAL := bootstrap
-endif
-
 INDENT_SOURCES = `find . -name '*.[ch]' | grep -v -e /gl/ -e build-aux -e /config.h -e _cmd.`
-
-autoreconf:
-	printf "gdoc_MANS =\ngdoc_TEXINFOS =\n" > liboath/man/Makefile.gdoc
-	printf "gdoc_MANS =\ngdoc_TEXINFOS =\n" > libpskc/man/Makefile.gdoc
-	touch ChangeLog
-	test -f configure || autoreconf --force --install
-
-bootstrap: autoreconf
-	test -f Makefile || ./configure $(CFGFLAGS)
 
 # syntax-check
 VC_LIST_ALWAYS_EXCLUDE_REGEX = ^GNUmakefile|maint.mk|build-aux/|gl/|m4/libxml2.m4|oathtool/doc/parse-datetime.texi|(liboath|libpskc)/man/gdoc|liboath/gtk-doc.make|libpskc/gtk-doc.make|libpskc/schemas/|(oathtool|liboath)/(build-aux|gl)/.*$$
@@ -56,6 +43,12 @@ exclude_file_name_regexp--sc_readme_link_copying = ^libpskc/README|pam_oath/READ
 exclude_file_name_regexp--sc_readme_link_install = $(exclude_file_name_regexp--sc_readme_link_copying)
 
 update-copyright-env = UPDATE_COPYRIGHT_HOLDER="Simon Josefsson" UPDATE_COPYRIGHT_USE_INTERVALS=2
+
+# maint.mk's public-submodule-commit breaks on shallow gnulib
+# https://lists.gnu.org/archive/html/bug-gnulib/2022-08/msg00040.html
+# so let's disable it - XXX FIXME let's revisit this later
+submodule-checks =
+gl_public_submodule_commit =
 
 glimport:
 	cd liboath && gtkdocize --copy

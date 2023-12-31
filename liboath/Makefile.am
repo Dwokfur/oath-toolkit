@@ -19,7 +19,7 @@ AM_DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 SUBDIRS = gl . tests gtk-doc man
 
-ACLOCAL_AMFLAGS = -I m4 -I gl/m4
+ACLOCAL_AMFLAGS = -I m4 -I ../m4 -I gl/m4
 
 AM_CPPFLAGS = -DLIBOATH_BUILDING
 AM_CPPFLAGS += -I$(srcdir)/gl -I$(builddir)/gl
@@ -32,8 +32,9 @@ lib_LTLIBRARIES = liboath.la
 oath_includedir=$(includedir)/liboath
 oath_include_HEADERS = oath.h
 
-liboath_la_SOURCES = oath.h global.c coding.c usersfile.c hotp.c hotp.h totp.c
-liboath_la_SOURCES += liboath.map aux.c aux.h errors.c
+liboath_la_SOURCES = oath.h hotp.h
+liboath_la_SOURCES += global.c coding.c usersfile.c hotp.c totp.c errors.c
+liboath_la_SOURCES += liboath.map
 liboath_la_LIBADD = gl/libgnu.la
 liboath_la_LDFLAGS = \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -no-undefined

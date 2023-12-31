@@ -517,6 +517,13 @@ oath_authenticate_usersfile (const char *usersfile,
 			     size_t window,
 			     const char *passwd, time_t * last_otp)
 {
+  (void) usersfile;
+  (void) username;
+  (void) otp;
+  (void) window;
+  (void) passwd;
+  (void) last_otp;
+
   /* The main reason we don't support this on Windows yet is file
    * locking. So return that as the error. */
   return OATH_FILE_LOCK_ERROR;

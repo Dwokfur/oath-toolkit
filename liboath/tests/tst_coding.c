@@ -47,7 +47,8 @@ main (void)
     }
   if (secretlen != 20)
     {
-      printf ("oath_hex2bin too small: 20 != %lu\n", secretlen);
+      printf ("oath_hex2bin too small: 20 != %lu\n",
+	      (long unsigned) secretlen);
       return 1;
     }
 
@@ -88,7 +89,7 @@ main (void)
     }
   if (secretlen != 20)
     {
-      printf ("oath_hex2bin: 20 != %lu\n", secretlen);
+      printf ("oath_hex2bin: 20 != %lu\n", (long unsigned) secretlen);
       return 1;
     }
   if (memcmp (secret, "\xAB\xCD\xEF\x34\x35\x36\x37\x38\x39\x30"
@@ -238,7 +239,8 @@ main (void)
     }
   if (len != strlen ("foo"))
     {
-      printf ("oath_base32_decode length mismatch: %lu\n", len);
+      printf ("oath_base32_decode length mismatch: %lu\n",
+	      (long unsigned) len);
       return 1;
     }
 
@@ -250,7 +252,8 @@ main (void)
     }
   if (len != strlen ("foo"))
     {
-      printf ("oath_base32_decode length mismatch: %lu\n", len);
+      printf ("oath_base32_decode length mismatch: %lu\n",
+	      (long unsigned) len);
       return 1;
     }
 
@@ -275,7 +278,8 @@ main (void)
     }
   if (len != 3 || memcmp (tmp, "foo", len) != 0)
     {
-      printf ("oath_base32_decode failure: %lu/%s\n", len, tmp);
+      printf ("oath_base32_decode failure: %lu/%s\n",
+	      (long unsigned) len, tmp);
       return 1;
     }
   free (tmp);
@@ -289,7 +293,8 @@ main (void)
     }
   if (len != 6 || memcmp (tmp, "foobar", len) != 0)
     {
-      printf ("oath_base32_decode failure: %lu/%s\n", len, tmp);
+      printf ("oath_base32_decode failure: %lu/%s\n",
+	      (long unsigned) len, tmp);
       return 1;
     }
   free (tmp);
@@ -302,7 +307,8 @@ main (void)
     }
   if (len != 3 || memcmp (tmp, "foo", len) != 0)
     {
-      printf ("oath_base32_decode failure: %lu/%s\n", len, tmp);
+      printf ("oath_base32_decode failure: %lu/%s\n",
+	      (long unsigned) len, tmp);
       return 1;
     }
   free (tmp);
@@ -315,7 +321,8 @@ main (void)
     }
   if (len != 3 || memcmp (tmp, "foo", len) != 0)
     {
-      printf ("oath_base32_decode failure: %lu/%s\n", len, tmp);
+      printf ("oath_base32_decode failure: %lu/%s\n",
+	      (long unsigned) len, tmp);
       return 1;
     }
   free (tmp);
@@ -329,7 +336,7 @@ main (void)
     }
   if (len != 16)
     {
-      printf ("oath_base32_decode failure: %lu\n", len);
+      printf ("oath_base32_decode failure: %lu\n", (unsigned long) len);
       return 1;
     }
   free (tmp);

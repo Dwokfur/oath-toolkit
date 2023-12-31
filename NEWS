@@ -3,6 +3,12 @@ Copyright (C) 2009-2023 Simon Josefsson.  Licensed under the GPLv3+.
 
 * Version 2.6.10 (unreleased)
 
+** Building from git uses a ./bootstrap script instead of 'make bootstrap'.
+
+** Build fixes for Windows.
+In particular, don't use filenames "aux.h" and "aux.c" which interact
+badly with the AUX special filename.
+
 ** Build fixes for Arch Linux.
 
 ** Various build fixes including updated gnulib files.

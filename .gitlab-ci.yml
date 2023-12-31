@@ -32,7 +32,7 @@ stages:
  - test
  - deploy
 
-gcc:
+B-gcc:
   image: gcc:latest
   stage: build
   before_script:
@@ -40,14 +40,14 @@ gcc:
   - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt
   script:
   - gcc --version
-  - make autoreconf
+  - ./bootstrap
   - ./configure CC="gcc -std=gnu2x" --enable-gcc-warnings WARN_CFLAGS=-Werror
   - make V=1
   - make V=1 check VERBOSE=t
   - git status
   - git diff --exit-code
 
-clang:
+B-clang:
   image: silkeh/clang:latest
   stage: build
   before_script:
@@ -55,31 +55,33 @@ clang:
   - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt
   script:
   - clang --version
-  - make autoreconf
+  - ./bootstrap
   - ./configure CC="clang -std=gnu2x" --enable-gcc-warnings WARN_CFLAGS=-Werror
   - make V=1
   - make V=1 check VERBOSE=t
   - git status
   - git diff --exit-code
 
-Trisquel11:
+B-Trisquel11:
   image: registry.gitlab.com/oath-toolkit/build-images:Trisquel11
   stage: build
   script:
   - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
-  - make bootstrap
+  - ./bootstrap
+  - ./configure --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
   - make syntax-check
   - make V=1
+  - make V=1 check
   - make dist
   - sha224sum oath-toolkit-*.tar.gz
   - cd website && ./build-website.sh
 
-Debian12-coverage:
+B-Debian12-coverage:
   image: registry.gitlab.com/oath-toolkit/build-images:Debian12-coverage
   stage: build
   script:
   - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
-  - make autoreconf
+  - ./bootstrap
   - ./configure --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests CFLAGS="-g --coverage"
   - lcov --directory . --zerocounters
   - make check V=1 VERBOSE=t
@@ -90,18 +92,67 @@ Debian12-coverage:
   - lcov --remove coverage/oath-toolkit.info '/usr/include/*' '*/liboath/gl/*' '*/liboath/tests/*' '*/libpskc/gl/*' '*/libpskc/tests/*' '*/oathtool/gl/*' '*/pam_oath/tests/*' '*/pskctool/gl/*' -o coverage/oath-toolkit_filtered.info
   - genhtml --output-directory coverage coverage/oath-toolkit_filtered.info --highlight --frames --legend --title "OATH Toolkit"
 
-Fedora39-clanganalyzer:
+B-Fedora39-clanganalyzer:
   image: registry.gitlab.com/oath-toolkit/build-images:Fedora39-clanganalyzer
   stage: build
   script:
-  - make autoreconf
+  - ./bootstrap
   - scan-build ./configure --with-xmlsec-crypto-engine=openssl
   - scan-build -o clang-analyzer make V=1
+
+# https://docs.gitlab.com/ee/ci/runners/saas/macos/environment.html
+B-macOS14Xcode15:
+  image: macos-14-xcode-15
+  tags: [ saas-macos-medium-m1 ]
+  stage: build
+  variables:
+    HOMEBREW_NO_AUTO_UPDATE: 1
+    HOMEBREW_NO_INSTALL_UPGRADE: 1
+    HOMEBREW_NO_INSTALL_CLEANUP: 1
+    HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+  before_script:
+  - brew install autoconf automake libtool gengetopt bison gtk-doc help2man libxmlsec1
+  script:
+  - PATH="/opt/homebrew/opt/bison/bin:$PATH" # brew bison is keg-only
+  - ./bootstrap
+  - ./configure --enable-gcc-warnings
+  - make syntax-check
+  - make V=1
+  - make V=1 -k check VERBOSE=t
+  - git status
+  - git diff --exit-code
+
+# https://docs.gitlab.com/ee/ci/runners/saas/windows_saas_runner.html
+B-Windows-UCRT64:
+  tags: [ shared-windows, windows-1809 ]
+  stage: build
+  script: # https://www.msys2.org/docs/ci/#other-systems
+  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - ./msys2.exe -y -oC:\
+  - Remove-Item msys2.exe
+  - $env:CHERE_INVOKING = 'yes'
+  - $env:MSYSTEM = 'UCRT64' # https://www.msys2.org/docs/environments/
+  - C:\msys64\usr\bin\bash -lc ' '
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - |
+    C:\msys64\usr\bin\bash -lc '
+    pacman --noconfirm -Syu git autoconf automake libtool make mingw-w64-ucrt-x86_64-gcc bison gtk-doc gengetopt help2man
+    # https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
+    file configure.ac
+    git config --global core.autocrlf false
+    git config --global core.eol lf
+    git rm -rf --cached . | tail
+    git reset --hard HEAD
+    file configure.ac
+    ./bootstrap
+    ./configure --enable-gcc-warnings
+    make V=1 -k check VERBOSE=t'
 
 Debian12:
   image: debian:12-slim
   stage: test
-  needs: [Trisquel11]
+  needs: [B-Trisquel11]
   before_script:
   - apt-get update -qq
   - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
@@ -116,7 +167,7 @@ Debian12:
 Debian12:
   image: debian:12-slim
   stage: test
-  needs: [Trisquel11]
+  needs: [B-Trisquel11]
   before_script:
   - apt-get update -qq
   - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
@@ -131,7 +182,7 @@ Debian12:
 Ubuntu-xmlsec:
   image: ubuntu:20.04
   stage: test
-  needs: [Trisquel11]
+  needs: [B-Trisquel11]
   variables:
     DEBIAN_FRONTEND: noninteractive
   before_script:
@@ -148,7 +199,7 @@ Ubuntu-xmlsec:
 AlmaLinux8:
   image: almalinux:8
   stage: test
-  needs: [Trisquel11]
+  needs: [B-Trisquel11]
   before_script:
   - yum -y install make gcc diffutils file pam-devel
   script:
@@ -160,7 +211,7 @@ AlmaLinux8:
 AlmaLinux8-xmlsec:
   image: almalinux:8
   stage: test
-  needs: [Trisquel11]
+  needs: [B-Trisquel11]
   before_script:
   - yum -y install make gcc diffutils file pam-devel
   - yum -y install libxml2-devel libtool-ltdl-devel
@@ -175,7 +226,7 @@ AlmaLinux8-xmlsec:
 Alpine:
   image: alpine:latest
   stage: test
-  needs: [Trisquel11]
+  needs: [B-Trisquel11]
   before_script:
   - apk update
   - apk add build-base datefudge
@@ -188,7 +239,7 @@ Alpine:
 ArchLinux:
   image: archlinux:latest
   stage: test
-  needs: [Trisquel11]
+  needs: [B-Trisquel11]
   before_script:
   - pacman -Suy --noconfirm make gcc diffutils file
   script:
@@ -202,7 +253,7 @@ ArchLinux:
 ArchLinux-xmlsec:
   image: archlinux:latest
   stage: test
-  needs: [Trisquel11]
+  needs: [B-Trisquel11]
   before_script:
   - pacman -Suy --noconfirm make gcc diffutils file xmlsec pkg-config
   script:
@@ -216,7 +267,7 @@ ArchLinux-xmlsec:
 Gentoo:
   image: registry.gitlab.com/oath-toolkit/build-images:Gentoo
   stage: test
-  needs: [Trisquel11]
+  needs: [B-Trisquel11]
   script:
   - tar xfz oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
@@ -225,10 +276,31 @@ Gentoo:
   - ../configure --enable-gcc-warnings
   - make check V=1 VERBOSE=t
 
+macOS13Xcode14:
+  image: macos-13-xcode-14
+  tags: [ saas-macos-medium-m1 ]
+  stage: test
+  needs: [B-Trisquel11]
+  variables:
+    HOMEBREW_NO_AUTO_UPDATE: 1
+    HOMEBREW_NO_INSTALL_UPGRADE: 1
+    HOMEBREW_NO_INSTALL_CLEANUP: 1
+    HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+  before_script:
+  - brew install libxmlsec1
+  script:
+  - gzip -cd oath-toolkit-*.tar.gz | tar xf -
+  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - mkdir b
+  - cd b
+  - ../configure --enable-gcc-warnings
+  - make syntax-check
+  - make V=1 check VERBOSE=t
+
 Mingw32:
   image: debian:11-slim
   stage: test
-  needs: [Trisquel11]
+  needs: [B-Trisquel11]
   before_script:
   - dpkg --add-architecture i386
   - apt-get update -qq
@@ -245,7 +317,7 @@ Mingw32:
 Mingw64:
   image: debian:11-slim
   stage: test
-  needs: [Trisquel11]
+  needs: [B-Trisquel11]
   before_script:
   - apt-get update -qq
   - apt-get install -y -qq make mingw-w64 wine wine64 binfmt-support wine-binfmt
@@ -258,9 +330,30 @@ Mingw64:
   - make -C liboath/tests check VERBOSE=t
   - make -C oathtool/tests check VERBOSE=T
 
+Windows-MINGW64:
+  tags: [ shared-windows, windows-1809 ]
+  stage: test
+  needs: [B-Trisquel11]
+  script: # https://www.msys2.org/docs/ci/#other-systems
+  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - ./msys2.exe -y -oC:\
+  - Remove-Item msys2.exe
+  - $env:CHERE_INVOKING = 'yes'
+  - $env:MSYSTEM = 'MINGW64' # https://www.msys2.org/docs/environments/
+  - C:\msys64\usr\bin\bash -lc ' '
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - |
+    C:\msys64\usr\bin\bash -lcx '
+    pacman --noconfirm -Syu  make mingw-w64-x86_64-gcc
+    tar xfa oath-toolkit-*.tar.gz
+    cd `ls -d oath-toolkit-* | grep -v tar.gz`
+    ./configure --enable-gcc-warnings
+    make V=1 -k check VERBOSE=t'
+
 .pages:
   stage: deploy
-  needs: ["Trisquel11", "Debian12-coverage", "Fedora39-clanganalyzer"]
+  needs: ["B-Trisquel11", "B-Debian12-coverage", "B-Fedora39-clanganalyzer"]
   script:
   - mkdir public
   - mv coverage/ public/

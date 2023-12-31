@@ -22,10 +22,11 @@
 #include <config.h>
 
 #include "oath.h"
-#include "hotp.h"
-#include "aux.h"		/* _oath_strcmp_callback */
+#include "hotp.h"		/* _oath_hotp_generate2,
+				   _oath_strcmp_callback */
 
-#include <stdio.h>		/* For snprintf. */
+#include <stdio.h>		/* snprintf */
+#include <string.h>		/* strcmp */
 
 #include "gc.h"
 
@@ -255,4 +256,11 @@ oath_hotp_validate (const char *secret,
 				      start_moving_factor,
 				      window, strlen (otp),
 				      _oath_strcmp_callback, (void *) otp);
+}
+
+int
+_oath_strcmp_callback (void *handle, const char *test_otp)
+{
+  char *otp = handle;
+  return strcmp (otp, test_otp) == 0 ? 0 : 1;
 }
