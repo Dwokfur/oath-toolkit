@@ -123,6 +123,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module malloc-posix:
   # Code from module malloca:
   # Code from module manywarnings:
+  # Code from module mbszero:
   # Code from module memchr:
   # Code from module mempcpy:
   # Code from module memxor:
@@ -320,7 +321,7 @@ AC_DEFUN([gl_INIT],
   gl_CONDITIONAL([GL_COND_OBJ_FSTAT], [test $REPLACE_FSTAT = 1])
   AM_COND_IF([GL_COND_OBJ_FSTAT], [
     case "$host_os" in
-      mingw*)
+      mingw* | windows*)
         AC_LIBOBJ([stat-w32])
         ;;
     esac
@@ -395,6 +396,10 @@ AC_DEFUN([gl_INIT],
   fi
   gl_STDLIB_MODULE_INDICATOR([malloc-posix])
   gl_MALLOCA
+  AC_REQUIRE([AC_TYPE_MBSTATE_T])
+  gl_MBSTATE_T_BROKEN
+  gl_MUSL_LIBC
+  gl_WCHAR_MODULE_INDICATOR([mbszero])
   gl_FUNC_MEMCHR
   gl_CONDITIONAL([GL_COND_OBJ_MEMCHR], [test $REPLACE_MEMCHR = 1])
   AM_COND_IF([GL_COND_OBJ_MEMCHR], [
@@ -472,7 +477,7 @@ AC_DEFUN([gl_INIT],
   gl_CONDITIONAL([GL_COND_OBJ_STAT], [test $REPLACE_STAT = 1])
   AM_COND_IF([GL_COND_OBJ_STAT], [
     case "$host_os" in
-      mingw*)
+      mingw* | windows*)
         AC_LIBOBJ([stat-w32])
         ;;
     esac
@@ -860,6 +865,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/malloc/scratch_buffer_set_array_size.c
   lib/malloca.c
   lib/malloca.h
+  lib/mbszero.c
   lib/memchr.c
   lib/memchr.valgrind
   lib/mempcpy.c
@@ -883,6 +889,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/reallocarray.c
   lib/rename.c
   lib/rmdir.c
+  lib/same-inode.c
   lib/same-inode.h
   lib/scratch_buffer.h
   lib/sha1-stream.c
@@ -999,6 +1006,8 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/libgcrypt.m4
   m4/limits-h.m4
   m4/locale-fr.m4
+  m4/locale-ja.m4
+  m4/locale-zh.m4
   m4/lseek.m4
   m4/lstat.m4
   m4/malloc.m4
@@ -1006,6 +1015,8 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/manywarnings-c++.m4
   m4/manywarnings.m4
   m4/math_h.m4
+  m4/mbrtowc.m4
+  m4/mbstate_t.m4
   m4/memchr.m4
   m4/mempcpy.m4
   m4/memxor.m4

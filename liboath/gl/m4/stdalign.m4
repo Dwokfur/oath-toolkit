@@ -68,8 +68,10 @@ AC_DEFUN([gl_ALIGNASOF],
   dnl The "zz" puts this toward config.h's end, to avoid potential
   dnl collisions with other definitions.
   AH_VERBATIM([zzalignas],
-[#if !defined HAVE_C_ALIGNASOF && __cplusplus < 201103 && !defined alignof
-# if HAVE_STDALIGN_H
+[#if !defined HAVE_C_ALIGNASOF \
+    && !(defined __cplusplus && 201103 <= __cplusplus) \
+    && !defined alignof
+# if defined HAVE_STDALIGN_H
 #  include <stdalign.h>
 # endif
 
@@ -110,7 +112,11 @@ AC_DEFUN([gl_ALIGNASOF],
 #     define _Alignof(type) alignof (type)
 #    else
       template <class __t> struct __alignof_helper { char __a; __t __b; };
-#     define _Alignof(type) offsetof (__alignof_helper<type>, __b)
+#     if (defined __GNUC__ && 4 <= __GNUC__) || defined __clang__
+#      define _Alignof(type) __builtin_offsetof (__alignof_helper<type>, __b)
+#     else
+#      define _Alignof(type) offsetof (__alignof_helper<type>, __b)
+#     endif
 #     define _GL_STDALIGN_NEEDS_STDDEF 1
 #    endif
 #   else
@@ -166,7 +172,7 @@ AC_DEFUN([gl_ALIGNASOF],
 #   define _Alignas(a) __declspec (align (a))
 #  endif
 # endif
-# if !HAVE_STDALIGN_H
+# if !defined HAVE_STDALIGN_H
 #  if ((defined _Alignas \
         && !(defined __cplusplus \
              && (201103 <= __cplusplus || defined _MSC_VER))) \
@@ -175,7 +181,7 @@ AC_DEFUN([gl_ALIGNASOF],
 #  endif
 # endif
 
-# if _GL_STDALIGN_NEEDS_STDDEF
+# if defined _GL_STDALIGN_NEEDS_STDDEF
 #  include <stddef.h>
 # endif
 #endif])

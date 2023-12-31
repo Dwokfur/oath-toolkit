@@ -87,6 +87,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module libc-config:
   # Code from module limits-h:
   # Code from module malloca:
+  # Code from module mbszero:
   # Code from module memchr:
   # Code from module mktime:
   # Code from module mktime-internal:
@@ -220,7 +221,7 @@ AC_DEFUN([gl_INIT],
   gl_CONDITIONAL([GL_COND_OBJ_FSTAT], [test $REPLACE_FSTAT = 1])
   AM_COND_IF([GL_COND_OBJ_FSTAT], [
     case "$host_os" in
-      mingw*)
+      mingw* | windows*)
         AC_LIBOBJ([stat-w32])
         ;;
     esac
@@ -274,6 +275,10 @@ AC_DEFUN([gl_INIT],
   gl_CONDITIONAL_HEADER([limits.h])
   AC_PROG_MKDIR_P
   gl_MALLOCA
+  AC_REQUIRE([AC_TYPE_MBSTATE_T])
+  gl_MBSTATE_T_BROKEN
+  gl_MUSL_LIBC
+  gl_WCHAR_MODULE_INDICATOR([mbszero])
   gl_FUNC_MEMCHR
   gl_CONDITIONAL([GL_COND_OBJ_MEMCHR], [test $REPLACE_MEMCHR = 1])
   AM_COND_IF([GL_COND_OBJ_MEMCHR], [
@@ -320,7 +325,7 @@ AC_DEFUN([gl_INIT],
   gl_CONDITIONAL([GL_COND_OBJ_STAT], [test $REPLACE_STAT = 1])
   AM_COND_IF([GL_COND_OBJ_STAT], [
     case "$host_os" in
-      mingw*)
+      mingw* | windows*)
         AC_LIBOBJ([stat-w32])
         ;;
     esac
@@ -668,6 +673,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/limits.in.h
   lib/malloca.c
   lib/malloca.h
+  lib/mbszero.c
   lib/memchr.c
   lib/memchr.valgrind
   lib/mktime-internal.h
@@ -775,8 +781,12 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/largefile.m4
   m4/limits-h.m4
   m4/locale-fr.m4
+  m4/locale-ja.m4
+  m4/locale-zh.m4
   m4/malloca.m4
   m4/math_h.m4
+  m4/mbrtowc.m4
+  m4/mbstate_t.m4
   m4/memchr.m4
   m4/mktime.m4
   m4/mmap-anon.m4

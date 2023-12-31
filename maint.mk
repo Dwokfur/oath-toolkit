@@ -998,12 +998,12 @@ sc_prohibit_empty_lines_at_EOF:
 	       exit 1; }						\
 	  || :
 
-# Make sure we don't use st_blocks.  Use ST_NBLOCKS instead.
+# Make sure we don't use st_blocks.  Use ST_NBLOCKS or STP_NBLOCKS instead.
 # This is a bit of a kludge, since it prevents use of the string
 # even in comments, but for now it does the job with no false positives.
 sc_prohibit_stat_st_blocks:
 	@prohibit='[.>]st_blocks'					\
-	halt='do not use st_blocks; use ST_NBLOCKS'			\
+	halt='do not use st_blocks; use ST_NBLOCKS or STP_NBLOCKS'	\
 	  $(_sc_search_regexp)
 
 # Make sure we don't define any S_IS* macros in src/*.c files.
@@ -1375,13 +1375,13 @@ sc_unportable_grep_q:
 
 sc_readme_link_install:
 	@require='INSTALL'					\
-	in_vc_files='$(top_srcdir)/README$$'                    \
+	in_vc_files='^README$$'					\
 	halt='The README file should refer to INSTALL'          \
 	  $(_sc_search_regexp)
 
 sc_readme_link_copying:
 	@require='COPYING'					\
-	in_vc_files='$(top_srcdir)/README$$'                    \
+	in_vc_files='^README$$'					\
 	halt='The README file should refer to COPYING[.LESSER]' \
 	  $(_sc_search_regexp)
 

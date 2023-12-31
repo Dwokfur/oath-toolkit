@@ -34,7 +34,6 @@
 #  --doc-base=doc \
 #  --tests-base=gl/tests \
 #  --aux-dir=build-aux \
-#  --with-tests \
 #  --no-conditional-dependencies \
 #  --no-libtool \
 #  --macro-prefix=gl \
@@ -60,7 +59,6 @@ gl_M4_BASE([gl/m4])
 gl_PO_BASE([])
 gl_DOC_BASE([doc])
 gl_TESTS_BASE([gl/tests])
-gl_WITH_TESTS
 gl_LIB([libgnu])
 gl_MAKEFILE_NAME([])
 gl_MACRO_PREFIX([gl])

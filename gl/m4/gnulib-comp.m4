@@ -47,13 +47,9 @@ AC_DEFUN([gl_EARLY],
   # Code from module gitlog-to-changelog:
   # Code from module gnumakefile:
   # Code from module maintainer-makefile:
-  # Code from module test-framework-sh:
-  # Code from module test-framework-sh-tests:
   # Code from module update-copyright:
-  # Code from module update-copyright-tests:
   # Code from module useless-if-before-free:
   # Code from module vc-list-files:
-  # Code from module vc-list-files-tests:
 ])
 
 # This macro should be invoked from ./configure.ac, in the section
@@ -144,8 +140,6 @@ changequote([, ])dnl
   m4_pushdef([GL_MACRO_PREFIX], [gltests])
   m4_pushdef([GL_MODULE_INDICATOR_PREFIX], [GL])
   gl_COMMON
-  AC_REQUIRE([gl_CC_ALLOW_WARNINGS])
-  AC_REQUIRE([gl_CXX_ALLOW_WARNINGS])
   gl_source_base='gl/tests'
   gl_source_base_prefix=
 changequote(,)dnl
@@ -154,10 +148,6 @@ changequote([, ])dnl
   AC_SUBST([gltests_WITNESS])
   gl_module_indicator_condition=$gltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
-  abs_aux_dir=`cd "$ac_aux_dir"; pwd`
-  AC_SUBST([abs_aux_dir])
-  abs_aux_dir=`cd "$ac_aux_dir"; pwd`
-  AC_SUBST([abs_aux_dir])
   m4_popdef([gl_MODULE_INDICATOR_CONDITION])
   m4_ifval(gltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gltests_LIBSOURCES_DIR])[ ||
@@ -277,11 +267,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/autobuild.m4
   m4/gnulib-common.m4
   m4/zzgnulib.m4
-  tests/init.sh
-  tests/test-init.sh
-  tests/test-update-copyright.sh
-  tests/test-vc-list-files-cvs.sh
-  tests/test-vc-list-files-git.sh
   top/GNUmakefile
   top/maint.mk
 ])

@@ -5,6 +5,9 @@ Copyright (C) 2009-2023 Simon Josefsson.  Licensed under the GPLv3+.
 
 ** Build fixes for Arch Linux.
 
+** Updated gnulib files.
+One remaining gnulib self-test disabled.
+
 * Version 2.6.9 (released 2023-07-09)
 
 ** Improve compatibility with recent libxmlsec.
