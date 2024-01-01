@@ -36,6 +36,7 @@ B-gcc:
   image: gcc:latest
   stage: build
   before_script:
+  - gcc --version
   - apt-get update -qq
   - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt
   script:
@@ -51,6 +52,7 @@ B-clang:
   image: silkeh/clang:latest
   stage: build
   before_script:
+  - clang --version
   - apt-get update -qq
   - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt
   script:
