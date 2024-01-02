@@ -1,4 +1,4 @@
-Copyright (C) 2009-2023 Simon Josefsson.  Licensed under the GPLv3+.
+Copyright (C) 2009-2024 Simon Josefsson.  Licensed under the GPLv3+.
 
 .Download, build and self-check version controlled sources:
 ----

@@ -1,6 +1,6 @@
 /*
  * tst_errors.c - self-tests for liboath strerror functions
- * Copyright (C) 2011-2023 Simon Josefsson
+ * Copyright (C) 2011-2024 Simon Josefsson
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
