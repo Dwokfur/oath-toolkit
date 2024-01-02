@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2023 Free Software Foundation, Inc.
+# Copyright (C) 2002-2024 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -570,7 +570,8 @@ AC_DEFUN([gl_INIT],
   ])
   gl_STRING_MODULE_INDICATOR([strtok_r])
   gl_FUNC_STRVERSCMP
-  gl_CONDITIONAL([GL_COND_OBJ_STRVERSCMP], [test $HAVE_STRVERSCMP = 0])
+  gl_CONDITIONAL([GL_COND_OBJ_STRVERSCMP],
+                 [test $HAVE_STRVERSCMP = 0 || test $REPLACE_STRVERSCMP = 1])
   AM_COND_IF([GL_COND_OBJ_STRVERSCMP], [
     gl_PREREQ_STRVERSCMP
   ])
