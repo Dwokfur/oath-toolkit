@@ -57,6 +57,12 @@ main (void)
       return 1;
     }
 
+  if (oath_check_version ("UNKNOWN"))
+    {
+      printf ("oath_check_version (UNKNOWN) didn't fail?!\n");
+      return 1;
+    }
+
   if (OATH_VERSION_NUMBER < 0x02060300 || OATH_VERSION_NUMBER >= 0x03000000)
     {
       printf ("OATH_VERSION_NUMBER out of range?!\n");

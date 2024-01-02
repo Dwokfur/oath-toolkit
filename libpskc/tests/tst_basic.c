@@ -70,6 +70,12 @@ main (void)
       return 1;
     }
 
+  if (pskc_check_version ("UNKNOWN"))
+    {
+      printf ("pskc_check_version (UNKNOWN) didn't fail?!\n");
+      return 1;
+    }
+
   if (PSKC_VERSION_NUMBER < 0x02060300 || PSKC_VERSION_NUMBER >= 0x03000000)
     {
       printf ("PSKC_VERSION_NUMBER out of range?!\n");

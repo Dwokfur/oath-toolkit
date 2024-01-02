@@ -73,7 +73,7 @@ B-Trisquel11:
   - ./configure --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
   - make syntax-check
   - make V=1
-  - make V=1 check
+  - make V=1 check VERBOSE=t
   - make dist
   - sha224sum oath-toolkit-*.tar.gz
   - cd website && ./build-website.sh
