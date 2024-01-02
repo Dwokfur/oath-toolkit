@@ -355,7 +355,7 @@ oath_totp_validate3 (const char *secret,
 		     unsigned time_step_size,
 		     time_t start_offset,
 		     size_t window,
-		     int *otp_pos, uint64_t * otp_counter, const char *otp)
+		     int *otp_pos, uint64_t *otp_counter, const char *otp)
 {
   return oath_totp_validate4_callback (secret, secret_length, now,
 				       time_step_size, start_offset,
@@ -417,7 +417,7 @@ oath_totp_validate3_callback (const char *secret,
 			      unsigned digits,
 			      size_t window,
 			      int *otp_pos,
-			      uint64_t * otp_counter,
+			      uint64_t *otp_counter,
 			      oath_validate_strcmp_function strcmp_otp,
 			      void *strcmp_handle)
 {
@@ -464,7 +464,7 @@ oath_totp_validate4 (const char *secret,
 		     time_t start_offset,
 		     size_t window,
 		     int *otp_pos,
-		     uint64_t * otp_counter, int flags, const char *otp)
+		     uint64_t *otp_counter, int flags, const char *otp)
 {
   return oath_totp_validate4_callback (secret, secret_length, now,
 				       time_step_size, start_offset,
@@ -530,7 +530,7 @@ oath_totp_validate4_callback (const char *secret,
 			      unsigned digits,
 			      size_t window,
 			      int *otp_pos,
-			      uint64_t * otp_counter,
+			      uint64_t *otp_counter,
 			      int flags,
 			      oath_validate_strcmp_function strcmp_otp,
 			      void *strcmp_handle)

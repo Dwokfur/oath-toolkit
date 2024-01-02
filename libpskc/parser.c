@@ -32,7 +32,7 @@
 #include "base64.h"
 
 static void
-parse_deviceinfo (xmlNode * x, struct pskc_key *kp, int *rc)
+parse_deviceinfo (xmlNode *x, struct pskc_key *kp, int *rc)
 {
   xmlNode *cur_node = NULL;
 
@@ -101,7 +101,7 @@ parse_deviceinfo (xmlNode * x, struct pskc_key *kp, int *rc)
 }
 
 static void
-parse_cryptomoduleinfo (xmlNode * x, struct pskc_key *kp, int *rc)
+parse_cryptomoduleinfo (xmlNode *x, struct pskc_key *kp, int *rc)
 {
   xmlNode *cur_node = NULL;
 
@@ -125,7 +125,7 @@ parse_cryptomoduleinfo (xmlNode * x, struct pskc_key *kp, int *rc)
 }
 
 static void
-parse_intlongstrdatatype (xmlNode * x, const char **var, int *rc)
+parse_intlongstrdatatype (xmlNode *x, const char **var, int *rc)
 {
   xmlNode *cur_node = NULL;
 
@@ -172,7 +172,7 @@ remove_whitespace (const char *str, size_t *outlen)
 }
 
 static void
-parse_data (xmlNode * x, struct pskc_key *kp, int *rc)
+parse_data (xmlNode *x, struct pskc_key *kp, int *rc)
 {
   xmlNode *cur_node = NULL;
 
@@ -256,7 +256,7 @@ parse_data (xmlNode * x, struct pskc_key *kp, int *rc)
 }
 
 static void
-parse_algorithmparameters (xmlNode * x, struct pskc_key *kp, int *rc)
+parse_algorithmparameters (xmlNode *x, struct pskc_key *kp, int *rc)
 {
   xmlNode *cur_node = NULL;
 
@@ -372,7 +372,7 @@ parse_algorithmparameters (xmlNode * x, struct pskc_key *kp, int *rc)
 }
 
 static void
-parse_policy (xmlNode * x, struct pskc_key *kp, int *rc)
+parse_policy (xmlNode *x, struct pskc_key *kp, int *rc)
 {
   xmlNode *cur_node = NULL;
 
@@ -487,7 +487,7 @@ parse_policy (xmlNode * x, struct pskc_key *kp, int *rc)
 }
 
 static void
-parse_key (xmlNode * x, struct pskc_key *kp, int *rc)
+parse_key (xmlNode *x, struct pskc_key *kp, int *rc)
 {
   xmlNode *cur_node = NULL;
 
@@ -525,7 +525,7 @@ parse_key (xmlNode * x, struct pskc_key *kp, int *rc)
 }
 
 static void
-parse_keypackage (xmlNode * x, struct pskc_key *kp, int *rc)
+parse_keypackage (xmlNode *x, struct pskc_key *kp, int *rc)
 {
   xmlNode *cur_node = NULL;
 
@@ -574,7 +574,7 @@ parse_keypackage (xmlNode * x, struct pskc_key *kp, int *rc)
 }
 
 static void
-parse_keypackages (pskc_t * pd, xmlNode * x, int *rc)
+parse_keypackages (pskc_t *pd, xmlNode *x, int *rc)
 {
   xmlNode *cur_node = NULL;
 
@@ -617,7 +617,7 @@ parse_keypackages (pskc_t * pd, xmlNode * x, int *rc)
 }
 
 static void
-parse_keycontainer (pskc_t * pd, xmlNode * x, int *rc)
+parse_keycontainer (pskc_t *pd, xmlNode *x, int *rc)
 {
   xmlAttr *cur_attr = NULL;
   const char *name = (const char *) x->name;
@@ -658,7 +658,7 @@ parse_keycontainer (pskc_t * pd, xmlNode * x, int *rc)
  *   allocation errors %PSKC_MALLOC_ERROR is returned.
  **/
 int
-pskc_init (pskc_t ** container)
+pskc_init (pskc_t **container)
 {
   *container = calloc (1, sizeof (**container));
   if (*container == NULL)
@@ -674,7 +674,7 @@ pskc_init (pskc_t ** container)
  * @container handle.
  **/
 void
-pskc_done (pskc_t * container)
+pskc_done (pskc_t *container)
 {
   size_t i;
 
@@ -714,7 +714,7 @@ pskc_done (pskc_t * container)
  *   %PSKC_PARSE_ERROR is returned.
  **/
 int
-pskc_parse_from_memory (pskc_t * container, size_t len, const char *buffer)
+pskc_parse_from_memory (pskc_t *container, size_t len, const char *buffer)
 {
   xmlDocPtr xmldoc;
   xmlNode *root;

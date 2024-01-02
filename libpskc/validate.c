@@ -40,7 +40,7 @@
  * Returns: On success, %PSKC_OK (zero) is returned, or an error code.
  **/
 int
-pskc_validate (pskc_t * container, int *isvalid)
+pskc_validate (pskc_t *container, int *isvalid)
 {
   xmlSchemaParserCtxtPtr _pskc_parser_ctxt = NULL;
   xmlSchemaPtr _pskc_schema = NULL;

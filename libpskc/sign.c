@@ -44,7 +44,7 @@
  * Returns: On success, %PSKC_OK (zero) is returned, or an error code.
  */
 int
-pskc_sign_x509 (pskc_t * container,
+pskc_sign_x509 (pskc_t *container,
 		const char *key_file, const char *cert_file)
 {
 #ifdef USE_XMLSEC
@@ -156,7 +156,7 @@ pskc_sign_x509 (pskc_t * container,
 
 #ifdef USE_XMLSEC
 static int
-verify (pskc_t * container, xmlSecKeysMngrPtr mngr,
+verify (pskc_t *container, xmlSecKeysMngrPtr mngr,
 	xmlSecDSigCtxPtr dsigCtx, const char *cert_file, int *valid_signature)
 {
   xmlNodePtr node = NULL;
@@ -209,7 +209,7 @@ verify (pskc_t * container, xmlSecKeysMngrPtr mngr,
  * Returns: On success, %PSKC_OK (zero) is returned, or an error code.
  */
 int
-pskc_verify_x509crt (pskc_t * container, const char *cert_file,
+pskc_verify_x509crt (pskc_t *container, const char *cert_file,
 		     int *valid_signature)
 {
 #ifdef USE_XMLSEC

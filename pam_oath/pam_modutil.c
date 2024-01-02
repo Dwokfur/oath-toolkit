@@ -21,7 +21,7 @@
 # define PWD_ABSURD_PWD_LENGTH   0x4000
 
 void
-_pam_modutil_cleanup (pam_handle_t * pamh, void *data, int error_status)
+_pam_modutil_cleanup (pam_handle_t *pamh, void *data, int error_status)
 {
   if (data)
     {
@@ -30,7 +30,7 @@ _pam_modutil_cleanup (pam_handle_t * pamh, void *data, int error_status)
 }
 
 struct passwd *
-pam_modutil_getpwnam (pam_handle_t * pamh, const char *user)
+pam_modutil_getpwnam (pam_handle_t *pamh, const char *user)
 {
   void *buffer = NULL;
   size_t length = PWD_INITIAL_LENGTH;

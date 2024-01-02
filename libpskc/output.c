@@ -129,7 +129,7 @@ buffer_addf (struct buffer *buf, const char *fmt, ...)
 }
 
 static void
-print_keypackage (struct buffer *buf, pskc_key_t * kp)
+print_keypackage (struct buffer *buf, pskc_key_t *kp)
 {
   const char *device_manufacturer = pskc_get_device_manufacturer (kp);
   const char *device_serialno = pskc_get_device_serialno (kp);
@@ -320,7 +320,7 @@ print_keypackage (struct buffer *buf, pskc_key_t * kp)
 }
 
 static void
-print_keycontainer (pskc_t * data, struct buffer *buf)
+print_keycontainer (pskc_t *data, struct buffer *buf)
 {
   const char *version = pskc_get_version (data);
   const char *id = pskc_get_id (data);
@@ -355,7 +355,7 @@ print_keycontainer (pskc_t * data, struct buffer *buf)
  * Returns: %PSKC_OK on success, or an error code.
  */
 int
-pskc_output (pskc_t * container,
+pskc_output (pskc_t *container,
 	     pskc_output_formats_t format, char **out, size_t *len)
 {
   if (format == PSKC_OUTPUT_HUMAN_COMPLETE)

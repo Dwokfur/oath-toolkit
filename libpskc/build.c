@@ -31,7 +31,7 @@
 #include "inttostr.h"		/* umaxtostr */
 
 static int
-build_deviceinfo (pskc_key_t * kp, xmlNodePtr keyp)
+build_deviceinfo (pskc_key_t *kp, xmlNodePtr keyp)
 {
   const char *manufacturer = pskc_get_device_manufacturer (kp);
   const char *serialno = pskc_get_device_serialno (kp);
@@ -86,7 +86,7 @@ build_deviceinfo (pskc_key_t * kp, xmlNodePtr keyp)
 }
 
 static int
-build_cryptomoduleinfo (pskc_key_t * kp, xmlNodePtr keyp)
+build_cryptomoduleinfo (pskc_key_t *kp, xmlNodePtr keyp)
 {
   const char *cryptomodule_id = pskc_get_cryptomodule_id (kp);
   xmlNodePtr cminfo;
@@ -103,7 +103,7 @@ build_cryptomoduleinfo (pskc_key_t * kp, xmlNodePtr keyp)
 }
 
 static int
-build_algparm (pskc_key_t * kp, xmlNodePtr keyp)
+build_algparm (pskc_key_t *kp, xmlNodePtr keyp)
 {
   const char *suite = pskc_get_key_algparm_suite (kp);
   int chall_encoding_p;
@@ -191,7 +191,7 @@ build_algparm (pskc_key_t * kp, xmlNodePtr keyp)
 }
 
 static int
-build_data (pskc_key_t * kp, xmlNodePtr keyp)
+build_data (pskc_key_t *kp, xmlNodePtr keyp)
 {
   const char *b64secret = pskc_get_key_data_b64secret (kp);
   int counter_p;
@@ -255,7 +255,7 @@ build_data (pskc_key_t * kp, xmlNodePtr keyp)
 }
 
 static int
-build_policy (pskc_key_t * kp, xmlNodePtr keyp)
+build_policy (pskc_key_t *kp, xmlNodePtr keyp)
 {
   int keyusage_p;
   int keyusages = pskc_get_key_policy_keyusages (kp, &keyusage_p);
@@ -363,7 +363,7 @@ build_policy (pskc_key_t * kp, xmlNodePtr keyp)
 }
 
 static int
-build_key (pskc_key_t * kp, xmlNodePtr keyp)
+build_key (pskc_key_t *kp, xmlNodePtr keyp)
 {
   const char *id = pskc_get_key_id (kp);
   const char *alg = pskc_get_key_algorithm (kp);
@@ -419,7 +419,7 @@ build_key (pskc_key_t * kp, xmlNodePtr keyp)
 }
 
 static int
-build_keypackage (pskc_key_t * kp, xmlNodePtr keyp)
+build_keypackage (pskc_key_t *kp, xmlNodePtr keyp)
 {
   build_deviceinfo (kp, keyp);
   build_cryptomoduleinfo (kp, keyp);
@@ -429,7 +429,7 @@ build_keypackage (pskc_key_t * kp, xmlNodePtr keyp)
 }
 
 static int
-build_keycont (pskc_t * container, xmlNodePtr keycont)
+build_keycont (pskc_t *container, xmlNodePtr keycont)
 {
   const char *ver = pskc_get_version (container);
   const char *id = pskc_get_id (container);
@@ -483,7 +483,7 @@ build_keycont (pskc_t * container, xmlNodePtr keycont)
  *   allocation errors %PSKC_MALLOC_ERROR is returned.
  **/
 int
-pskc_build_xml (pskc_t * container, char **out, size_t *len)
+pskc_build_xml (pskc_t *container, char **out, size_t *len)
 {
   xmlDocPtr doc = NULL;
   xmlNodePtr keycont = NULL;

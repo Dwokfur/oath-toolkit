@@ -133,7 +133,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
 }
 
 static int
-parse_usersfile_str (pam_handle_t * pamh, const struct cfg *cfg,
+parse_usersfile_str (pam_handle_t *pamh, const struct cfg *cfg,
 		     const char *user, char **usersfile)
 {
   int retval = PAM_SUCCESS;
@@ -248,7 +248,7 @@ done:
 }
 
 PAM_EXTERN int
-pam_sm_authenticate (pam_handle_t * pamh,
+pam_sm_authenticate (pam_handle_t *pamh,
 		     int flags, int argc, const char **argv)
 {
   int retval, rc;
@@ -485,7 +485,7 @@ done:
 }
 
 PAM_EXTERN int
-pam_sm_setcred (pam_handle_t * pamh, int flags, int argc, const char **argv)
+pam_sm_setcred (pam_handle_t *pamh, int flags, int argc, const char **argv)
 {
   return PAM_SUCCESS;
 }

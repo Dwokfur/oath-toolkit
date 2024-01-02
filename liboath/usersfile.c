@@ -82,9 +82,9 @@ parse_usersfile (const char *username,
 		 const char *otp,
 		 size_t window,
 		 const char *passwd,
-		 time_t * last_otp,
-		 FILE * infh,
-		 char **lineptr, size_t *n, uint64_t * new_moving_factor,
+		 time_t *last_otp,
+		 FILE *infh,
+		 char **lineptr, size_t *n, uint64_t *new_moving_factor,
 		 size_t *skipped_users)
 {
   int bad_password = 0;
@@ -239,8 +239,8 @@ parse_usersfile (const char *username,
 static int
 update_usersfile2 (const char *username,
 		   const char *otp,
-		   FILE * infh,
-		   FILE * outfh,
+		   FILE *infh,
+		   FILE *outfh,
 		   char **lineptr,
 		   size_t *n, char *timestamp, uint64_t new_moving_factor,
 		   size_t skipped_users)
@@ -302,7 +302,7 @@ static int
 update_usersfile (const char *usersfile,
 		  const char *username,
 		  const char *otp,
-		  FILE * infh,
+		  FILE *infh,
 		  char **lineptr,
 		  size_t *n, char *timestamp, uint64_t new_moving_factor,
 		  size_t skipped_users)
@@ -458,7 +458,7 @@ oath_authenticate_usersfile (const char *usersfile,
 			     const char *username,
 			     const char *otp,
 			     size_t window,
-			     const char *passwd, time_t * last_otp)
+			     const char *passwd, time_t *last_otp)
 {
   FILE *infh;
   char *line = NULL;
@@ -515,7 +515,7 @@ oath_authenticate_usersfile (const char *usersfile,
 			     const char *username,
 			     const char *otp,
 			     size_t window,
-			     const char *passwd, time_t * last_otp)
+			     const char *passwd, time_t *last_otp)
 {
   (void) usersfile;
   (void) username;

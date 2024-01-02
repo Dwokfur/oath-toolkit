@@ -37,7 +37,7 @@ my_log (const char *msg)
 }
 
 static int
-precheck (pskc_t * pskc)
+precheck (pskc_t *pskc)
 {
   pskc_key_t *keyp;
 
@@ -92,7 +92,7 @@ precheck (pskc_t * pskc)
 }
 
 static int
-check (pskc_t * pskc)
+check (pskc_t *pskc)
 {
   pskc_key_t *keyp;
 

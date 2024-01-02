@@ -44,7 +44,7 @@
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_version (pskc_t * container)
+pskc_get_version (pskc_t *container)
 {
   return container->version;
 }
@@ -65,7 +65,7 @@ pskc_get_version (pskc_t * container)
  * Since: 2.2.0
  */
 void
-pskc_set_version (pskc_t * container, const char *version)
+pskc_set_version (pskc_t *container, const char *version)
 {
   container->version = version;
 }
@@ -80,7 +80,7 @@ pskc_set_version (pskc_t * container, const char *version)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_id (pskc_t * container)
+pskc_get_id (pskc_t *container)
 {
   return container->id;
 }
@@ -99,7 +99,7 @@ pskc_get_id (pskc_t * container)
  * Since: 2.2.0
  */
 void
-pskc_set_id (pskc_t * container, const char *id)
+pskc_set_id (pskc_t *container, const char *id)
 {
   container->id = id;
 }
@@ -115,7 +115,7 @@ pskc_set_id (pskc_t * container, const char *id)
  * element, 0 if there is no Signature element.
  */
 int
-pskc_get_signed_p (pskc_t * container)
+pskc_get_signed_p (pskc_t *container)
 {
   return container->signed_p;
 }
@@ -133,7 +133,7 @@ pskc_get_signed_p (pskc_t * container)
  *   #pskc_key_t pointer.
  */
 pskc_key_t *
-pskc_get_keypackage (pskc_t * container, size_t i)
+pskc_get_keypackage (pskc_t *container, size_t i)
 {
   if (i >= container->nkeypackages)
     return NULL;
@@ -154,7 +154,7 @@ pskc_get_keypackage (pskc_t * container, size_t i)
  * Since: 2.2.0
  */
 int
-pskc_add_keypackage (pskc_t * container, pskc_key_t ** key)
+pskc_add_keypackage (pskc_t *container, pskc_key_t **key)
 {
   struct pskc_key *tmp;
 
@@ -185,7 +185,7 @@ pskc_add_keypackage (pskc_t * container, pskc_key_t ** key)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_device_manufacturer (pskc_key_t * key)
+pskc_get_device_manufacturer (pskc_key_t *key)
 {
   return key->device_manufacturer;
 }
@@ -205,7 +205,7 @@ pskc_get_device_manufacturer (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_device_manufacturer (pskc_key_t * key, const char *devmfr)
+pskc_set_device_manufacturer (pskc_key_t *key, const char *devmfr)
 {
   key->device_manufacturer = devmfr;
 }
@@ -221,7 +221,7 @@ pskc_set_device_manufacturer (pskc_key_t * key, const char *devmfr)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_device_serialno (pskc_key_t * key)
+pskc_get_device_serialno (pskc_key_t *key)
 {
   return key->device_serialno;
 }
@@ -241,7 +241,7 @@ pskc_get_device_serialno (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_device_serialno (pskc_key_t * key, const char *serialno)
+pskc_set_device_serialno (pskc_key_t *key, const char *serialno)
 {
   key->device_serialno = serialno;
 }
@@ -258,7 +258,7 @@ pskc_set_device_serialno (pskc_key_t * key, const char *serialno)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_device_model (pskc_key_t * key)
+pskc_get_device_model (pskc_key_t *key)
 {
   return key->device_model;
 }
@@ -279,7 +279,7 @@ pskc_get_device_model (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_device_model (pskc_key_t * key, const char *model)
+pskc_set_device_model (pskc_key_t *key, const char *model)
 {
   key->device_model = model;
 }
@@ -297,7 +297,7 @@ pskc_set_device_model (pskc_key_t * key, const char *model)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_device_issueno (pskc_key_t * key)
+pskc_get_device_issueno (pskc_key_t *key)
 {
   return key->device_issueno;
 }
@@ -319,7 +319,7 @@ pskc_get_device_issueno (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_device_issueno (pskc_key_t * key, const char *issueno)
+pskc_set_device_issueno (pskc_key_t *key, const char *issueno)
 {
   key->device_issueno = issueno;
 }
@@ -341,7 +341,7 @@ pskc_set_device_issueno (pskc_key_t * key, const char *issueno)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_device_devicebinding (pskc_key_t * key)
+pskc_get_device_devicebinding (pskc_key_t *key)
 {
   return key->device_devicebinding;
 }
@@ -367,7 +367,7 @@ pskc_get_device_devicebinding (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_device_devicebinding (pskc_key_t * key, const char *devbind)
+pskc_set_device_devicebinding (pskc_key_t *key, const char *devbind)
 {
   key->device_devicebinding = devbind;
 }
@@ -384,7 +384,7 @@ pskc_set_device_devicebinding (pskc_key_t * key, const char *devbind)
  *   content, or NULL if not set.
  */
 const struct tm *
-pskc_get_device_startdate (pskc_key_t * key)
+pskc_get_device_startdate (pskc_key_t *key)
 {
   if (!key->device_startdate_str)
     return NULL;
@@ -403,7 +403,7 @@ pskc_get_device_startdate (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_device_startdate (pskc_key_t * key, const struct tm *startdate)
+pskc_set_device_startdate (pskc_key_t *key, const struct tm *startdate)
 {
   key->device_startdate_str = "set";
   memcpy (&key->device_startdate, startdate, sizeof (key->device_startdate));
@@ -421,7 +421,7 @@ pskc_set_device_startdate (pskc_key_t * key, const struct tm *startdate)
  *   content, or NULL if not set.
  */
 const struct tm *
-pskc_get_device_expirydate (pskc_key_t * key)
+pskc_get_device_expirydate (pskc_key_t *key)
 {
   if (!key->device_expirydate_str)
     return NULL;
@@ -440,7 +440,7 @@ pskc_get_device_expirydate (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_device_expirydate (pskc_key_t * key, const struct tm *expirydate)
+pskc_set_device_expirydate (pskc_key_t *key, const struct tm *expirydate)
 {
   key->device_expirydate_str = "set";
   memcpy (&key->device_expirydate, expirydate,
@@ -458,7 +458,7 @@ pskc_set_device_expirydate (pskc_key_t * key, const struct tm *expirydate)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_device_userid (pskc_key_t * key)
+pskc_get_device_userid (pskc_key_t *key)
 {
   return key->device_userid;
 }
@@ -478,7 +478,7 @@ pskc_get_device_userid (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_device_userid (pskc_key_t * key, const char *userid)
+pskc_set_device_userid (pskc_key_t *key, const char *userid)
 {
   key->device_userid = userid;
 }
@@ -496,7 +496,7 @@ pskc_set_device_userid (pskc_key_t * key, const char *userid)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_cryptomodule_id (pskc_key_t * key)
+pskc_get_cryptomodule_id (pskc_key_t *key)
 {
   return key->cryptomodule_id;
 }
@@ -518,7 +518,7 @@ pskc_get_cryptomodule_id (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_cryptomodule_id (pskc_key_t * key, const char *cid)
+pskc_set_cryptomodule_id (pskc_key_t *key, const char *cid)
 {
   key->cryptomodule_id = cid;
 }
@@ -534,7 +534,7 @@ pskc_set_cryptomodule_id (pskc_key_t * key, const char *cid)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_key_id (pskc_key_t * key)
+pskc_get_key_id (pskc_key_t *key)
 {
   return key->key_id;
 }
@@ -554,7 +554,7 @@ pskc_get_key_id (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_key_id (pskc_key_t * key, const char *keyid)
+pskc_set_key_id (pskc_key_t *key, const char *keyid)
 {
   key->key_id = keyid;
 }
@@ -570,7 +570,7 @@ pskc_set_key_id (pskc_key_t * key, const char *keyid)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_key_algorithm (pskc_key_t * key)
+pskc_get_key_algorithm (pskc_key_t *key)
 {
   return key->key_algorithm;
 }
@@ -590,7 +590,7 @@ pskc_get_key_algorithm (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_key_algorithm (pskc_key_t * key, const char *keyalg)
+pskc_set_key_algorithm (pskc_key_t *key, const char *keyalg)
 {
   key->key_algorithm = keyalg;
 }
@@ -605,7 +605,7 @@ pskc_set_key_algorithm (pskc_key_t * key, const char *keyalg)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_key_issuer (pskc_key_t * key)
+pskc_get_key_issuer (pskc_key_t *key)
 {
   return key->key_issuer;
 }
@@ -624,7 +624,7 @@ pskc_get_key_issuer (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_key_issuer (pskc_key_t * key, const char *keyissuer)
+pskc_set_key_issuer (pskc_key_t *key, const char *keyissuer)
 {
   key->key_issuer = keyissuer;
 }
@@ -639,7 +639,7 @@ pskc_set_key_issuer (pskc_key_t * key, const char *keyissuer)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_key_algparm_suite (pskc_key_t * key)
+pskc_get_key_algparm_suite (pskc_key_t *key)
 {
   return key->key_algparm_suite;
 }
@@ -658,7 +658,7 @@ pskc_get_key_algparm_suite (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_key_algparm_suite (pskc_key_t * key, const char *keyalgparmsuite)
+pskc_set_key_algparm_suite (pskc_key_t *key, const char *keyalgparmsuite)
 {
   key->key_algparm_suite = keyalgparmsuite;
 }
@@ -678,7 +678,7 @@ pskc_set_key_algparm_suite (pskc_key_t * key, const char *keyalgparmsuite)
  * Returns: an #pskc_valueformat value
  */
 pskc_valueformat
-pskc_get_key_algparm_chall_encoding (pskc_key_t * key, int *present)
+pskc_get_key_algparm_chall_encoding (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -703,7 +703,7 @@ pskc_get_key_algparm_chall_encoding (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_algparm_chall_encoding (pskc_key_t * key, pskc_valueformat vf)
+pskc_set_key_algparm_chall_encoding (pskc_key_t *key, pskc_valueformat vf)
 {
   key->key_algparm_chall_encoding_str = "set";
   key->key_algparm_chall_encoding = vf;
@@ -729,7 +729,7 @@ pskc_set_key_algparm_chall_encoding (pskc_key_t * key, pskc_valueformat vf)
  * Returns: an integer holding the content.
  */
 uint32_t
-pskc_get_key_algparm_chall_min (pskc_key_t * key, int *present)
+pskc_get_key_algparm_chall_min (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -759,7 +759,7 @@ pskc_get_key_algparm_chall_min (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_algparm_chall_min (pskc_key_t * key, uint32_t challmin)
+pskc_set_key_algparm_chall_min (pskc_key_t *key, uint32_t challmin)
 {
   key->key_algparm_chall_min_str = "set";
   key->key_algparm_chall_min = challmin;
@@ -785,7 +785,7 @@ pskc_set_key_algparm_chall_min (pskc_key_t * key, uint32_t challmin)
  * Returns: an integer holding the content.
  */
 uint32_t
-pskc_get_key_algparm_chall_max (pskc_key_t * key, int *present)
+pskc_get_key_algparm_chall_max (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -815,7 +815,7 @@ pskc_get_key_algparm_chall_max (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_algparm_chall_max (pskc_key_t * key, uint32_t challmax)
+pskc_set_key_algparm_chall_max (pskc_key_t *key, uint32_t challmax)
 {
   key->key_algparm_chall_max_str = "set";
   key->key_algparm_chall_max = challmax;
@@ -842,7 +842,7 @@ pskc_set_key_algparm_chall_max (pskc_key_t * key, uint32_t challmax)
  * indicate false.
  */
 int
-pskc_get_key_algparm_chall_checkdigits (pskc_key_t * key, int *present)
+pskc_get_key_algparm_chall_checkdigits (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -872,7 +872,7 @@ pskc_get_key_algparm_chall_checkdigits (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_algparm_chall_checkdigits (pskc_key_t * key, int checkdigit)
+pskc_set_key_algparm_chall_checkdigits (pskc_key_t *key, int checkdigit)
 {
   key->key_algparm_chall_checkdigits_str = "set";
   key->key_algparm_chall_checkdigits = checkdigit ? 1 : 0;
@@ -893,7 +893,7 @@ pskc_set_key_algparm_chall_checkdigits (pskc_key_t * key, int checkdigit)
  * Returns: an #pskc_valueformat value
  */
 pskc_valueformat
-pskc_get_key_algparm_resp_encoding (pskc_key_t * key, int *present)
+pskc_get_key_algparm_resp_encoding (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -918,7 +918,7 @@ pskc_get_key_algparm_resp_encoding (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_algparm_resp_encoding (pskc_key_t * key, pskc_valueformat vf)
+pskc_set_key_algparm_resp_encoding (pskc_key_t *key, pskc_valueformat vf)
 {
   key->key_algparm_resp_encoding_str = "set";
   key->key_algparm_resp_encoding = vf;
@@ -943,7 +943,7 @@ pskc_set_key_algparm_resp_encoding (pskc_key_t * key, pskc_valueformat vf)
  * Returns: an integer holding the content.
  */
 uint32_t
-pskc_get_key_algparm_resp_length (pskc_key_t * key, int *present)
+pskc_get_key_algparm_resp_length (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -972,7 +972,7 @@ pskc_get_key_algparm_resp_length (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_algparm_resp_length (pskc_key_t * key, uint32_t length)
+pskc_set_key_algparm_resp_length (pskc_key_t *key, uint32_t length)
 {
   key->key_algparm_resp_length_str = "set";
   key->key_algparm_resp_length = length;
@@ -998,7 +998,7 @@ pskc_set_key_algparm_resp_length (pskc_key_t * key, uint32_t length)
  * indicate false.
  */
 int
-pskc_get_key_algparm_resp_checkdigits (pskc_key_t * key, int *present)
+pskc_get_key_algparm_resp_checkdigits (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -1027,7 +1027,7 @@ pskc_get_key_algparm_resp_checkdigits (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_algparm_resp_checkdigits (pskc_key_t * key, int checkdigit)
+pskc_set_key_algparm_resp_checkdigits (pskc_key_t *key, int checkdigit)
 {
   key->key_algparm_resp_checkdigits_str = "set";
   key->key_algparm_resp_checkdigits = checkdigit ? 1 : 0;
@@ -1043,7 +1043,7 @@ pskc_set_key_algparm_resp_checkdigits (pskc_key_t * key, int checkdigit)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_key_profileid (pskc_key_t * key)
+pskc_get_key_profileid (pskc_key_t *key)
 {
   return key->key_profileid;
 }
@@ -1062,7 +1062,7 @@ pskc_get_key_profileid (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_key_profileid (pskc_key_t * key, const char *profileid)
+pskc_set_key_profileid (pskc_key_t *key, const char *profileid)
 {
   key->key_profileid = profileid;
 }
@@ -1077,7 +1077,7 @@ pskc_set_key_profileid (pskc_key_t * key, const char *profileid)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_key_reference (pskc_key_t * key)
+pskc_get_key_reference (pskc_key_t *key)
 {
   return key->key_reference;
 }
@@ -1096,7 +1096,7 @@ pskc_get_key_reference (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_key_reference (pskc_key_t * key, const char *keyref)
+pskc_set_key_reference (pskc_key_t *key, const char *keyref)
 {
   key->key_reference = keyref;
 }
@@ -1111,7 +1111,7 @@ pskc_set_key_reference (pskc_key_t * key, const char *keyref)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_key_friendlyname (pskc_key_t * key)
+pskc_get_key_friendlyname (pskc_key_t *key)
 {
   return key->key_friendlyname;
 }
@@ -1130,7 +1130,7 @@ pskc_get_key_friendlyname (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_key_friendlyname (pskc_key_t * key, const char *fname)
+pskc_set_key_friendlyname (pskc_key_t *key, const char *fname)
 {
   key->key_friendlyname = fname;
 }
@@ -1145,7 +1145,7 @@ pskc_set_key_friendlyname (pskc_key_t * key, const char *fname)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_key_userid (pskc_key_t * key)
+pskc_get_key_userid (pskc_key_t *key)
 {
   return key->key_userid;
 }
@@ -1164,7 +1164,7 @@ pskc_get_key_userid (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_key_userid (pskc_key_t * key, const char *keyuserid)
+pskc_set_key_userid (pskc_key_t *key, const char *keyuserid)
 {
   key->key_userid = keyuserid;
 }
@@ -1182,7 +1182,7 @@ pskc_set_key_userid (pskc_key_t * key, const char *keyuserid)
  *   content of length *@len, or NULL if not set.
  */
 const char *
-pskc_get_key_data_secret (pskc_key_t * key, size_t *len)
+pskc_get_key_data_secret (pskc_key_t *key, size_t *len)
 {
   if (len)
     *len = key->key_secret_len;
@@ -1208,7 +1208,7 @@ pskc_get_key_data_secret (pskc_key_t * key, size_t *len)
  * Since: 2.2.0
  */
 int
-pskc_set_key_data_secret (pskc_key_t * key, const char *data, size_t len)
+pskc_set_key_data_secret (pskc_key_t *key, const char *data, size_t len)
 {
   char *out, *datacopy;
 
@@ -1246,7 +1246,7 @@ pskc_set_key_data_secret (pskc_key_t * key, const char *data, size_t len)
  *   content of length *@len, or NULL if not set.
  */
 const char *
-pskc_get_key_data_b64secret (pskc_key_t * key)
+pskc_get_key_data_b64secret (pskc_key_t *key)
 {
   return key->key_b64secret;
 }
@@ -1270,7 +1270,7 @@ pskc_get_key_data_b64secret (pskc_key_t * key)
  * Since: 2.2.0
  */
 int
-pskc_set_key_data_b64secret (pskc_key_t * key, const char *b64secret)
+pskc_set_key_data_b64secret (pskc_key_t *key, const char *b64secret)
 {
   size_t l = strlen (b64secret);
   char *out, *b64copy;
@@ -1320,7 +1320,7 @@ pskc_set_key_data_b64secret (pskc_key_t * key, const char *b64secret)
  * Returns: an integer holding the content.
  */
 uint64_t
-pskc_get_key_data_counter (pskc_key_t * key, int *present)
+pskc_get_key_data_counter (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -1344,7 +1344,7 @@ pskc_get_key_data_counter (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_data_counter (pskc_key_t * key, uint64_t counter)
+pskc_set_key_data_counter (pskc_key_t *key, uint64_t counter)
 {
   key->key_counter_str = "set";
   key->key_counter = counter;
@@ -1366,7 +1366,7 @@ pskc_set_key_data_counter (pskc_key_t * key, uint64_t counter)
  * Returns: an integer holding the content.
  */
 uint32_t
-pskc_get_key_data_time (pskc_key_t * key, int *present)
+pskc_get_key_data_time (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -1392,7 +1392,7 @@ pskc_get_key_data_time (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_data_time (pskc_key_t * key, uint32_t datatime)
+pskc_set_key_data_time (pskc_key_t *key, uint32_t datatime)
 {
   key->key_time_str = "set";
   key->key_time = datatime;
@@ -1414,7 +1414,7 @@ pskc_set_key_data_time (pskc_key_t * key, uint32_t datatime)
  * Returns: an integer holding the content.
  */
 uint32_t
-pskc_get_key_data_timeinterval (pskc_key_t * key, int *present)
+pskc_get_key_data_timeinterval (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -1440,7 +1440,7 @@ pskc_get_key_data_timeinterval (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_data_timeinterval (pskc_key_t * key, uint32_t timeinterval)
+pskc_set_key_data_timeinterval (pskc_key_t *key, uint32_t timeinterval)
 {
   key->key_timeinterval_str = "set";
   key->key_timeinterval = timeinterval;
@@ -1467,7 +1467,7 @@ pskc_set_key_data_timeinterval (pskc_key_t * key, uint32_t timeinterval)
  * Returns: an integer holding the content.
  */
 uint32_t
-pskc_get_key_data_timedrift (pskc_key_t * key, int *present)
+pskc_get_key_data_timedrift (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -1498,7 +1498,7 @@ pskc_get_key_data_timedrift (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_data_timedrift (pskc_key_t * key, uint32_t timedrift)
+pskc_set_key_data_timedrift (pskc_key_t *key, uint32_t timedrift)
 {
   key->key_timedrift_str = "set";
   key->key_timedrift = timedrift;
@@ -1515,7 +1515,7 @@ pskc_set_key_data_timedrift (pskc_key_t * key, uint32_t timedrift)
  *   content, or NULL if not set.
  */
 const struct tm *
-pskc_get_key_policy_startdate (pskc_key_t * key)
+pskc_get_key_policy_startdate (pskc_key_t *key)
 {
   if (!key->key_policy_startdate_str)
     return NULL;
@@ -1533,7 +1533,7 @@ pskc_get_key_policy_startdate (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_key_policy_startdate (pskc_key_t * key, const struct tm *startdate)
+pskc_set_key_policy_startdate (pskc_key_t *key, const struct tm *startdate)
 {
   key->key_policy_startdate_str = "set";
   memcpy (&key->key_policy_startdate, startdate,
@@ -1551,7 +1551,7 @@ pskc_set_key_policy_startdate (pskc_key_t * key, const struct tm *startdate)
  *   content, or NULL if not set.
  */
 const struct tm *
-pskc_get_key_policy_expirydate (pskc_key_t * key)
+pskc_get_key_policy_expirydate (pskc_key_t *key)
 {
   if (!key->key_policy_expirydate_str)
     return NULL;
@@ -1569,7 +1569,7 @@ pskc_get_key_policy_expirydate (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_key_policy_expirydate (pskc_key_t * key, const struct tm *expirydate)
+pskc_set_key_policy_expirydate (pskc_key_t *key, const struct tm *expirydate)
 {
   key->key_policy_expirydate_str = "set";
   memcpy (&key->key_policy_expirydate, expirydate,
@@ -1589,7 +1589,7 @@ pskc_set_key_policy_expirydate (pskc_key_t * key, const struct tm *expirydate)
  *   content, or NULL if not set.
  */
 const char *
-pskc_get_key_policy_pinkeyid (pskc_key_t * key)
+pskc_get_key_policy_pinkeyid (pskc_key_t *key)
 {
   return key->key_policy_pinkeyid;
 }
@@ -1611,7 +1611,7 @@ pskc_get_key_policy_pinkeyid (pskc_key_t * key)
  * Since: 2.2.0
  */
 void
-pskc_set_key_policy_pinkeyid (pskc_key_t * key, const char *pinkeyid)
+pskc_set_key_policy_pinkeyid (pskc_key_t *key, const char *pinkeyid)
 {
   key->key_policy_pinkeyid = pinkeyid;
 }
@@ -1631,7 +1631,7 @@ pskc_set_key_policy_pinkeyid (pskc_key_t * key, const char *pinkeyid)
  * Returns: an #pskc_pinusagemode value
  */
 pskc_pinusagemode
-pskc_get_key_policy_pinusagemode (pskc_key_t * key, int *present)
+pskc_get_key_policy_pinusagemode (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -1656,7 +1656,7 @@ pskc_get_key_policy_pinusagemode (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_policy_pinusagemode (pskc_key_t * key,
+pskc_set_key_policy_pinusagemode (pskc_key_t *key,
 				  pskc_pinusagemode pinusagemode)
 {
   key->key_policy_pinusagemode_str = "set";
@@ -1680,7 +1680,7 @@ pskc_set_key_policy_pinusagemode (pskc_key_t * key,
  * Returns: an integer holding the content.
  */
 uint32_t
-pskc_get_key_policy_pinmaxfailedattempts (pskc_key_t * key, int *present)
+pskc_get_key_policy_pinmaxfailedattempts (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -1707,7 +1707,7 @@ pskc_get_key_policy_pinmaxfailedattempts (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_policy_pinmaxfailedattempts (pskc_key_t * key, uint32_t attempts)
+pskc_set_key_policy_pinmaxfailedattempts (pskc_key_t *key, uint32_t attempts)
 {
   key->key_policy_pinmaxfailedattempts_str = "set";
   key->key_policy_pinmaxfailedattempts = attempts;
@@ -1733,7 +1733,7 @@ pskc_set_key_policy_pinmaxfailedattempts (pskc_key_t * key, uint32_t attempts)
  * Returns: an integer holding the content.
  */
 uint32_t
-pskc_get_key_policy_pinminlength (pskc_key_t * key, int *present)
+pskc_get_key_policy_pinminlength (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -1763,7 +1763,7 @@ pskc_get_key_policy_pinminlength (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_policy_pinminlength (pskc_key_t * key, uint32_t minlength)
+pskc_set_key_policy_pinminlength (pskc_key_t *key, uint32_t minlength)
 {
   key->key_policy_pinminlength_str = "set";
   key->key_policy_pinminlength = minlength;
@@ -1789,7 +1789,7 @@ pskc_set_key_policy_pinminlength (pskc_key_t * key, uint32_t minlength)
  * Returns: an integer holding the content.
  */
 uint32_t
-pskc_get_key_policy_pinmaxlength (pskc_key_t * key, int *present)
+pskc_get_key_policy_pinmaxlength (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -1819,7 +1819,7 @@ pskc_get_key_policy_pinmaxlength (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_policy_pinmaxlength (pskc_key_t * key, uint32_t maxlength)
+pskc_set_key_policy_pinmaxlength (pskc_key_t *key, uint32_t maxlength)
 {
   key->key_policy_pinmaxlength_str = "set";
   key->key_policy_pinmaxlength = maxlength;
@@ -1840,7 +1840,7 @@ pskc_set_key_policy_pinmaxlength (pskc_key_t * key, uint32_t maxlength)
  * Returns: an #pskc_valueformat value
  */
 pskc_valueformat
-pskc_get_key_policy_pinencoding (pskc_key_t * key, int *present)
+pskc_get_key_policy_pinencoding (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -1865,7 +1865,7 @@ pskc_get_key_policy_pinencoding (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_policy_pinencoding (pskc_key_t * key,
+pskc_set_key_policy_pinencoding (pskc_key_t *key,
 				 pskc_valueformat pinencoding)
 {
   key->key_policy_pinencoding_str = "set";
@@ -1888,7 +1888,7 @@ pskc_set_key_policy_pinencoding (pskc_key_t * key,
  * together.
  */
 int
-pskc_get_key_policy_keyusages (pskc_key_t * key, int *present)
+pskc_get_key_policy_keyusages (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -1913,7 +1913,7 @@ pskc_get_key_policy_keyusages (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_policy_keyusages (pskc_key_t * key, int keyusages)
+pskc_set_key_policy_keyusages (pskc_key_t *key, int keyusages)
 {
   key->key_policy_keyusage_str = "set";
   key->key_policy_keyusages = keyusages;
@@ -1940,7 +1940,7 @@ pskc_set_key_policy_keyusages (pskc_key_t * key, int keyusages)
  * Returns: an integer holding the content.
  */
 uint64_t
-pskc_get_key_policy_numberoftransactions (pskc_key_t * key, int *present)
+pskc_get_key_policy_numberoftransactions (pskc_key_t *key, int *present)
 {
   if (present)
     {
@@ -1971,7 +1971,7 @@ pskc_get_key_policy_numberoftransactions (pskc_key_t * key, int *present)
  * Since: 2.2.0
  */
 void
-pskc_set_key_policy_numberoftransactions (pskc_key_t * key, uint64_t uses)
+pskc_set_key_policy_numberoftransactions (pskc_key_t *key, uint64_t uses)
 {
   key->key_policy_numberoftransactions_str = "set";
   key->key_policy_numberoftransactions = uses;
