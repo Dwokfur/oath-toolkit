@@ -67,6 +67,8 @@ B-clang:
 B-Trisquel11:
   image: registry.gitlab.com/oath-toolkit/build-images:Trisquel11
   stage: build
+  before_script:
+  - apt-get remove -y -qq --purge indent
   script:
   - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
   - ./bootstrap
@@ -234,10 +236,13 @@ AlmaLinux8:
   needs: [B-Trisquel11]
   before_script:
   - yum -y install make gcc diffutils file pam-devel
+  - dnf -y install epel-release
+  - dnf --enablerepo=powertools -y install indent
   script:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
   - ./configure --disable-pskc --enable-gcc-warnings --disable-valgrind-tests
+  - make syntax-check
   - make check V=1 VERBOSE=t
 
 AlmaLinux8-xmlsec:
