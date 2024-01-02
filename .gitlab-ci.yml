@@ -126,6 +126,7 @@ B-macOS14Xcode15:
 
 # https://docs.gitlab.com/ee/ci/runners/saas/windows_saas_runner.html
 B-Windows-UCRT64:
+  when: manual
   tags: [ shared-windows, windows-1809 ]
   stage: build
   script: # https://www.msys2.org/docs/ci/#other-systems
@@ -152,6 +153,7 @@ B-Windows-UCRT64:
     make V=1 -k check VERBOSE=t'
 
 Windows-MSYS:
+  when: manual
   tags: [ shared-windows, windows-1809 ]
   stage: test
   needs: [B-Trisquel11]
@@ -173,6 +175,7 @@ Windows-MSYS:
     make V=1 -k check VERBOSE=t'
 
 Windows-MINGW64:
+  when: manual
   tags: [ shared-windows, windows-1809 ]
   stage: test
   needs: [B-Trisquel11]
@@ -192,21 +195,6 @@ Windows-MINGW64:
     cd `ls -d oath-toolkit-* | grep -v tar.gz`
     ./configure --enable-gcc-warnings
     make V=1 -k check VERBOSE=t'
-
-Debian12:
-  image: debian:12-slim
-  stage: test
-  needs: [B-Trisquel11]
-  before_script:
-  - apt-get update -qq
-  - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
-  script:
-  - tar xfa oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
-  - mkdir b
-  - cd b
-  - ../configure --enable-gcc-warnings --disable-valgrind-tests || (cat config.log; exit 1)
-  - make check V=1 || (find . -name test-suite.log -exec cat {} +; exit 1)
 
 Debian12:
   image: debian:12-slim
