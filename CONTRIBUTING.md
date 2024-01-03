@@ -111,7 +111,14 @@ x. Make sure ../www-oath-toolkit/ contains a git checkout of the
    git clone git@gitlab.com:oath-toolkit/website.git www-oath-toolkit
    cvs -z3 -d:ext:USER@cvs.savannah.nongnu.org:/web/oath-toolkit co -d www-oath-toolkit-cvs oath-toolkit
 
-x. Run 'make' and then 'make release'.
+x. Create release artifacts.
+   ./bootstrap
+   ./configure --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
+   make
+   make release-check
+
+x. Upload release artifacts.
+   make release-upload-www release-upload-ftp
 
 x. Manually update the CVS website that will be synchronized to the
    main website via savannah
