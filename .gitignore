@@ -316,7 +316,6 @@
 /libpskc/man/pskc_get_key_policy_pinminlength.3
 /libpskc/man/pskc_get_key_policy_pinusagemode.3
 /libpskc/man/pskc_get_key_policy_startdate.3
-/libpskc/man/pskc_get_key_policy_usage.3
 /libpskc/man/pskc_get_key_profileid.3
 /libpskc/man/pskc_get_key_reference.3
 /libpskc/man/pskc_get_key_userid.3
