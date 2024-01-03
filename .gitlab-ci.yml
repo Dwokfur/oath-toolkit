@@ -106,6 +106,7 @@ B-Fedora39-clanganalyzer:
 
 # https://docs.gitlab.com/ee/ci/runners/saas/macos/environment.html
 B-macOS14Xcode15:
+  when: manual
   image: macos-14-xcode-15
   tags: [ saas-macos-medium-m1 ]
   stage: build
@@ -314,6 +315,7 @@ Gentoo:
   - make check V=1 VERBOSE=t
 
 macOS13Xcode14:
+  when: manual
   image: macos-13-xcode-14
   tags: [ saas-macos-medium-m1 ]
   stage: test
