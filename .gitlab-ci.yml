@@ -43,8 +43,8 @@ B-gcc:
   - gcc --version
   - ./bootstrap
   - ./configure CC="gcc -std=gnu2x" --enable-gcc-warnings WARN_CFLAGS=-Werror
-  - make V=1
-  - make V=1 check VERBOSE=t
+  - make -j$(nproc) V=1
+  - make -j$(nproc) V=1 check VERBOSE=t
   - git status
   - git diff --exit-code
 
@@ -59,8 +59,8 @@ B-clang:
   - clang --version
   - ./bootstrap
   - ./configure CC="clang -std=gnu2x" --enable-gcc-warnings WARN_CFLAGS=-Werror
-  - make V=1
-  - make V=1 check VERBOSE=t
+  - make -j$(nproc) V=1
+  - make -j$(nproc) V=1 check VERBOSE=t
   - git status
   - git diff --exit-code
 
@@ -73,10 +73,10 @@ B-Trisquel11:
   - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
   - ./bootstrap
   - ./configure --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
-  - make syntax-check
-  - make V=1
-  - make V=1 check VERBOSE=t
-  - make dist
+  - make -j$(nproc) syntax-check
+  - make -j$(nproc) V=1
+  - make -j$(nproc) V=1 check VERBOSE=t
+  - make -j$(nproc) dist
   - sha224sum oath-toolkit-*.tar.gz
   - cd website && ./build-website.sh
 
@@ -88,7 +88,7 @@ B-Debian12-coverage:
   - ./bootstrap
   - ./configure --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests CFLAGS="-g --coverage"
   - lcov --directory . --zerocounters
-  - make check V=1 VERBOSE=t
+  - make -j$(nproc) check V=1 VERBOSE=t
   - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
   - grep '^PASS run-root-tests.sh' pam_oath/tests/run-root-tests.sh.log
   - mkdir coverage
@@ -102,7 +102,7 @@ B-Fedora39-clanganalyzer:
   script:
   - ./bootstrap
   - scan-build ./configure --with-xmlsec-crypto-engine=openssl
-  - scan-build -o clang-analyzer make V=1
+  - scan-build -o clang-analyzer make -j$(nproc) V=1
 
 # https://docs.gitlab.com/ee/ci/runners/saas/macos/environment.html
 B-macOS14Xcode15:
@@ -121,9 +121,9 @@ B-macOS14Xcode15:
   - PATH="/opt/homebrew/opt/bison/bin:$PATH" # brew bison is keg-only
   - ./bootstrap
   - ./configure --enable-gcc-warnings
-  - make syntax-check
-  - make V=1
-  - make V=1 -k check VERBOSE=t
+  - make -j$(nproc) syntax-check
+  - make -j$(nproc) V=1
+  - make -j$(nproc) V=1 -k check VERBOSE=t
   - git status
   - git diff --exit-code
 
@@ -153,7 +153,7 @@ B-Windows-UCRT64:
     file configure.ac
     ./bootstrap
     ./configure --enable-gcc-warnings
-    make V=1 -k check VERBOSE=t'
+    make -j$(nproc) V=1 -k check VERBOSE=t'
 
 Windows-MSYS:
   when: manual
@@ -175,7 +175,7 @@ Windows-MSYS:
     tar xfa oath-toolkit-*.tar.gz
     cd `ls -d oath-toolkit-* | grep -v tar.gz`
     ./configure --enable-gcc-warnings
-    make V=1 -k check VERBOSE=t'
+    make -j$(nproc) V=1 -k check VERBOSE=t'
 
 Windows-MINGW64:
   when: manual
@@ -197,7 +197,7 @@ Windows-MINGW64:
     tar xfa oath-toolkit-*.tar.gz
     cd `ls -d oath-toolkit-* | grep -v tar.gz`
     ./configure --enable-gcc-warnings
-    make V=1 -k check VERBOSE=t'
+    make -j$(nproc) V=1 -k check VERBOSE=t'
 
 Debian12:
   image: debian:12-slim
@@ -212,7 +212,7 @@ Debian12:
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings --disable-valgrind-tests
-  - make check V=1 VERBOSE=t
+  - make -j$(nproc) check V=1 VERBOSE=t
 
 Ubuntu-xmlsec:
   image: ubuntu:20.04
@@ -229,7 +229,7 @@ Ubuntu-xmlsec:
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings --disable-valgrind-tests
-  - make check V=1 VERBOSE=t
+  - make -j$(nproc) check V=1 VERBOSE=t
 
 AlmaLinux8:
   image: almalinux:8
@@ -243,8 +243,8 @@ AlmaLinux8:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
   - ./configure --disable-pskc --enable-gcc-warnings --disable-valgrind-tests
-  - make syntax-check
-  - make check V=1 VERBOSE=t
+  - make -j$(nproc) syntax-check
+  - make -j$(nproc) check V=1 VERBOSE=t
 
 AlmaLinux8-xmlsec:
   image: almalinux:8
@@ -259,7 +259,7 @@ AlmaLinux8-xmlsec:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
   - ./configure --enable-gcc-warnings --disable-valgrind-tests --with-xmlsec-crypto-engine=openssl
-  - make check V=1 VERBOSE=t
+  - make -j$(nproc) check V=1 VERBOSE=t
 
 Alpine:
   image: alpine:latest
@@ -272,7 +272,7 @@ Alpine:
   - tar xfz oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
   - ./configure --disable-pskc --enable-gcc-warnings
-  - make check V=1 VERBOSE=t
+  - make -j$(nproc) check V=1 VERBOSE=t
 
 ArchLinux:
   image: archlinux:latest
@@ -286,7 +286,7 @@ ArchLinux:
   - mkdir b
   - cd b
   - ../configure --disable-pskc --enable-gcc-warnings
-  - make check V=1 VERBOSE=t
+  - make -j$(nproc) check V=1 VERBOSE=t
 
 ArchLinux-xmlsec:
   image: archlinux:latest
@@ -300,7 +300,7 @@ ArchLinux-xmlsec:
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings
-  - make check V=1 VERBOSE=t
+  - make -j$(nproc) check V=1 VERBOSE=t
 
 Gentoo:
   image: registry.gitlab.com/oath-toolkit/build-images:Gentoo
@@ -312,7 +312,7 @@ Gentoo:
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings
-  - make check V=1 VERBOSE=t
+  - make -j$(nproc) check V=1 VERBOSE=t
 
 macOS13Xcode14:
   when: manual
@@ -333,8 +333,8 @@ macOS13Xcode14:
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings
-  - make syntax-check
-  - make V=1 check VERBOSE=t
+  - make -j$(nproc) syntax-check
+  - make -j$(nproc) V=1 check VERBOSE=t
 
 Mingw32:
   image: debian:11-slim
@@ -349,9 +349,9 @@ Mingw32:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
   - ./configure --host=i686-w64-mingw32 CC='i686-w64-mingw32-gcc -static-libgcc'
-  - make V=1
-  - make -C liboath/tests check VERBOSE=t
-  - make -C oathtool/tests check VERBOSE=t
+  - make -j$(nproc) V=1
+  - make -j$(nproc) -C liboath/tests check VERBOSE=t
+  - make -j$(nproc) -C oathtool/tests check VERBOSE=t
 
 Mingw64:
   image: debian:11-slim
@@ -365,9 +365,9 @@ Mingw64:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
   - ./configure --host=x86_64-w64-mingw32
-  - make V=1
-  - make -C liboath/tests check VERBOSE=t
-  - make -C oathtool/tests check VERBOSE=T
+  - make -j$(nproc) V=1
+  - make -j$(nproc) -C liboath/tests check VERBOSE=t
+  - make -j$(nproc) -C oathtool/tests check VERBOSE=T
 
 .pages:
   stage: deploy
