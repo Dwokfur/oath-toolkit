@@ -1,7 +1,7 @@
 OATH Toolkit NEWS -- History of user-visible changes.           -*- outline -*-
 Copyright (C) 2009-2024 Simon Josefsson.  Licensed under the GPLv3+.
 
-* Version 2.6.11 (unreleased)
+* Version 2.6.11 (released 2024-01-11)
 
 ** liboath: Handle invalid base32 encoded secrets.  Fixes: #41.
 The gnulib update in version 2.6.10 made the base32 encoding functions
