@@ -1,0 +1,62 @@
+From a7e4e1ce9de463b5645470997a902724dea2a981 Mon Sep 17 00:00:00 2001
+From: Simon Josefsson <simon@josefsson.org>
+Date: Thu, 11 Jan 2024 08:38:36 +0100
+Subject: [PATCH] liboath: Don't reject invalid base32.  Fixes: #41.
+
+---
+ liboath/gl/base32.c | 18 ------------------
+ 1 file changed, 18 deletions(-)
+
+diff --git a/liboath/gl/base32.c b/liboath/gl/base32.c
+index 270c505..c1beb0d 100644
+--- a/liboath/gl/base32.c
++++ b/liboath/gl/base32.c
+@@ -354,10 +354,6 @@ decode_8 (char const *restrict in, idx_t inlen,
+       if (in[3] != '=' || in[4] != '=' || in[5] != '='
+           || in[6] != '=' || in[7] != '=')
+         return_false;
+-
+-      /* Reject non-canonical encodings.  */
+-      if (base32_to_int[to_uchar (in[1])] & 0x03)
+-        return_false;
+     }
+   else
+     {
+@@ -376,10 +372,6 @@ decode_8 (char const *restrict in, idx_t inlen,
+         {
+           if (in[5] != '=' || in[6] != '=' || in[7] != '=')
+             return_false;
+-
+-          /* Reject non-canonical encodings.  */
+-          if (base32_to_int[to_uchar (in[3])] & 0x0f)
+-            return_false;
+         }
+       else
+         {
+@@ -397,10 +389,6 @@ decode_8 (char const *restrict in, idx_t inlen,
+             {
+               if (in[6] != '=' || in[7] != '=')
+                 return_false;
+-
+-              /* Reject non-canonical encodings.  */
+-              if (base32_to_int[to_uchar (in[4])] & 0x01)
+-                return_false;
+             }
+           else
+             {
+@@ -427,12 +415,6 @@ decode_8 (char const *restrict in, idx_t inlen,
+                       --*outleft;
+                     }
+                 }
+-              else
+-                {
+-                  /* Reject non-canonical encodings.  */
+-                  if (base32_to_int[to_uchar (in[6])] & 0x07)
+-                    return_false;
+-                }
+             }
+         }
+     }
+-- 
+2.34.1
+
