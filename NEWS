@@ -3,6 +3,12 @@ Copyright (C) 2009-2024 Simon Josefsson.  Licensed under the GPLv3+.
 
 * Version 2.6.11 (unreleased)
 
+** liboath: Handle invalid base32 encoded secrets.  Fixes: #41.
+The gnulib update in version 2.6.10 made the base32 encoding functions
+reject invalid encodings, but it appears as if these are wildly used.
+We now accept invalid encodings again.  Thanks to Dorancé Martínez and
+Seres Bendegúz for reports.
+
 * Version 2.6.10 (released 2024-01-03)
 
 ** Building from git uses a ./bootstrap script instead of 'make bootstrap'.
