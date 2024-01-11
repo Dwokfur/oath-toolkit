@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+.NOTPARALLEL:
+
 SUBDIRS = gl . tests
 
 ACLOCAL_AMFLAGS = -I gl/m4
@@ -40,7 +42,6 @@ MAINTAINERCLEANFILES = $(dist_man_MANS)
 EXTRA_DIST = pskctool.h2m
 
 pskctool.1: $(srcdir)/pskctool.c $(srcdir)/pskctool.ggo $(srcdir)/pskctool.h2m $(srcdir)/configure.ac
-	$(MAKE) $(builddir)/pskctool$(EXEEXT)
 	$(AM_V_GEN)$(HELP2MAN) \
 		--include $(srcdir)/pskctool.h2m \
 		--no-info \

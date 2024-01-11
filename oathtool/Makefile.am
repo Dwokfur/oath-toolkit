@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+.NOTPARALLEL:
+
 SUBDIRS = gl . tests
 
 ACLOCAL_AMFLAGS = -I gl/m4
@@ -42,7 +44,6 @@ MAINTAINERCLEANFILES = $(dist_man_MANS)
 EXTRA_DIST = oathtool.h2m
 
 oathtool.1: $(srcdir)/oathtool.c $(srcdir)/oathtool.ggo $(srcdir)/oathtool.h2m $(srcdir)/configure.ac
-	$(MAKE) $(builddir)/oathtool$(EXEEXT)
 	$(AM_V_GEN)$(HELP2MAN) \
 		--include $(srcdir)/oathtool.h2m \
 		--no-info \
