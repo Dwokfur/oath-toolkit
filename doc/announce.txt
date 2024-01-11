@@ -1,7 +1,7 @@
 To: oath-toolkit-help@nongnu.org
-Subject: OATH Toolkit 2.6.10
+Subject: OATH Toolkit 2.6.11
 <#secure method=pgpmime mode=sign>
-This is to announce oath-toolkit-2.6.10, a stable release.
+This is to announce oath-toolkit-2.6.11, a stable release.
 
 OATH Toolkit provide components to build one-time password
 authentication systems.  It contains shared C libraries, command line
@@ -58,19 +58,19 @@ are invited to join our oath-toolkit-help mailing list, see:
   https://lists.nongnu.org/mailman/listinfo/oath-toolkit-help
 
 Here are the compressed sources and a GPG detached signature:
-  https://download.savannah.nongnu.org/releases/oath-toolkit/oath-toolkit-2.6.10.tar.gz
-  https://download.savannah.nongnu.org/releases/oath-toolkit/oath-toolkit-2.6.10.tar.gz.sig
+  https://download.savannah.nongnu.org/releases/oath-toolkit/oath-toolkit-2.6.11.tar.gz
+  https://download.savannah.nongnu.org/releases/oath-toolkit/oath-toolkit-2.6.11.tar.gz.sig
 
 Here are the SHA1 and SHA224 checksums:
 
-3e346ef1218e0f2894e6b2ba643c43b7afae175c  oath-toolkit-2.6.10.tar.gz
-7c90d32c50102864f4cd5a08eac7f4323b8f67a18df2c84ba867c886  oath-toolkit-2.6.10.tar.gz
+7e365d0fa892c4d1493585751adaec0ebd07d66e  oath-toolkit-2.6.11.tar.gz
+a6a91cfe8aa5498d032278aa4e759e39c9b87e04f68aed55a68c9efa  oath-toolkit-2.6.11.tar.gz
 
 Use a .sig file to verify that the corresponding file (without the
 .sig suffix) is intact.  First, be sure to download both the .sig file
 and the corresponding tarball.  Then, run a command like this:
 
-  gpg --verify oath-toolkit-2.6.10.tar.gz.sig
+  gpg --verify oath-toolkit-2.6.11.tar.gz.sig
 
 The signature should match the fingerprint of the following key:
 
@@ -90,18 +90,13 @@ or refresh it, and then rerun the 'gpg --verify' command.
 
 NEWS
 
-* Version 2.6.10 (released 2024-01-03)
+* Version 2.6.11 (released 2024-01-03)
 
-** Building from git uses a ./bootstrap script instead of 'make bootstrap'.
-
-** Build fixes for Windows.
-In particular, don't use filenames "aux.h" and "aux.c" which interact
-badly with the AUX special filename.
-
-** Build fixes for Arch Linux.
-
-** Various build fixes including updated gnulib files.
-One remaining gnulib self-test disabled.
+** liboath: Handle invalid base32 encoded secrets.  Fixes: #41.
+The gnulib update in version 2.6.10 made the base32 encoding functions
+reject invalid encodings, but it appears as if these are wildly used.
+We now accept invalid encodings again.  Thanks to Dorancé Martínez and
+Seres Bendegúz for reports.
 
 Happy hacking,
 Simon
