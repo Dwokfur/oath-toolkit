@@ -82,51 +82,79 @@ The release rules are implemented in cfg.mk, and to make new official
 release the following steps are made:
 
 x. Make sure you have updated to latest gnulib files.
-   make glimport
-   git rm -f ...
-   git add ...
-   git commit -m "Update gnulib files." -a
+
+```
+rm -rf gl liboath/gl libpskc/gl oathtool/gl pskctool/gl/
+git restore {.,liboath,libpskc,oathtool,pskctool}/gl/m4/gnulib-cache.m4
+git restore */gl/override/*/*.diff
+PATH=$PATH:/path/to/where/gnulib-tool/lives make -f cfg.mk glimport
+git add .
+git commit -m "Update gnulib files." -a
+```
 
 x. Make sure you have pushed git to GitLab and that CI/CD passes.
    https://gitlab.com/oath-toolkit/oath-toolkit/-/pipelines
 
 x. Make sure NEWS reflect all changes made since the last release.
-   make review-diff
+
+```
+make review-diff
+```
 
 x. Make sure the '(unreleased)' string in NEWS is changed into
    '(released XXXX-YY-ZZ)' for the release.
 
 x. Make sure you have committed everything and have a clean checkout.
-   git clean -d -x -f
-   git status
-   git reset --hard
 
-x. Run 'make tag VERSION=1.2.3' for the version number.
-   Use 'git tag -d ...' to remove tags if you made mistakes.
+```
+git clean -d -x -f
+git status
+git reset --hard
+```
+
+x. Run `make tag VERSION=1.2.3` for the version number.
+   Use `git tag -d ...` to remove tags if you made mistakes.
+
+```
+make -f cfg.mk tag PACKAGE=oath-toolkit VERSION=2.6.11
+```
 
 x. Make sure ../www-oath-toolkit/ contains a git checkout of the
    website git repository, and ../www-oath-toolkit-cvs/ contains a CVS
    checkout of the website.
-   cd ..
-   git clone git@gitlab.com:oath-toolkit/website.git www-oath-toolkit
-   cvs -z3 -d:ext:USER@cvs.savannah.nongnu.org:/web/oath-toolkit co -d www-oath-toolkit-cvs oath-toolkit
+
+```
+cd ..
+git clone git@gitlab.com:oath-toolkit/website.git www-oath-toolkit
+cvs -z3 -d:ext:USER@cvs.savannah.nongnu.org:/web/oath-toolkit co -d www-oath-toolkit-cvs oath-toolkit
+```
 
 x. Create release artifacts.
-   ./bootstrap
-   ./configure --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
-   make
-   make release-check
+
+```
+./bootstrap
+./configure --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
+make
+make release-check
+```
 
 x. Upload release artifacts.
-   make release-upload-www release-upload-ftp
+
+```
+make release-upload-www release-upload-ftp
+```
 
 x. Manually update the CVS website that will be synchronized to the
    main website via savannah
-   cd ../www-oath-toolkit-cvs/
-   sh -x ./synk-from-git.sh
-   cvs add ...
-   cvs rm -f ...
-   cvs commit -mUpdate.
+
+```
+cd ../www-oath-toolkit-cvs/
+sh -x ./synk-from-git.sh
+cvs update # figure out what to 'cvs add' and what to 'cvs rm -f'
+cvs add ...
+cvs rm -f ...
+cvs commit -mUpdate.
+```
 
 x. Post release announcement based on doc/announce.txt, updating
    announcement in git.
