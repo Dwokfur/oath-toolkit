@@ -84,6 +84,23 @@ B-Trisquel11:
   - sha224sum oath-toolkit-*.tar.gz
   - cd website && ./build-website.sh
 
+B-Debian13-arm64:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
+  image: debian:trixie-slim
+  tags: [ arm64 ]
+  stage: build
+  before_script:
+  - apt-get update -qq
+  - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt indent
+  script:
+  - ./bootstrap
+  - ./configure -C --enable-gcc-warnings
+  - make -j$(nproc) syntax-check
+  - make -j$(nproc) V=1
+  - make -j$(nproc) V=1 check VERBOSE=t
+
 B-Debian12-coverage:
   image: registry.gitlab.com/oath-toolkit/build-images:Debian12-coverage
   stage: build
@@ -288,6 +305,23 @@ Alpine-mold:
   - (! grep -E 'mold. warning' build.log)
   - grep 'mold ' libpskc/.libs/libpskc.so
 
+Alpine-arm64:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
+  image: alpine:latest
+  tags: [ arm64 ]
+  stage: test
+  needs: [B-Trisquel11]
+  before_script:
+  - apk update
+  - apk add build-base datefudge xmlsec-dev
+  script:
+  - tar xfz oath-toolkit-*.tar.gz
+  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - ./configure -C --enable-gcc-warnings
+  - make -j$(nproc) check V=1 VERBOSE=t
+
 ArchLinux:
   image: archlinux:latest
   stage: test
@@ -314,6 +348,23 @@ ArchLinux-xmlsec:
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings
+  - make -j$(nproc) check V=1 VERBOSE=t
+
+Fedora39-arm64:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
+  image: fedora:39
+  tags: [ arm64 ]
+  stage: test
+  needs: [B-Trisquel11]
+  before_script:
+  - dnf install -y make gcc diffutils file pam-devel
+  - dnf install -y libxml2-devel xmlsec1-devel xmlsec1-openssl libtool-ltdl-devel
+  script:
+  - tar xfz oath-toolkit-*.tar.gz
+  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - ./configure -C --enable-gcc-warnings
   - make -j$(nproc) check V=1 VERBOSE=t
 
 Gentoo:
