@@ -101,6 +101,23 @@ B-Debian13-arm64:
   - make -j$(nproc) V=1
   - make -j$(nproc) V=1 check VERBOSE=t
 
+B-Ubuntu2204-ppc64:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
+  image: ubuntu:22.04
+  tags: [ ppc64 ]
+  stage: build
+  before_script:
+  - apt-get update -qq
+  - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt
+  script:
+  - ./bootstrap
+  - ./configure -C --enable-gcc-warnings
+  - make -j$(nproc) syntax-check
+  - make -j$(nproc) V=1
+  - make -j$(nproc) V=1 check VERBOSE=t
+
 B-Debian12-coverage:
   image: registry.gitlab.com/oath-toolkit/build-images:Debian12-coverage
   stage: build
@@ -242,6 +259,27 @@ Debian12:
   - cd b
   - ../configure --enable-gcc-warnings --disable-valgrind-tests
   - make -j$(nproc) check V=1 VERBOSE=t
+  - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
+
+Ubuntu2310-xmlsec-ppc64:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
+  image: ubuntu:23.10
+  tags: [ ppc64 ]
+  stage: test
+  needs: [B-Trisquel11]
+  variables:
+    DEBIAN_FRONTEND: noninteractive
+  before_script:
+  - apt-get update -qq
+  - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
+  script:
+  - tar xfa oath-toolkit-*.tar.gz
+  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - ./configure -C --enable-gcc-warnings --disable-valgrind-tests
+  - make -j$(nproc) check V=1 VERBOSE=t
+  - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
 
 Ubuntu-xmlsec:
   image: ubuntu:20.04
@@ -260,21 +298,6 @@ Ubuntu-xmlsec:
   - ../configure --enable-gcc-warnings --disable-valgrind-tests
   - make -j$(nproc) check V=1 VERBOSE=t
 
-AlmaLinux8:
-  image: almalinux:8
-  stage: test
-  needs: [B-Trisquel11]
-  before_script:
-  - yum -y install make gcc diffutils file pam-devel
-  - dnf -y install epel-release
-  - dnf --enablerepo=powertools -y install indent
-  script:
-  - tar xfa oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
-  - ./configure --disable-pskc --enable-gcc-warnings --disable-valgrind-tests
-  - make -j$(nproc) syntax-check
-  - make -j$(nproc) check V=1 VERBOSE=t
-
 AlmaLinux8-xmlsec:
   image: almalinux:8
   stage: test
@@ -283,11 +306,29 @@ AlmaLinux8-xmlsec:
   - yum -y install make gcc diffutils file pam-devel
   - yum -y install libxml2-devel libtool-ltdl-devel
   - dnf -y install epel-release
-  - dnf -y --enablerepo=powertools install xmlsec1-openssl-devel
+  - dnf -y --enablerepo=powertools install indent xmlsec1-openssl-devel
   script:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
-  - ./configure --enable-gcc-warnings --disable-valgrind-tests --with-xmlsec-crypto-engine=openssl
+  - ./configure -C --enable-gcc-warnings --disable-valgrind-tests --with-xmlsec-crypto-engine=openssl
+  - make -j$(nproc) syntax-check
+  - make -j$(nproc) check V=1 VERBOSE=t
+  - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
+
+RockyLinux9-ppc64:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
+  image: rockylinux:9
+  tags: [ ppc64 ]
+  stage: test
+  needs: [B-Trisquel11]
+  before_script:
+  - dnf -y install make gcc diffutils file pam-devel
+  script:
+  - tar xfa oath-toolkit-*.tar.gz
+  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - ./configure -C --enable-gcc-warnings
   - make -j$(nproc) check V=1 VERBOSE=t
 
 Alpine-mold:
@@ -322,20 +363,6 @@ Alpine-arm64:
   - ./configure -C --enable-gcc-warnings
   - make -j$(nproc) check V=1 VERBOSE=t
 
-ArchLinux:
-  image: archlinux:latest
-  stage: test
-  needs: [B-Trisquel11]
-  before_script:
-  - pacman -Suy --noconfirm make gcc diffutils file
-  script:
-  - tar xfz oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
-  - mkdir b
-  - cd b
-  - ../configure --disable-pskc --enable-gcc-warnings
-  - make -j$(nproc) check V=1 VERBOSE=t
-
 ArchLinux-xmlsec:
   image: archlinux:latest
   stage: test
@@ -349,6 +376,7 @@ ArchLinux-xmlsec:
   - cd b
   - ../configure --enable-gcc-warnings
   - make -j$(nproc) check V=1 VERBOSE=t
+  - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
 
 Fedora39-arm64:
   rules:
