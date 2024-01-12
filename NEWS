@@ -3,6 +3,12 @@ Copyright (C) 2009-2024 Simon Josefsson.  Licensed under the GPLv3+.
 
 * Version 2.6.12 (unreleased)
 
+** libpskc: Fix linker warning when linked with mold.
+Thanks to Jan Palus, see
+<https://gitlab.com/oath-toolkit/oath-toolkit/-/merge_requests/30> and
+<https://gitlab.com/oath-toolkit/oath-toolkit/-/merge_requests/36> for
+regression testing.
+
 * Version 2.6.11 (released 2024-01-11)
 
 ** liboath: Handle invalid base32 encoded secrets.  Fixes: #41.

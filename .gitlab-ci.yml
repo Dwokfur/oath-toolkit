@@ -76,7 +76,7 @@ B-Trisquel11:
   script:
   - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
   - ./bootstrap
-  - ./configure --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
+  - ./configure -C --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
   - make -j$(nproc) syntax-check
   - make -j$(nproc) V=1
   - make -j$(nproc) V=1 check VERBOSE=t
@@ -273,18 +273,20 @@ AlmaLinux8-xmlsec:
   - ./configure --enable-gcc-warnings --disable-valgrind-tests --with-xmlsec-crypto-engine=openssl
   - make -j$(nproc) check V=1 VERBOSE=t
 
-Alpine:
+Alpine-mold:
   image: alpine:latest
   stage: test
   needs: [B-Trisquel11]
   before_script:
   - apk update
-  - apk add build-base datefudge
+  - apk add build-base datefudge xmlsec-dev mold
   script:
   - tar xfz oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
-  - ./configure --disable-pskc --enable-gcc-warnings
-  - make -j$(nproc) check V=1 VERBOSE=t
+  - ./configure -C --enable-gcc-warnings CC='cc -fuse-ld=mold'
+  - make -j$(nproc) check V=1 VERBOSE=t 2>&1 | tee build.log
+  - (! grep -E 'mold. warning' build.log)
+  - grep 'mold ' libpskc/.libs/libpskc.so
 
 ArchLinux:
   image: archlinux:latest
