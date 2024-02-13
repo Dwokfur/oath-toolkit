@@ -24,6 +24,7 @@
 #include <pskc/pskc.h>
 
 #include "internal.h"
+#include <stdlib.h>		/* free */
 #include <string.h>		/* strverscmp */
 #include <libxml/parser.h>	/* xmlInitParser */
 #include <libxml/catalog.h>	/* xmlLoadCatalog */
