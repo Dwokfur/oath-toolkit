@@ -175,7 +175,7 @@ B-Windows-UCRT64:
   tags: [ shared-windows, windows-1809 ]
   stage: build
   script: # https://www.msys2.org/docs/ci/#other-systems
-  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - wget.exe --no-check-certificate -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
   - ./msys2.exe -y -oC:\
   - Remove-Item msys2.exe
   - $env:CHERE_INVOKING = 'yes'
@@ -205,7 +205,7 @@ Windows-MSYS:
   stage: test
   needs: [B-Trisquel11]
   script: # https://www.msys2.org/docs/ci/#other-systems
-  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - wget.exe --no-check-certificate -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
   - ./msys2.exe -y -oC:\
   - Remove-Item msys2.exe
   - $env:CHERE_INVOKING = 'yes'
@@ -229,7 +229,7 @@ Windows-MINGW64:
   stage: test
   needs: [B-Trisquel11]
   script: # https://www.msys2.org/docs/ci/#other-systems
-  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - wget.exe --no-check-certificate -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
   - ./msys2.exe -y -oC:\
   - Remove-Item msys2.exe
   - $env:CHERE_INVOKING = 'yes'
