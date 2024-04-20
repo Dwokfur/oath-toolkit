@@ -1,4 +1,5 @@
-# printf.m4 serial 89
+# printf.m4
+# serial 91
 dnl Copyright (C) 2003, 2007-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -890,6 +891,7 @@ AC_DEFUN([gl_PRINTF_DIRECTIVE_N],
     [
       AC_RUN_IFELSE(
         [AC_LANG_SOURCE([[
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -907,6 +909,12 @@ invalid_parameter_handler (const wchar_t *expression,
   exit (1);
 }
 #endif
+static void
+abort_handler (int sig)
+{
+  (void) sig;
+  _exit (1);
+}
 static char fmtstring[10];
 static char buf[100];
 int main ()
@@ -915,6 +923,7 @@ int main ()
 #ifdef _MSC_VER
   _set_invalid_parameter_handler (invalid_parameter_handler);
 #endif
+  signal (SIGABRT, abort_handler);
   /* Copy the format string.  Some systems (glibc with _FORTIFY_SOURCE=2)
      support %n in format strings in read-only memory but not in writable
      memory.  */
@@ -1697,6 +1706,7 @@ AC_DEFUN([gl_SNPRINTF_DIRECTIVE_N],
     [
       AC_RUN_IFELSE(
         [AC_LANG_SOURCE([[
+#include <signal.h>
 #include <stdio.h>
 #include <string.h>
 #if HAVE_SNPRINTF
@@ -1713,11 +1723,18 @@ static int my_snprintf (char *buf, int size, const char *format, ...)
   return ret;
 }
 #endif
+static void
+abort_handler (int sig)
+{
+  (void) sig;
+  _exit (1);
+}
 static char fmtstring[10];
 static char buf[100];
 int main ()
 {
   int count = -1;
+  signal (SIGABRT, abort_handler);
   /* Copy the format string.  Some systems (glibc with _FORTIFY_SOURCE=2)
      support %n in format strings in read-only memory but not in writable
      memory.  */
@@ -2023,7 +2040,7 @@ static wchar_t buf[100];
 int main ()
 {
   int result = 0;
-  /* This catches a glibc 2.15 and Haiku 2022 bug.  */
+  /* This catches a glibc 2.15, Haiku 2022, NetBSD 10.0 bug.  */
   if (swprintf (buf, sizeof (buf) / sizeof (wchar_t),
                 L"%La %d", 3.1416015625L, 33, 44, 55) < 0
       || (wcscmp (buf, L"0x1.922p+1 33") != 0
@@ -2053,6 +2070,8 @@ int main ()
            *-musl* | midipix*) gl_cv_func_swprintf_directive_la="guessing yes";;
                                # Guess yes on Android.
            linux*-android*)    gl_cv_func_swprintf_directive_la="guessing yes";;
+                               # Guess no on NetBSD.
+           netbsd*)            gl_cv_func_swprintf_directive_la="guessing no";;
                                # Guess no on native Windows.
            mingw* | windows*)  gl_cv_func_swprintf_directive_la="guessing no";;
                                # If we don't know, obey --enable-cross-guesses.

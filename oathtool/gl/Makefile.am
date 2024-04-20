@@ -48,6 +48,7 @@ SUBDIRS =
 noinst_HEADERS =
 noinst_LIBRARIES =
 noinst_LTLIBRARIES =
+pkgdata_DATA =
 EXTRA_DIST =
 BUILT_SOURCES =
 SUFFIXES =
@@ -72,6 +73,7 @@ EXTRA_libgnu_la_SOURCES =
 libgnu_la_LDFLAGS = $(AM_LDFLAGS)
 libgnu_la_LDFLAGS += -no-undefined
 libgnu_la_LDFLAGS += $(CLOCK_TIME_LIB)
+libgnu_la_LDFLAGS += $(LIBTHREAD)
 libgnu_la_LDFLAGS += $(LTLIBINTL)
 
 ## begin gnulib module absolute-header
@@ -387,6 +389,7 @@ SED_HEADER_STDOUT = sed -e 1h -e '1$(SED_HEADER_NOEDIT)' -e 1G
 SED_HEADER_TO_AT_t = $(SED_HEADER_STDOUT) -n -e 'w $@-t'
 
 # Use $(gl_V_at) instead of $(AM_V_GEN) or $(AM_V_at) on a line that
+# is its recipe's first line if and only if @NMD@ lines are absent.
 gl_V_at = $(AM_V_GEN)
 
 ## end   gnulib module gen-header
@@ -534,6 +537,56 @@ EXTRA_DIST += limits.in.h
 
 ## end   gnulib module limits-h
 
+## begin gnulib module locale
+
+BUILT_SOURCES += locale.h
+
+# We need the following in order to create <locale.h> when the system
+# doesn't have one that provides all definitions.
+locale.h: locale.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(WARN_ON_USE_H)
+	$(gl_V_at)$(SED_HEADER_STDOUT) \
+	      -e 's|@''GUARD_PREFIX''@|GL|g' \
+	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
+	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
+	      -e 's|@''NEXT_LOCALE_H''@|$(NEXT_LOCALE_H)|g' \
+	      -e 's/@''GNULIB_LOCALECONV''@/$(GL_GNULIB_LOCALECONV)/g' \
+	      -e 's/@''GNULIB_SETLOCALE''@/$(GL_GNULIB_SETLOCALE)/g' \
+	      -e 's/@''GNULIB_SETLOCALE_NULL''@/$(GL_GNULIB_SETLOCALE_NULL)/g' \
+	      -e 's/@''GNULIB_DUPLOCALE''@/$(GL_GNULIB_DUPLOCALE)/g' \
+	      -e 's/@''GNULIB_LOCALENAME_UNSAFE''@/$(GL_GNULIB_LOCALENAME_UNSAFE)/g' \
+	      -e 's|@''HAVE_NEWLOCALE''@|$(HAVE_NEWLOCALE)|g' \
+	      -e 's|@''HAVE_DUPLOCALE''@|$(HAVE_DUPLOCALE)|g' \
+	      -e 's|@''HAVE_FREELOCALE''@|$(HAVE_FREELOCALE)|g' \
+	      -e 's|@''HAVE_XLOCALE_H''@|$(HAVE_XLOCALE_H)|g' \
+	      -e 's|@''REPLACE_LOCALECONV''@|$(REPLACE_LOCALECONV)|g' \
+	      -e 's|@''REPLACE_SETLOCALE''@|$(REPLACE_SETLOCALE)|g' \
+	      -e 's|@''REPLACE_NEWLOCALE''@|$(REPLACE_NEWLOCALE)|g' \
+	      -e 's|@''REPLACE_DUPLOCALE''@|$(REPLACE_DUPLOCALE)|g' \
+	      -e 's|@''REPLACE_FREELOCALE''@|$(REPLACE_FREELOCALE)|g' \
+	      -e 's|@''REPLACE_STRUCT_LCONV''@|$(REPLACE_STRUCT_LCONV)|g' \
+	      -e 's|@''LOCALENAME_ENHANCE_LOCALE_FUNCS''@|$(LOCALENAME_ENHANCE_LOCALE_FUNCS)|g' \
+	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
+	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
+	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
+	      $(srcdir)/locale.in.h > $@-t
+	$(AM_V_at)mv $@-t $@
+MOSTLYCLEANFILES += locale.h locale.h-t
+
+EXTRA_DIST += locale.in.h
+
+## end   gnulib module locale
+
+## begin gnulib module localename-unsafe-limited
+
+if GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED
+libgnu_la_SOURCES += localename-unsafe.c
+endif
+
+EXTRA_DIST += localename.h
+
+## end   gnulib module localename-unsafe-limited
+
 ## begin gnulib module malloca
 
 libgnu_la_SOURCES += malloca.c
@@ -600,7 +653,9 @@ EXTRA_DIST += msvc-nothrow.h
 
 libgnu_la_SOURCES += nstrftime.c
 
-EXTRA_DIST += strftime.h
+EXTRA_DIST += strftime.c strftime.h
+
+EXTRA_libgnu_la_SOURCES += strftime.c
 
 ## end   gnulib module nstrftime
 
@@ -626,35 +681,20 @@ endif
 # Additionally, here we assume GNU Bison and therefore don't need the ylwrap
 # script.
 # Therefore we override this rule.
-# Since this is a rule that produces multiple files, we apply the idiom from
-# <https://lists.gnu.org/archive/html/bug-make/2020-09/msg00008.html>, so that
-# it works also in parallel 'make'.
-generate-parse-datetime:
-	$(AM_V_YACC)$(PARSE_DATETIME_BISON) -d $(YFLAGS) $(AM_YFLAGS) $(srcdir)/parse-datetime.y \
+parse-datetime.c: parse-datetime.y
+	$(AM_V_YACC)$(PARSE_DATETIME_BISON) $(YFLAGS) $(AM_YFLAGS) $(srcdir)/parse-datetime.y \
 	&& test ':' = '$(PARSE_DATETIME_BISON)' || { \
 	  sed -e 's|".*/parse-datetime\.y"|"parse-datetime.y"|' \
 	      -e 's|"parse-datetime\.tab\.c"|"parse-datetime.c"|' \
-	      -e 's|"parse-datetime\.tab\.h"|"parse-datetime-gen.h"|' \
 	      < parse-datetime.tab.c > parse-datetime.c-tmp \
-	  && sed -e 's|".*/parse-datetime\.y"|"parse-datetime.y"|' \
-	         -e 's|"parse-datetime\.tab\.h"|"parse-datetime-gen.h"|' \
-	         < parse-datetime.tab.h > parse-datetime-gen.h-tmp \
-	  && rm -f parse-datetime.tab.c parse-datetime.tab.h \
-	  && mv parse-datetime.c-tmp $(srcdir)/parse-datetime.c \
-	  && mv parse-datetime-gen.h-tmp $(srcdir)/parse-datetime-gen.h; \
+	  && rm -f parse-datetime.tab.c \
+	  && mv parse-datetime.c-tmp $(srcdir)/parse-datetime.c; \
 	}
-.PHONY: generate-parse-datetime
-# The above rule will generate files with time stamp order
-# parse-datetime.y <= parse-datetime.c <= parse-datetime-gen.h.
-parse-datetime.c: parse-datetime.y
-	@{ test -f $(srcdir)/parse-datetime.c && test ! $(srcdir)/parse-datetime.c -ot $(srcdir)/parse-datetime.y; } || $(MAKE) generate-parse-datetime
-parse-datetime-gen.h: parse-datetime.c
-	@{ test -f $(srcdir)/parse-datetime-gen.h && test ! $(srcdir)/parse-datetime-gen.h -ot $(srcdir)/parse-datetime.c; } || $(MAKE) generate-parse-datetime
 libgnu_la_SOURCES += parse-datetime.y
-BUILT_SOURCES += parse-datetime.c parse-datetime-gen.h
-MOSTLYCLEANFILES += parse-datetime.tab.c parse-datetime.tab.h parse-datetime.c-tmp parse-datetime-gen.h-tmp
-MAINTAINERCLEANFILES += parse-datetime.c parse-datetime-gen.h
-EXTRA_DIST += parse-datetime.c parse-datetime-gen.h
+BUILT_SOURCES += parse-datetime.c
+MOSTLYCLEANFILES += parse-datetime.tab.c parse-datetime.c-tmp
+MAINTAINERCLEANFILES += parse-datetime.c
+EXTRA_DIST += parse-datetime.c
 
 EXTRA_DIST += parse-datetime.h
 
@@ -688,6 +728,14 @@ libgnu_la_SOURCES += setenv.c
 endif
 
 ## end   gnulib module setenv
+
+## begin gnulib module setlocale-null-unlocked
+
+libgnu_la_SOURCES += setlocale_null-unlocked.c
+
+EXTRA_DIST += setlocale_null.h
+
+## end   gnulib module setlocale-null-unlocked
 
 ## begin gnulib module size_max
 
@@ -1087,6 +1135,7 @@ stdlib.h: stdlib.in.h $(top_builddir)/config.status $(CXXDEFS_H) \
 	      -e 's/@''GNULIB_SECURE_GETENV''@/$(GL_GNULIB_SECURE_GETENV)/g' \
 	      -e 's/@''GNULIB_SETENV''@/$(GL_GNULIB_SETENV)/g' \
 	      -e 's/@''GNULIB_STRTOD''@/$(GL_GNULIB_STRTOD)/g' \
+	      -e 's/@''GNULIB_STRTOF''@/$(GL_GNULIB_STRTOF)/g' \
 	      -e 's/@''GNULIB_STRTOL''@/$(GL_GNULIB_STRTOL)/g' \
 	      -e 's/@''GNULIB_STRTOLD''@/$(GL_GNULIB_STRTOLD)/g' \
 	      -e 's/@''GNULIB_STRTOLL''@/$(GL_GNULIB_STRTOLL)/g' \
@@ -1139,6 +1188,7 @@ stdlib.h: stdlib.in.h $(top_builddir)/config.status $(CXXDEFS_H) \
 	      -e 's|@''HAVE_SETSTATE''@|$(HAVE_SETSTATE)|g' \
 	      -e 's|@''HAVE_DECL_SETSTATE''@|$(HAVE_DECL_SETSTATE)|g' \
 	      -e 's|@''HAVE_STRTOD''@|$(HAVE_STRTOD)|g' \
+	      -e 's|@''HAVE_STRTOF''@|$(HAVE_STRTOF)|g' \
 	      -e 's|@''HAVE_STRTOL''@|$(HAVE_STRTOL)|g' \
 	      -e 's|@''HAVE_STRTOLD''@|$(HAVE_STRTOLD)|g' \
 	      -e 's|@''HAVE_STRTOLL''@|$(HAVE_STRTOLL)|g' \
@@ -1184,6 +1234,7 @@ stdlib.h: stdlib.in.h $(top_builddir)/config.status $(CXXDEFS_H) \
 	      -e 's|@''REPLACE_SETENV''@|$(REPLACE_SETENV)|g' \
 	      -e 's|@''REPLACE_SETSTATE''@|$(REPLACE_SETSTATE)|g' \
 	      -e 's|@''REPLACE_STRTOD''@|$(REPLACE_STRTOD)|g' \
+	      -e 's|@''REPLACE_STRTOF''@|$(REPLACE_STRTOF)|g' \
 	      -e 's|@''REPLACE_STRTOL''@|$(REPLACE_STRTOL)|g' \
 	      -e 's|@''REPLACE_STRTOLD''@|$(REPLACE_STRTOLD)|g' \
 	      -e 's|@''REPLACE_STRTOLL''@|$(REPLACE_STRTOLL)|g' \
@@ -1311,6 +1362,7 @@ string.h: string.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
 	      -e 's|@''REPLACE_MEMCHR''@|$(REPLACE_MEMCHR)|g' \
 	      -e 's|@''REPLACE_MEMMEM''@|$(REPLACE_MEMMEM)|g' \
 	      -e 's|@''REPLACE_MEMPCPY''@|$(REPLACE_MEMPCPY)|g' \
+	      -e 's|@''REPLACE_MEMSET_EXPLICIT''@|$(REPLACE_MEMSET_EXPLICIT)|g' \
 	      -e 's|@''REPLACE_FREE''@|$(REPLACE_FREE)|g' \
 	      -e 's|@''REPLACE_STPCPY''@|$(REPLACE_STPCPY)|g' \
 	      -e 's|@''REPLACE_STPNCPY''@|$(REPLACE_STPNCPY)|g' \
@@ -1513,6 +1565,7 @@ time.h: time.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(
 	      -e 's|@''REPLACE_TIME''@|$(REPLACE_TIME)|g' \
 	      -e 's|@''REPLACE_TIMEGM''@|$(REPLACE_TIMEGM)|g' \
 	      -e 's|@''REPLACE_TIMESPEC_GET''@|$(REPLACE_TIMESPEC_GET)|g' \
+	      -e 's|@''REPLACE_TIMESPEC_GETRES''@|$(REPLACE_TIMESPEC_GETRES)|g' \
 	      -e 's|@''REPLACE_TZSET''@|$(REPLACE_TZSET)|g' \
 	      -e 's|@''PTHREAD_H_DEFINES_STRUCT_TIMESPEC''@|$(PTHREAD_H_DEFINES_STRUCT_TIMESPEC)|g' \
 	      -e 's|@''SYS_TIME_H_DEFINES_STRUCT_TIMESPEC''@|$(SYS_TIME_H_DEFINES_STRUCT_TIMESPEC)|g' \
