@@ -29,11 +29,11 @@
 #include <ctype.h>
 
 /* Gnulib. */
-#include "progname.h"
-#include "error.h"
-#include "version-etc.h"
-#include "parse-duration.h"
-#include "parse-datetime.h"
+#include <progname.h>
+#include <error.h>
+#include <version-etc.h>
+#include <parse-duration.h>
+#include <parse-datetime.h>
 
 #include "oathtool_cmd.h"
 

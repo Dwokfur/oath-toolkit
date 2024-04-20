@@ -27,10 +27,10 @@
 #include <errno.h>
 
 /* Gnulib. */
-#include "progname.h"
-#include "error.h"
-#include "version-etc.h"
-#include "read-file.h"
+#include <progname.h>
+#include <error.h>
+#include <version-etc.h>
+#include <read-file.h>
 
 #include "pskctool_cmd.h"
 
