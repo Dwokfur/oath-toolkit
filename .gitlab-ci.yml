@@ -172,7 +172,7 @@ B-Windows-UCRT64:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
-  tags: [ shared-windows, windows-1809 ]
+  tags: [ saas-windows-medium-amd64 ]
   stage: build
   script: # https://www.msys2.org/docs/ci/#other-systems
   - wget.exe --no-check-certificate -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
@@ -201,7 +201,7 @@ Windows-MSYS:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
-  tags: [ shared-windows, windows-1809 ]
+  tags: [ saas-windows-medium-amd64 ]
   stage: test
   needs: [B-Trisquel11]
   script: # https://www.msys2.org/docs/ci/#other-systems
@@ -225,7 +225,7 @@ Windows-MINGW64:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
-  tags: [ shared-windows, windows-1809 ]
+  tags: [ saas-windows-medium-amd64 ]
   stage: test
   needs: [B-Trisquel11]
   script: # https://www.msys2.org/docs/ci/#other-systems
