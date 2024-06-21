@@ -1,5 +1,4 @@
-# inttypes.m4
-# serial 37
+# inttypes.m4 serial 37
 dnl Copyright (C) 2006-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,

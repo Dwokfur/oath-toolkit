@@ -18,11 +18,6 @@
 
 #include <time.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 bool parse_datetime (struct timespec *restrict,
                      char const *, struct timespec const *);
 
@@ -33,8 +28,3 @@ bool parse_datetime (struct timespec *restrict,
 bool parse_datetime2 (struct timespec *restrict,
                       char const *, struct timespec const *,
                       unsigned int flags, timezone_t, char const *);
-
-
-#ifdef __cplusplus
-}
-#endif

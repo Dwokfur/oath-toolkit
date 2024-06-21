@@ -24,9 +24,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#if defined _WIN32 && ! defined __CYGWIN__
-# include <wchar.h>
-#endif
 
 void
 rpl_tzset (void)
@@ -57,22 +54,7 @@ rpl_tzset (void)
      responsibility.  */
   const char *tz = getenv ("TZ");
   if (tz != NULL && strchr (tz, '/') != NULL)
-    {
-      /* Neutralize it, in a way that is multithread-safe.
-         (If we were to use _putenv ("TZ="), it would free the memory allocated
-         for the environment variable "TZ", and thus other threads that are
-         using the previously fetched value of getenv ("TZ") could crash.)  */
-      char **env = _environ;
-      wchar_t **wenv = _wenviron;
-      if (env != NULL)
-        for (char *s = env; *s != NULL; s++)
-          if (s[0] == 'T' && s[1] == 'Z' && s[2] == '=')
-            s[0] = '$';
-      if (wenv != NULL)
-        for (wchar_t *ws = wenv; *ws != NULL; ws++)
-          if (ws[0] == L'T' && ws[1] == L'Z' && ws[2] == L'=')
-            ws[0] = L'$';
-    }
+    _putenv ("TZ=");
 
   /* On native Windows, tzset() is deprecated.  Use _tzset() instead.  See
      <https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/posix-tzset>

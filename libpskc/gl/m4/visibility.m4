@@ -1,5 +1,4 @@
-# visibility.m4
-# serial 9
+# visibility.m4 serial 8
 dnl Copyright (C) 2005, 2008, 2010-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -32,18 +31,18 @@ AC_DEFUN([gl_VISIBILITY],
     dnl user has put into $CC $CFLAGS $CPPFLAGS.
     AC_CACHE_CHECK([whether the -Werror option is usable],
       [gl_cv_cc_vis_werror],
-      [gl_saved_CFLAGS="$CFLAGS"
+      [gl_save_CFLAGS="$CFLAGS"
        CFLAGS="$CFLAGS -Werror"
        AC_COMPILE_IFELSE(
          [AC_LANG_PROGRAM([[]], [[]])],
          [gl_cv_cc_vis_werror=yes],
          [gl_cv_cc_vis_werror=no])
-       CFLAGS="$gl_saved_CFLAGS"
+       CFLAGS="$gl_save_CFLAGS"
       ])
     dnl Now check whether visibility declarations are supported.
     AC_CACHE_CHECK([for simple visibility declarations],
       [gl_cv_cc_visibility],
-      [gl_saved_CFLAGS="$CFLAGS"
+      [gl_save_CFLAGS="$CFLAGS"
        CFLAGS="$CFLAGS -fvisibility=hidden"
        dnl We use the option -Werror and a function dummyfunc, because on some
        dnl platforms (Cygwin 1.7) the use of -fvisibility triggers a warning
@@ -69,7 +68,7 @@ AC_DEFUN([gl_VISIBILITY],
             [[]])],
          [gl_cv_cc_visibility=yes],
          [gl_cv_cc_visibility=no])
-       CFLAGS="$gl_saved_CFLAGS"
+       CFLAGS="$gl_save_CFLAGS"
       ])
     if test $gl_cv_cc_visibility = yes; then
       CFLAG_VISIBILITY="-fvisibility=hidden"

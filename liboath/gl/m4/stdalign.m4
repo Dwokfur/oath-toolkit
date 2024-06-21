@@ -1,11 +1,9 @@
-# stdalign.m4
-# serial 1
+# Check for alignas and alignof that conform to C23.
+
 dnl Copyright 2011-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
-
-# Check for alignas and alignof that conform to C23.
 
 dnl Written by Paul Eggert and Bruno Haible.
 
@@ -15,10 +13,10 @@ AC_DEFUN([gl_ALIGNASOF],
 [
   AC_CACHE_CHECK([for alignas and alignof],
     [gl_cv_header_working_stdalign_h],
-    [gl_saved_CFLAGS=$CFLAGS
+    [gl_save_CFLAGS=$CFLAGS
      for gl_working in "yes, keywords" "yes, <stdalign.h> macros"; do
       AS_CASE([$gl_working],
-        [*stdalign.h*], [CFLAGS="$gl_saved_CFLAGS -DINCLUDE_STDALIGN_H"])
+        [*stdalign.h*], [CFLAGS="$gl_save_CFLAGS -DINCLUDE_STDALIGN_H"])
       AC_COMPILE_IFELSE(
        [AC_LANG_PROGRAM(
           [[#include <stdint.h>
@@ -58,7 +56,7 @@ AC_DEFUN([gl_ALIGNASOF],
        [gl_cv_header_working_stdalign_h=$gl_working],
        [gl_cv_header_working_stdalign_h=no])
 
-      CFLAGS=$gl_saved_CFLAGS
+      CFLAGS=$gl_save_CFLAGS
       test "$gl_cv_header_working_stdalign_h" != no && break
      done])
 

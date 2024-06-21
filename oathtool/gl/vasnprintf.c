@@ -2335,7 +2335,6 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 
             if (dp->conversion == 'n')
               {
-#if NEED_PRINTF_WITH_N_DIRECTIVE
                 switch (a.arg[dp->arg_index].type)
                   {
                   case TYPE_COUNT_SCHAR_POINTER:
@@ -2380,9 +2379,6 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                   default:
                     abort ();
                   }
-#else
-                abort ();
-#endif
               }
 #if ENABLE_UNISTDIO
             /* The unistdio extensions.  */

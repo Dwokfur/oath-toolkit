@@ -1,5 +1,4 @@
-# double-slash-root.m4
-# serial 4   -*- Autoconf -*-
+# double-slash-root.m4 serial 4   -*- Autoconf -*-
 dnl Copyright (C) 2006, 2008-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,

@@ -84,7 +84,7 @@ fread_file (FILE *stream, int flags, size_t *length)
 
   {
     size_t size = 0; /* number of bytes read so far */
-    int saved_errno;
+    int save_errno;
 
     for (;;)
       {
@@ -96,7 +96,7 @@ fread_file (FILE *stream, int flags, size_t *length)
 
         if (count != requested)
           {
-            saved_errno = errno;
+            save_errno = errno;
             if (ferror (stream))
               break;
 
@@ -131,11 +131,11 @@ fread_file (FILE *stream, int flags, size_t *length)
 
         {
           char *new_buf;
-          size_t saved_alloc = alloc;
+          size_t save_alloc = alloc;
 
           if (alloc == PTRDIFF_MAX)
             {
-              saved_errno = ENOMEM;
+              save_errno = ENOMEM;
               break;
             }
 
@@ -150,16 +150,16 @@ fread_file (FILE *stream, int flags, size_t *length)
               if (!new_buf)
                 {
                   /* BUF should be cleared below after the loop.  */
-                  saved_errno = errno;
+                  save_errno = errno;
                   break;
                 }
-              memcpy (new_buf, buf, saved_alloc);
-              memset_explicit (buf, 0, saved_alloc);
+              memcpy (new_buf, buf, save_alloc);
+              memset_explicit (buf, 0, save_alloc);
               free (buf);
             }
           else if (!(new_buf = realloc (buf, alloc)))
             {
-              saved_errno = errno;
+              save_errno = errno;
               break;
             }
 
@@ -171,7 +171,7 @@ fread_file (FILE *stream, int flags, size_t *length)
       memset_explicit (buf, 0, alloc);
 
     free (buf);
-    errno = saved_errno;
+    errno = save_errno;
     return NULL;
   }
 }

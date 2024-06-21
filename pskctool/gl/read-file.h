@@ -29,11 +29,6 @@
 /* Get FILE.  */
 #include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 /* Indicate that the file is treated as binary.  */
 #define RF_BINARY 0x1
 
@@ -45,10 +40,5 @@ extern char *fread_file (FILE * stream, int flags, size_t * length)
 
 extern char *read_file (const char *filename, int flags, size_t * length)
   _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE;
-
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* READ_FILE_H */
