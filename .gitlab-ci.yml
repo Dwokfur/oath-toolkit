@@ -89,7 +89,7 @@ B-Debian13-arm64:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
   image: debian:trixie-slim
-  tags: [ arm64 ]
+  tags: [ saas-linux-medium-arm64 ]
   stage: build
   before_script:
   - apt-get update -qq
@@ -351,7 +351,7 @@ Alpine-arm64:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
   image: alpine:latest
-  tags: [ arm64 ]
+  tags: [ saas-linux-medium-arm64 ]
   stage: test
   needs: [B-Trisquel11]
   before_script:
@@ -383,7 +383,7 @@ Fedora39-arm64:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
   image: fedora:39
-  tags: [ arm64 ]
+  tags: [ saas-linux-medium-arm64 ]
   stage: test
   needs: [B-Trisquel11]
   before_script:
