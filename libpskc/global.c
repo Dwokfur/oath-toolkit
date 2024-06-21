@@ -117,7 +117,6 @@ pskc_global_done (void)
       xmlSecShutdown ();
 #endif
       xmlCleanupParser ();
-      xmlMemoryDump ();
     }
 
   _pskc_init--;
