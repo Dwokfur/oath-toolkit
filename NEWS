@@ -3,11 +3,19 @@ Copyright (C) 2009-2024 Simon Josefsson.  Licensed under the GPLv3+.
 
 * Version 2.6.12 (unreleased)
 
+** libpskc: Don't call deprecated xmlMemoryDump.
+
+** libpskc: fix implicit declaration with musl.
+See <https://gitlab.com/oath-toolkit/oath-toolkit/-/merge_requests/39>.
+
 ** libpskc: Fix linker warning when linked with mold.
 Thanks to Jan Palus, see
 <https://gitlab.com/oath-toolkit/oath-toolkit/-/merge_requests/30> and
 <https://gitlab.com/oath-toolkit/oath-toolkit/-/merge_requests/36> for
 regression testing.
+
+** Various build fixes including updated gnulib files.
+Fixes Windows tzset build errors, among other things.
 
 * Version 2.6.11 (released 2024-01-11)
 
