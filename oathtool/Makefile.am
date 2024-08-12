@@ -32,7 +32,7 @@ liboathtool_cmd_la_CFLAGS =
 
 oathtool_cmd.h oathtool_cmd.c: oathtool.ggo Makefile.am
 	$(AM_V_GEN)cp -v $(srcdir)/oathtool.ggo repro-gengetopt.ggo && \
-	gengetopt --unamed-opts="KEY [OTP]" \
+	$(GENGETOPT) --unamed-opts="KEY [OTP]" \
 		--set-package="oathtool" \
 		--no-handle-version --no-handle-help \
 		--input repro-gengetopt.ggo --file-name oathtool_cmd && \

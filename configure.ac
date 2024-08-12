@@ -25,6 +25,7 @@ AC_CONFIG_MACRO_DIRS([m4 gl/m4])
 AM_INIT_AUTOMAKE([1.13 -Wall])
 
 AM_MISSING_PROG(HELP2MAN, help2man, $missing_dir)
+AM_MISSING_PROG(GENGETOPT, gengetopt, $missing_dir)
 
 AC_PROG_CC
 gl_EARLY
