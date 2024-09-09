@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <libgen.h>
 #include <ctype.h>
 #include <pwd.h>
 #include <unistd.h>
@@ -72,6 +73,7 @@ struct cfg
   int alwaysok;
   int try_first_pass;
   int use_first_pass;
+  int no_usersfile_okay;
   char *usersfile;
   unsigned digits;
   unsigned window;
@@ -86,6 +88,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
   cfg->alwaysok = 0;
   cfg->try_first_pass = 0;
   cfg->use_first_pass = 0;
+  cfg->no_usersfile_okay = 0;
   cfg->usersfile = NULL;
   cfg->digits = -1;
   cfg->window = 5;
@@ -100,6 +103,8 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
 	cfg->try_first_pass = 1;
       if (strcmp (argv[i], "use_first_pass") == 0)
 	cfg->use_first_pass = 1;
+      if (strcmp (argv[i], "no_usersfile_okay") == 0)
+	cfg->no_usersfile_okay = 1;
       if (strncmp (argv[i], "usersfile=", 10) == 0)
 	cfg->usersfile = (char *) argv[i] + 10;
       if (strncmp (argv[i], "digits=", 7) == 0)
@@ -126,6 +131,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
       D (("alwaysok=%d", cfg->alwaysok));
       D (("try_first_pass=%d", cfg->try_first_pass));
       D (("use_first_pass=%d", cfg->use_first_pass));
+      D (("no_usersfile_okay=%d", cfg->no_usersfile_okay));
       D (("usersfile=%s", cfg->usersfile ? cfg->usersfile : "(null)"));
       D (("digits=%d", cfg->digits));
       D (("window=%d", cfg->window));
@@ -291,6 +297,32 @@ pam_sm_authenticate (pam_handle_t *pamh,
       goto done;
     }
   DBG (("usersfile is %s", usersfile));
+
+  if (cfg.no_usersfile_okay)
+    {
+      char *ucopy, *base;
+      ucopy = strdup (usersfile);
+      base = dirname (ucopy);
+
+      /* make sure that the base dir exists so we are sure that, for example,
+         the user home directory is mounted. */
+      rc = access (base, F_OK);
+      free (ucopy);
+      if (rc != 0)
+	{
+	  DBG (("Basepath of file cannot be accessed '%s'", usersfile));
+	  retval = PAM_AUTH_ERR;
+	  goto done;
+	}
+
+      if (access (usersfile, F_OK) != 0)
+	{
+	  DBG (("no_usersfile_okay set and no userfile was found, authenticating..."));
+	  retval = PAM_SUCCESS;
+	  goto done;
+	}
+    }
+
 
   // quick check to skip unconfigured users before prompting for password
   {
