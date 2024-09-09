@@ -77,6 +77,7 @@ jas@mocca:~$ su
 [pam_oath.c:parse_cfg(127)] alwaysok=1
 [pam_oath.c:parse_cfg(128)] try_first_pass=0
 [pam_oath.c:parse_cfg(129)] use_first_pass=0
+[pam_oath.c:parse_cfg(129)] no_usersfile_okay=0
 [pam_oath.c:parse_cfg(130)] usersfile=/etc/users.oath
 [pam_oath.c:parse_cfg(131)] digits=0
 [pam_oath.c:parse_cfg(132)] window=20
@@ -144,6 +145,7 @@ jas@mocca:~$ su
 [pam_oath.c:parse_cfg(127)] alwaysok=1
 [pam_oath.c:parse_cfg(128)] try_first_pass=0
 [pam_oath.c:parse_cfg(129)] use_first_pass=0
+[pam_oath.c:parse_cfg(129)] no_usersfile_okay=0
 [pam_oath.c:parse_cfg(130)] usersfile=/etc/users.oath
 [pam_oath.c:parse_cfg(131)] digits=6
 [pam_oath.c:parse_cfg(132)] window=20
@@ -176,6 +178,7 @@ jas@mocca:~$ su
 [pam_oath.c:parse_cfg(127)] alwaysok=1
 [pam_oath.c:parse_cfg(128)] try_first_pass=0
 [pam_oath.c:parse_cfg(129)] use_first_pass=0
+[pam_oath.c:parse_cfg(129)] no_usersfile_okay=0
 [pam_oath.c:parse_cfg(130)] usersfile=/etc/users.oath
 [pam_oath.c:parse_cfg(131)] digits=6
 [pam_oath.c:parse_cfg(132)] window=20
@@ -213,6 +216,13 @@ List of all parameters
                     never prompt the user - if no password is
                     available or the password is not appropriate, the
                     user will be denied access.
+  "no_usersfile_okay": The argument no_usersfile_okay forces the module
+                      to act as if the user is not present in the config,
+                      if the config file does not exist. This has
+                      security implications only use if you know what you
+                      are doing. E.g.  if the file is in a mount like home
+                      and that fails to be mounted, then this will succeed
+                      even if the OTP if configured for that user.
 
   "usersfile": Specify filename where credentials are stored, for
                example "/etc/users.oath". The placeholder values
