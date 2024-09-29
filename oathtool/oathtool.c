@@ -96,6 +96,7 @@ verbose_totp (oath_totp_flags flags, time_t t0, time_t time_step_size,
 {
   struct tm tmp;
   char outstr[200];
+  long long counter;
 
   printf ("TOTP mode: %s\n", flags == OATH_TOTP_HMAC_SHA256 ? "SHA256" :
 	  flags == OATH_TOTP_HMAC_SHA512 ? "SHA512" :
@@ -107,8 +108,8 @@ verbose_totp (oath_totp_flags flags, time_t t0, time_t time_step_size,
   if (strftime (outstr, sizeof (outstr), "%Y-%m-%d %H:%M:%S UTC", &tmp) == 0)
     error (EXIT_FAILURE, 0, "strftime");
 
-  printf ("Step size (seconds): %ld\n", time_step_size);
-  printf ("Start time: %s (%ld)\n", outstr, t0);
+  printf ("Step size (seconds): %lld\n", (long long) time_step_size);
+  printf ("Start time: %s (%lld)\n", outstr, (long long) t0);
 
   if (gmtime_r (&when, &tmp) == NULL)
     error (EXIT_FAILURE, 0, "gmtime_r");
@@ -116,9 +117,9 @@ verbose_totp (oath_totp_flags flags, time_t t0, time_t time_step_size,
   if (strftime (outstr, sizeof (outstr), "%Y-%m-%d %H:%M:%S UTC", &tmp) == 0)
     error (EXIT_FAILURE, 0, "strftime");
 
-  printf ("Current time: %s (%ld)\n", outstr, when);
-  printf ("Counter: 0x%lX (%ld)\n\n", (when - t0) / time_step_size,
-	  (when - t0) / time_step_size);
+  printf ("Current time: %s (%lld)\n", outstr, (long long) when);
+  counter = (when - t0) / time_step_size;
+  printf ("Counter: 0x%llX (%lld)\n\n", counter, counter);
 }
 
 #define generate_otp_p(n) ((n) == 1)

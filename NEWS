@@ -3,6 +3,11 @@ Copyright (C) 2009-2024 Simon Josefsson.  Licensed under the GPLv3+.
 
 * Version 2.6.12 (unreleased)
 
+** oathtool: Fix test suite on 32-bit big-endian platforms.  Fixes: #44.
+Patch by Helge Deller and thanks to Jan Zerebecki.  See
+<https://lists.nongnu.org/archive/html/oath-toolkit-help/2024-04/msg00000.html>
+and <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/44>.
+
 ** libpskc: Don't call deprecated xmlMemoryDump.
 
 ** libpskc: fix implicit declaration with musl.
