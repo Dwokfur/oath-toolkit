@@ -42,13 +42,14 @@ B-gcc:
   before_script:
   - gcc --version
   - apt-get update -qq
-  - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt
+  - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt datefudge
   script:
   - gcc --version
   - ./bootstrap
   - ./configure CC="gcc -std=gnu2x" --enable-gcc-warnings WARN_CFLAGS=-Werror
   - make -j$(nproc) V=1
   - make -j$(nproc) V=1 check VERBOSE=t
+  - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
   - git status
   - git diff --exit-code
 
@@ -58,13 +59,14 @@ B-clang:
   before_script:
   - clang --version
   - apt-get update -qq
-  - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt
+  - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt faketime
   script:
   - clang --version
   - ./bootstrap
   - ./configure CC="clang -std=gnu2x" --enable-gcc-warnings WARN_CFLAGS=-Werror
   - make -j$(nproc) V=1
   - make -j$(nproc) V=1 check VERBOSE=t
+  - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
   - git status
   - git diff --exit-code
 
@@ -80,6 +82,7 @@ B-Trisquel11:
   - make -j$(nproc) syntax-check
   - make -j$(nproc) V=1
   - make -j$(nproc) V=1 check VERBOSE=t
+  - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
   - make -j$(nproc) dist
   - sha224sum oath-toolkit-*.tar.gz
   - cd website && ./build-website.sh
@@ -165,6 +168,7 @@ B-macOS14Xcode15:
   - make -j$(nproc) V=1
   - make -j$(nproc) V=1 -k check VERBOSE=t
   - git status
+  - git restore liboath/gtk-doc.make libpskc/gtk-doc.make
   - git diff --exit-code
 
 # https://docs.gitlab.com/ee/ci/runners/saas/windows_saas_runner.html

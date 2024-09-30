@@ -27,7 +27,7 @@ TSTAMP=`$FAKETIME "2006-09-23" date -u +%s`
 if test "$TSTAMP" != "1158969600"; then
     FAKETIME=faketime
     TSTAMP=`$FAKETIME "2006-09-23" date -u +%s`
-    if test "$TSTAMP" != "1158969600"; then
+    if test "$TSTAMP" != "1158969600" && test "$TSTAMP" != "1158969601"; then
 	echo "Faketime or datefudge missing ($TSTAMP)" >&2
 	exit 77
     fi
