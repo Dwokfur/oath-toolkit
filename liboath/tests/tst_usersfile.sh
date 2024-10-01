@@ -17,21 +17,25 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
+set -e
+
 srcdir=${srcdir:-.}
 
 TZ=UTC
 export TZ
 
 FAKETIME=datefudge
-TSTAMP=`$FAKETIME "2006-09-23" date -u +%s`
+TSTAMP=$($FAKETIME "2006-09-23" date -u +%s || true)
 if test "$TSTAMP" != "1158969600"; then
     FAKETIME=faketime
-    TSTAMP=`$FAKETIME "2006-09-23" date -u +%s`
+    TSTAMP=$($FAKETIME "2006-09-23" date -u +%s || true)
     if test "$TSTAMP" != "1158969600" && test "$TSTAMP" != "1158969601"; then
 	echo "Faketime or datefudge missing ($TSTAMP)" >&2
 	exit 77
     fi
 fi
+
+rm -f tmp.oath tmp2.oath tmp.oath.new tmp.oath.lock
 
 cp $srcdir/users.oath tmp.oath
 
