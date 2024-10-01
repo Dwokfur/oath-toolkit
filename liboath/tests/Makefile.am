@@ -33,8 +33,8 @@ ctests = \
 	tst_totp_algo \
 	tst_totp_validate
 
-check_PROGRAMS = $(ctests) tst_usersfile
-dist_check_SCRIPTS = tst_usersfile.sh
+check_PROGRAMS = $(ctests) tst_usersfile tst_fopen-wx
+dist_check_SCRIPTS = tst_usersfile.sh tst_fopen-wx.sh
 
 TESTS = $(ctests)
 

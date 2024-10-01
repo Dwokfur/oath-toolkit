@@ -161,7 +161,8 @@
 /liboath/tests/Makefile.in
 /liboath/tests/test-suite.html
 /liboath/tests/test-suite.log
-/liboath/tests/tmp.oath
+/liboath/tests/tst_fopen-wx
+/liboath/tests/tst_fopen-wx.log
 /liboath/tests/tst_basic
 /liboath/tests/tst_basic.log
 /liboath/tests/tst_coding

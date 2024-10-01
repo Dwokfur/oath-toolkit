@@ -3,6 +3,37 @@ Copyright (C) 2009-2024 Simon Josefsson.  Licensed under the GPLv3+.
 
 * Version 2.6.12 (unreleased)
 
+** liboath: Don't follow symbolic links for usersfile updates.
+Reported by Fabian Vogt (SUSE), and associated with CVE-2024-47191.
+See <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/43>.
+Security bug triggered by new feature in pam_oath v2.6.7 released on
+2021-05-01 with the USER/HOME placeholder strings, see
+<https://gitlab.com/oath-toolkit/oath-toolkit/-/merge_requests/12>.
+
+The fix is to open files for writing in exclusive mode (i.e., fail if
+the file exists including if it is a symbolic link).
+
+We offer a brief self-test to reproduce the problem in
+liboath/tests/tst_fopen-wx.c which you may use as follows:
+
+cc -o tst_fopen-wx tst_fopen-wx.c $(pkg-config --libs --cflags liboath)
+rm -f cve.oath cve.oath.new cve.sshd-config cve.oath.lock
+printf 'HOTP/E/8\tsilver\t4711\t3132333435363738393031323334353637383930313233343536373839303132\n' > cve.oath
+echo my-magic-cookie > cve.sshd-config
+ln -s cve.sshd-config cve.oath.new
+./tst_fopen-wx cve.oath silver 670691 4711
+
+If this is linked with a vulnerable liboath it will print:
+
+FAIL: Liboath VULNERABLE to fopen(wx) bug.
+
+If you link it to a fixed liboath it will print:
+
+PASS: Your liboath is NOT VULNERABLE to fopen(wx) bug.
+
+For convenience, the liboath/tests/tst_fopen-wx.sh script can be used
+to setup and invoke tst_fopen-wx.
+
 ** oathtool: Fix test suite on 32-bit big-endian platforms.  Fixes: #44.
 Patch by Helge Deller and thanks to Jan Zerebecki.  See
 <https://lists.nongnu.org/archive/html/oath-toolkit-help/2024-04/msg00000.html>
