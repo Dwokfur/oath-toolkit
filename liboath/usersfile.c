@@ -329,11 +329,11 @@ update_usersfile (const char *usersfile,
     if (lockfile == NULL || ((size_t) l) != strlen (usersfile) + 5)
       return OATH_PRINTF_ERROR;
 
-    lockfh = fopen (lockfile, "w");
+    lockfh = fopen (lockfile, "wx");
     if (!lockfh)
       {
 	free (lockfile);
-	return OATH_FILE_CREATE_ERROR;
+	return OATH_FILE_LOCK_ERROR;
       }
   }
 
@@ -365,15 +365,17 @@ update_usersfile (const char *usersfile,
     if (newfilename == NULL || ((size_t) l) != strlen (usersfile) + 4)
       {
 	fclose (lockfh);
+	unlink (lockfile);
 	free (lockfile);
 	return OATH_PRINTF_ERROR;
       }
 
-    outfh = fopen (newfilename, "w");
+    outfh = fopen (newfilename, "wx");
     if (!outfh)
       {
 	free (newfilename);
 	fclose (lockfh);
+	unlink (lockfile);
 	free (lockfile);
 	return OATH_FILE_CREATE_ERROR;
       }
