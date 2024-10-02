@@ -39,7 +39,7 @@
 #  crypto/gc-hmac-sha256 \
 #  crypto/gc-hmac-sha512 \
 #  fclose \
-#  fopen \
+#  fopen-gnu \
 #  fseeko \
 #  fsync \
 #  getline \
@@ -506,6 +506,15 @@ EXTRA_DIST += fopen.c
 EXTRA_libgnu_la_SOURCES += fopen.c
 
 ## end   gnulib module fopen
+
+## begin gnulib module fopen-gnu
+
+
+EXTRA_DIST += fopen.c
+
+EXTRA_libgnu_la_SOURCES += fopen.c
+
+## end   gnulib module fopen-gnu
 
 ## begin gnulib module fpurge
 

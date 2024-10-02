@@ -44,7 +44,7 @@
 #  crypto/gc-hmac-sha256 \
 #  crypto/gc-hmac-sha512 \
 #  fclose \
-#  fopen \
+#  fopen-gnu \
 #  fseeko \
 #  fsync \
 #  getline \
@@ -70,7 +70,7 @@ gl_MODULES([
   crypto/gc-hmac-sha256
   crypto/gc-hmac-sha512
   fclose
-  fopen
+  fopen-gnu
   fseeko
   fsync
   getline

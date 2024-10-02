@@ -89,6 +89,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module filename:
   # Code from module float:
   # Code from module fopen:
+  # Code from module fopen-gnu:
   # Code from module fpurge:
   # Code from module freading:
   # Code from module free-posix:
@@ -296,6 +297,13 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_FOPEN
   fi
   gl_STDIO_MODULE_INDICATOR([fopen])
+  gl_FUNC_FOPEN_GNU
+  if test $REPLACE_FOPEN_FOR_FOPEN_GNU = 1; then
+    AC_LIBOBJ([fopen])
+    gl_PREREQ_FOPEN
+  fi
+  gl_MODULE_INDICATOR([fopen-gnu])
+  gl_STDIO_MODULE_INDICATOR([fopen-gnu])
   gl_FUNC_FPURGE
   gl_CONDITIONAL([GL_COND_OBJ_FPURGE],
                  [test $HAVE_FPURGE = 0 || test $REPLACE_FPURGE = 1])
