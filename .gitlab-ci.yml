@@ -36,6 +36,13 @@ stages:
  - test
  - deploy
 
+sast:
+  stage: build
+  variables:
+    SAST_EXCLUDED_PATHS: oathtool/gl, pskctool/gl, liboath/gl, libpskc/gl
+include:
+- template: Security/SAST.gitlab-ci.yml
+
 B-gcc:
   image: gcc:latest
   stage: build
