@@ -219,7 +219,7 @@ List of all parameters
                "${USER}" and "${HOME}" may be used to specify the
                filename on a per-user basis. The values "${USER}" and
                "${HOME}" expand to the user's username and home
-               directory, respectively.
+               directory, respectively.  See below on file protection.
 
   "digits": Specify number of digits in the one-time password,
             required when using passwords in usersfile.  Supported
@@ -227,6 +227,51 @@ List of all parameters
 
   "window": Specify search depth, an integer typically from 5 to 50
             but other values can be useful too.
+
+Usersfile protection
+--------------------
+
+The PAM module performs its operations as root when re-writing the
+"usersfile".  Even if the file is owned by a non-root user, the file
+modifications are performed as the root user and file ownership is
+reset back to the original file owner.
+
+Thus "usersfile" MUST point to a protected file where non-root users
+cannot modify it.
+
+The exception is when a ${HOME} string is used.  In this case the PAM
+module will temporarily drop the effective user id to the user that is
+being logged in via PAM before accessing and rewriting the file.
+
+The following are the typicaly scenarios for the usersfile placement,
+and its recommended file protection.  Note that a root-owned file
+below a path controlled by a non-root user lead to a vulnerable
+configuration.
+
+1) usersfile=/etc/users.oath
+
+Root owned that is read/write-protected against users, for centralized
+control.
+
+2) usersfile=${HOME}/.config/oath/secrets
+
+User-owned file that is read/write-protected against other users.
+
+The disadvantage is that user can read their OATH secret, and
+potentially damage their ability to login by messing up the file, but
+in some situations that may be an advantage.
+
+3) usersfile=/var/oath/oath.${USER}.secrets
+
+Root-owned per-user files that are all read/write-protected against
+non-root users.  Typically more relevant for larger multi-user system
+where you want to split up the /etc/users.oath file on a per-user
+basis, for increased performance and/or administrative control.
+
+WARNING!  Don't use usersfile=/home/foo/bar/oath.secrets when
+/home/foo has write-permission for non-root user `foo` even when the
+`oath.secrets` file happen to be owned by root, as the user may use
+symbolic links at /home/foo/bar to redirection which file is opened.
 
 SSH Configuration
 -----------------

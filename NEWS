@@ -3,6 +3,28 @@ Copyright (C) 2009-2024 Simon Josefsson.  Licensed under the GPLv3+.
 
 * Version 2.6.12 (unreleased)
 
+** pam_oath: Drop privs when ${HOME} is used in the usersfile= setting.
+Reported by Fabian Vogt (SUSE), and associated with CVE-2024-47191.
+See <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/43>.
+Security bug triggered by new feature in pam_oath v2.6.7 released on
+2021-05-01 with the USER/HOME placeholder strings, see
+<https://gitlab.com/oath-toolkit/oath-toolkit/-/merge_requests/12>.
+
+Quoting a writeup in an alternate patch by Matthias Gerstner (SUSE):
+With the addition of the possibility to place a usersfile also into a
+user's home directory via variable expansion of ${HOME} and ${USER} in
+the `usersfile=` path specification, security issues sneaked in.  The
+PAM process usually runs with root privileges.  The file operations in
+an unprivileged user's home directory follow symlinks both when
+reading and creating files, allowing for a potential local root
+exploit, because of the `fchown()` performed on the newly created
+usersfile.
+
+We drop privileges to the user that is being logged into, assuming it
+has the necessary permissions for the usersfile belonging in their
+home directory.  This restricts the ability for non-root users to
+affect files beyond their control via liboath.
+
 ** liboath: Don't follow symbolic links for usersfile updates.
 Reported by Fabian Vogt (SUSE), and associated with CVE-2024-47191.
 See <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/43>.
