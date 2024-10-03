@@ -71,6 +71,10 @@ review-diff:
 tag = $(PACKAGE)-$(VERSION)
 htmldir = ../www-$(PACKAGE)
 
+srcdist:
+	git archive --prefix=$(PACKAGE)-$$(git describe | sed 's,oath-toolkit-,v,')/ \
+	       -o $(PACKAGE)-$$(git describe | sed 's,oath-toolkit-,,')-src.tar.gz HEAD
+
 tarball:
 	test `git describe` = `git tag -l $(tag)`
 	$(MAKE) distcheck
@@ -91,20 +95,22 @@ website-upload:
 		git commit -m "Auto-update." && \
 		git push
 
-release-check: syntax-check tarball website website-copy
+release-check: syntax-check tarball srcdist website website-copy
 
 release-upload-www: website-upload
 
 release-upload-ftp:
 	gpg -b $(distdir).tar.gz
 	gpg --verify $(distdir).tar.gz.sig
+	gpg -b $(distdir)-src.tar.gz
+	gpg --verify $(distdir)-src.tar.gz.sig
 	mkdir -p ../releases/$(PACKAGE)/
-	cp $(distdir).tar.gz $(distdir).tar.gz.sig ../releases/$(PACKAGE)/
-	scp $(distdir).tar.gz $(distdir).tar.gz.sig jas@dl.sv.nongnu.org:/releases/oath-toolkit/
+	cp -v $(distdir).tar.gz $(distdir).tar.gz.sig $(distdir)-src.tar.gz $(distdir)-src.tar.gz.sig ../releases/$(PACKAGE)/
+	scp $(distdir).tar.gz $(distdir).tar.gz.sig $(distdir)-src.tar.gz $(distdir)-src.tar.gz.sig jas@dl.sv.nongnu.org:/releases/oath-toolkit/
 	git push
 	git push --tags
-	sha1sum $(distdir).tar.gz
-	sha224sum $(distdir).tar.gz
+	sha1sum $(distdir)*.tar.gz
+	sha224sum $(distdir)*.tar.gz
 
 tag: # Use "make tag VERSION=1.2.3"
 	git tag -s -m $(VERSION) $(tag)
