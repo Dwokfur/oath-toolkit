@@ -28,7 +28,9 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include <pwd.h>
+#include <sys/types.h>
 #include <unistd.h>
+#include <errno.h>
 
 /* Libtool defines PIC for shared objects */
 #ifndef PIC
@@ -134,7 +136,8 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
 
 static int
 parse_usersfile_str (pam_handle_t *pamh, const struct cfg *cfg,
-		     const char *user, char **usersfile)
+		     const char *user, char **usersfile,
+		     uid_t *uid, gid_t *gid)
 {
   int retval = PAM_SUCCESS;
   size_t name_len = 0;
@@ -149,8 +152,8 @@ parse_usersfile_str (pam_handle_t *pamh, const struct cfg *cfg,
       return PAM_BUF_ERR;
     }
 
-  if (strstr (cfg->usersfile, "${USER}") == NULL
-      && strstr (cfg->usersfile, "${HOME}") == NULL)
+  if ((str = strstr (cfg->usersfile, "${HOME}")) == NULL
+      && strstr (cfg->usersfile, "${USER}") == NULL)
     {
       *usersfile = strdup (cfg->usersfile);
       if (!*usersfile)
@@ -162,6 +165,13 @@ parse_usersfile_str (pam_handle_t *pamh, const struct cfg *cfg,
   if (!pw)
     {
       return PAM_USER_UNKNOWN;
+    }
+
+  if (str)
+    {
+      /* Tell caller to drop privs. */
+      *uid = pw->pw_uid;
+      *gid = pw->pw_gid;
     }
 
   /*
@@ -264,6 +274,8 @@ pam_sm_authenticate (pam_handle_t *pamh,
   struct cfg cfg;
   char *query_prompt = NULL;
   char *onlypasswd = strdup ("");	/* empty passwords never match */
+  uid_t pamuid = 0, old_euid = geteuid ();
+  gid_t pamgid = 0, old_egid = getegid ();
 
   /* this has to be first in this function to avoid that cfg contain
      uninitialized variables. */
@@ -283,14 +295,34 @@ pam_sm_authenticate (pam_handle_t *pamh,
     }
   DBG (("get user returned: %s", user));
 
-  retval = parse_usersfile_str (pamh, &cfg, user, &usersfile);
+  retval = parse_usersfile_str (pamh, &cfg, user, &usersfile,
+				&pamuid, &pamgid);
   if (retval != PAM_SUCCESS)
     {
       DBG (("parse usersfile string returned error: %s",
 	    pam_strerror (pamh, retval)));
       goto done;
     }
-  DBG (("usersfile is %s", usersfile));
+  DBG (("usersfile is %s (id %d/%d)", usersfile, pamuid, pamgid));
+
+  if (pamuid || pamgid)
+    {
+      if (pamgid && setegid (pamgid) != 0)
+	{
+	  DBG (("setegid failed: %d", errno));
+	  retval = PAM_SERVICE_ERR;
+	  goto done;
+	}
+
+      if (pamuid && seteuid (pamuid) != 0)
+	{
+	  DBG (("seteuid failed: %d", errno));
+	  retval = PAM_SERVICE_ERR;
+	  goto done;
+	}
+
+      DBG (("Successfully dropped effective id to %d/%d", pamuid, pamgid));
+    }
 
   // quick check to skip unconfigured users before prompting for password
   {
@@ -470,6 +502,22 @@ pam_sm_authenticate (pam_handle_t *pamh,
   retval = PAM_SUCCESS;
 
 done:
+  if (pamuid || pamgid)
+    {
+      if (pamgid && setegid (old_egid) != 0)
+	{
+	  DBG (("Restoring setegid failed: %d", errno));
+	  retval = PAM_SERVICE_ERR;
+	}
+      if (pamuid && seteuid (old_euid) != 0)
+	{
+	  DBG (("Restoring setegid failed: %d", errno));
+	  retval = PAM_SERVICE_ERR;
+	}
+
+      DBG (("Successfully restored effective id to %d/%d",
+	    old_euid, old_egid));
+    }
   oath_done ();
   free (usersfile);
   free (query_prompt);
