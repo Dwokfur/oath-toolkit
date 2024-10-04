@@ -20,11 +20,26 @@
 #endif
 @PRAGMA_COLUMNS@
 
-#if defined __need_system_stdlib_h || defined __need_malloc_and_calloc
+#if ((defined __need_system_stdlib_h && !defined _GLIBCXX_STDLIB_H) \
+     || defined __need_malloc_and_calloc) \
+    && !defined __SUNPRO_CC
 /* Special invocation conventions inside some gnulib header files,
-   and inside some glibc header files, respectively.  */
+   and inside some glibc header files, respectively.
+   Do not recognize this special invocation convention when GCC's
+   c++/11/stdlib.h is being included or has been included. This is needed
+   to support the use of clang+llvm binaries on Ubuntu 22.04 with
+   CXX="$clangdir/bin/clang++ -I/usr/include/c++/11 \
+                              -I/usr/include/x86_64-linux-gnu/c++/11
+                              -L/usr/lib/gcc/x86_64-linux-gnu/11
+                              -Wl,-rpath,$clangdir/lib"
+   because in this case /usr/include/c++/11/stdlib.h (which does not support
+   the convention) is seen before the gnulib-generated stdlib.h.  */
 
 #@INCLUDE_NEXT@ @NEXT_STDLIB_H@
+
+/* Make sure that the macros that indicate the special invocation convention
+   get undefined.  This is needed at least on CentOS 7.  */
+#undef __need_malloc_and_calloc
 
 #else
 /* Normal invocation convention.  */
@@ -104,11 +119,22 @@ struct random_data
 # include <unistd.h>
 #endif
 
+#if ((@GNULIB_STRTOL@ && @REPLACE_STRTOL@) || (@GNULIB_STRTOLL@ && @REPLACE_STRTOLL@) || (@GNULIB_STRTOUL@ && @REPLACE_STRTOUL@) || (@GNULIB_STRTOULL@ && @REPLACE_STRTOULL@)) && defined __cplusplus && !defined GNULIB_NAMESPACE && defined __GNUG__ && !defined __clang__ && defined __sun
+/* When strtol, strtoll, strtoul, or strtoull is going to be defined as a macro
+   below, this may cause compilation errors later in the libstdc++ header files
+   (that are part of GCC), such as:
+     error: 'rpl_strtol' is not a member of 'std'
+   To avoid this, include the relevant header files here, before these symbols
+   get defined as macros.  But do so only on Solaris 11 (where it is needed),
+   not on mingw (where it would cause other compilation errors).  */
+# include <string>
+#endif
+
 /* _GL_ATTRIBUTE_DEALLOC (F, I) declares that the function returns pointers
    that can be freed by passing them as the Ith argument to the
    function F.  */
 #ifndef _GL_ATTRIBUTE_DEALLOC
-# if __GNUC__ >= 11
+# if __GNUC__ >= 11 && !defined __clang__
 #  define _GL_ATTRIBUTE_DEALLOC(f, i) __attribute__ ((__malloc__ (f, i)))
 # else
 #  define _GL_ATTRIBUTE_DEALLOC(f, i)
@@ -137,7 +163,7 @@ struct random_data
  */
 #ifndef _GL_ATTRIBUTE_NOTHROW
 # if defined __cplusplus
-#  if (__GNUC__ + (__GNUC_MINOR__ >= 8) > 2) || __clang_major >= 4
+#  if (__GNUC__ + (__GNUC_MINOR__ >= 8) > 2) || __clang_major__ >= 4
 #   if __cplusplus >= 201103L
 #    define _GL_ATTRIBUTE_NOTHROW noexcept (true)
 #   else
@@ -216,6 +242,31 @@ _GL_WARN_ON_USE (_Exit, "_Exit is unportable - "
 #endif
 
 
+#if @GNULIB_ABORT_DEBUG@
+# if @REPLACE_ABORT@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef abort
+#   define abort rpl_abort
+#  endif
+_GL_FUNCDECL_RPL (abort, _Noreturn void, (void));
+_GL_CXXALIAS_RPL (abort, void, (void));
+# else
+_GL_CXXALIAS_SYS (abort, void, (void));
+# endif
+# if __GLIBC__ >= 2
+_GL_CXXALIASWARN (abort);
+# endif
+#endif
+#if @GNULIB_ABORT_DEBUG@ && @REPLACE_ABORT@
+_GL_EXTERN_C void _gl_pre_abort (void);
+#else
+# if !GNULIB_defined_gl_pre_abort
+#  define _gl_pre_abort() /* nothing */
+#  define GNULIB_defined_gl_pre_abort 1
+# endif
+#endif
+
+
 #if @GNULIB_FREE_POSIX@
 # if @REPLACE_FREE@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
@@ -255,7 +306,7 @@ _GL_FUNCDECL_RPL (aligned_alloc, void *,
 _GL_CXXALIAS_RPL (aligned_alloc, void *, (size_t alignment, size_t size));
 # else
 #  if @HAVE_ALIGNED_ALLOC@
-#   if __GNUC__ >= 11
+#   if __GNUC__ >= 11 && !defined __clang__
 /* For -Wmismatched-dealloc: Associate aligned_alloc with free or rpl_free.  */
 #    if __GLIBC__ + (__GLIBC_MINOR__ >= 16) > 2
 _GL_FUNCDECL_SYS (aligned_alloc, void *,
@@ -275,7 +326,8 @@ _GL_CXXALIAS_SYS (aligned_alloc, void *, (size_t alignment, size_t size));
 _GL_CXXALIASWARN (aligned_alloc);
 # endif
 #else
-# if @GNULIB_FREE_POSIX@ && __GNUC__ >= 11 && !defined aligned_alloc
+# if @GNULIB_FREE_POSIX@ \
+     && (__GNUC__ >= 11 && !defined __clang__) && !defined aligned_alloc
 /* For -Wmismatched-dealloc: Associate aligned_alloc with free or rpl_free.  */
 #  if __GLIBC__ + (__GLIBC_MINOR__ >= 16) > 2
 _GL_FUNCDECL_SYS (aligned_alloc, void *,
@@ -327,7 +379,7 @@ _GL_FUNCDECL_RPL (calloc, void *,
                   _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE);
 _GL_CXXALIAS_RPL (calloc, void *, (size_t nmemb, size_t size));
 # else
-#  if __GNUC__ >= 11
+#  if __GNUC__ >= 11 && !defined __clang__
 /* For -Wmismatched-dealloc: Associate calloc with free or rpl_free.  */
 #   if __GLIBC__ + (__GLIBC_MINOR__ >= 14) > 2
 _GL_FUNCDECL_SYS (calloc, void *,
@@ -346,7 +398,8 @@ _GL_CXXALIAS_SYS (calloc, void *, (size_t nmemb, size_t size));
 _GL_CXXALIASWARN (calloc);
 # endif
 #else
-# if @GNULIB_FREE_POSIX@ && __GNUC__ >= 11 && !defined calloc
+# if @GNULIB_FREE_POSIX@ \
+     && (__GNUC__ >= 11 && !defined __clang__) && !defined calloc
 /* For -Wmismatched-dealloc: Associate calloc with free or rpl_free.  */
 #  if __GLIBC__ + (__GLIBC_MINOR__ >= 14) > 2
 _GL_FUNCDECL_SYS (calloc, void *,
@@ -378,7 +431,7 @@ _GL_FUNCDECL_RPL (canonicalize_file_name, char *,
                   _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE);
 _GL_CXXALIAS_RPL (canonicalize_file_name, char *, (const char *name));
 # else
-#  if !@HAVE_CANONICALIZE_FILE_NAME@ || __GNUC__ >= 11
+#  if !@HAVE_CANONICALIZE_FILE_NAME@ || (__GNUC__ >= 11 && !defined __clang__)
 #   if __GLIBC__ + (__GLIBC_MINOR__ >= 2) > 2
 _GL_FUNCDECL_SYS (canonicalize_file_name, char *,
                   (const char *name)
@@ -400,7 +453,8 @@ _GL_CXXALIAS_SYS (canonicalize_file_name, char *, (const char *name));
 # endif
 _GL_CXXALIASWARN (canonicalize_file_name);
 #else
-# if @GNULIB_FREE_POSIX@ && __GNUC__ >= 11 && !defined canonicalize_file_name
+# if @GNULIB_FREE_POSIX@ \
+     && (__GNUC__ >= 11 && !defined __clang__) && !defined canonicalize_file_name
 /* For -Wmismatched-dealloc: Associate canonicalize_file_name with free or
    rpl_free.  */
 #  if __GLIBC__ + (__GLIBC_MINOR__ >= 2) > 2
@@ -634,7 +688,7 @@ _GL_FUNCDECL_RPL (malloc, void *,
                   _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE);
 _GL_CXXALIAS_RPL (malloc, void *, (size_t size));
 # else
-#  if __GNUC__ >= 11
+#  if __GNUC__ >= 11 && !defined __clang__
 /* For -Wmismatched-dealloc: Associate malloc with free or rpl_free.  */
 #   if __GLIBC__ + (__GLIBC_MINOR__ >= 14) > 2
 _GL_FUNCDECL_SYS (malloc, void *,
@@ -653,7 +707,8 @@ _GL_CXXALIAS_SYS (malloc, void *, (size_t size));
 _GL_CXXALIASWARN (malloc);
 # endif
 #else
-# if @GNULIB_FREE_POSIX@ && __GNUC__ >= 11 && !defined malloc
+# if @GNULIB_FREE_POSIX@ \
+     && (__GNUC__ >= 11 && !defined __clang__) && !defined malloc
 /* For -Wmismatched-dealloc: Associate malloc with free or rpl_free.  */
 #  if __GLIBC__ + (__GLIBC_MINOR__ >= 14) > 2
 _GL_FUNCDECL_SYS (malloc, void *,
@@ -1396,7 +1451,7 @@ _GL_FUNCDECL_RPL (realloc, void *, (void *ptr, size_t size)
                                    _GL_ATTRIBUTE_DEALLOC_FREE);
 _GL_CXXALIAS_RPL (realloc, void *, (void *ptr, size_t size));
 # else
-#  if __GNUC__ >= 11
+#  if __GNUC__ >= 11 && !defined __clang__
 /* For -Wmismatched-dealloc: Associate realloc with free or rpl_free.  */
 #   if __GLIBC__ + (__GLIBC_MINOR__ >= 14) > 2
 _GL_FUNCDECL_SYS (realloc, void *,
@@ -1415,7 +1470,8 @@ _GL_CXXALIAS_SYS (realloc, void *, (void *ptr, size_t size));
 _GL_CXXALIASWARN (realloc);
 # endif
 #else
-# if @GNULIB_FREE_POSIX@ && __GNUC__ >= 11 && !defined realloc
+# if @GNULIB_FREE_POSIX@ \
+     && (__GNUC__ >= 11 && !defined __clang__) && !defined realloc
 /* For -Wmismatched-dealloc: Associate realloc with free or rpl_free.  */
 #  if __GLIBC__ + (__GLIBC_MINOR__ >= 14) > 2
 _GL_FUNCDECL_SYS (realloc, void *,
@@ -1588,6 +1644,38 @@ _GL_CXXALIASWARN (strtod);
 # if HAVE_RAW_DECL_STRTOD
 _GL_WARN_ON_USE (strtod, "strtod is unportable - "
                  "use gnulib module strtod for portability");
+# endif
+#endif
+
+#if @GNULIB_STRTOF@
+ /* Parse a float from STRING, updating ENDP if appropriate.  */
+# if @REPLACE_STRTOF@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   define strtof rpl_strtof
+#  endif
+#  define GNULIB_defined_strtof_function 1
+_GL_FUNCDECL_RPL (strtof, float,
+                  (const char *restrict str, char **restrict endp)
+                  _GL_ARG_NONNULL ((1)));
+_GL_CXXALIAS_RPL (strtof, float,
+                  (const char *restrict str, char **restrict endp));
+# else
+#  if !@HAVE_STRTOF@
+_GL_FUNCDECL_SYS (strtof, float,
+                  (const char *restrict str, char **restrict endp)
+                  _GL_ARG_NONNULL ((1)));
+#  endif
+_GL_CXXALIAS_SYS (strtof, float,
+                  (const char *restrict str, char **restrict endp));
+# endif
+# if __GLIBC__ >= 2
+_GL_CXXALIASWARN (strtof);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef strtof
+# if HAVE_RAW_DECL_STRTOF
+_GL_WARN_ON_USE (strtof, "strtof is unportable - "
+                 "use gnulib module strtof for portability");
 # endif
 #endif
 

@@ -296,8 +296,10 @@ _GL_CXXALIAS_SYS (socket, int, (int domain, int type, int protocol));
 # endif
 _GL_CXXALIASWARN (socket);
 #elif @HAVE_WINSOCK2_H@
-# undef socket
-# define socket socket_used_without_requesting_gnulib_module_socket
+# if !GNULIB_SOCKET
+#  undef socket
+#  define socket socket_used_without_requesting_gnulib_module_socket
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef socket
 # if HAVE_RAW_DECL_SOCKET
@@ -326,8 +328,10 @@ _GL_CXXALIAS_SYS_CAST (connect, int,
 # endif
 _GL_CXXALIASWARN (connect);
 #elif @HAVE_WINSOCK2_H@
-# undef connect
-# define connect socket_used_without_requesting_gnulib_module_connect
+# if !GNULIB_CONNECT
+#  undef connect
+#  define connect connect_used_without_requesting_gnulib_module_connect
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef connect
 # if HAVE_RAW_DECL_CONNECT
@@ -362,8 +366,10 @@ _GL_CXXALIAS_SYS_CAST (accept, int,
 _GL_CXXALIASWARN (accept);
 # endif
 #elif @HAVE_WINSOCK2_H@
-# undef accept
-# define accept accept_used_without_requesting_gnulib_module_accept
+# if !GNULIB_ACCEPT
+#  undef accept
+#  define accept accept_used_without_requesting_gnulib_module_accept
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef accept
 # if HAVE_RAW_DECL_ACCEPT
@@ -392,8 +398,10 @@ _GL_CXXALIAS_SYS_CAST (bind, int,
 # endif
 _GL_CXXALIASWARN (bind);
 #elif @HAVE_WINSOCK2_H@
-# undef bind
-# define bind bind_used_without_requesting_gnulib_module_bind
+# if !GNULIB_BIND
+#  undef bind
+#  define bind bind_used_without_requesting_gnulib_module_bind
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef bind
 # if HAVE_RAW_DECL_BIND
@@ -426,8 +434,10 @@ _GL_CXXALIAS_SYS_CAST (getpeername, int,
 _GL_CXXALIASWARN (getpeername);
 # endif
 #elif @HAVE_WINSOCK2_H@
-# undef getpeername
-# define getpeername getpeername_used_without_requesting_gnulib_module_getpeername
+# if !GNULIB_GETPEERNAME
+#  undef getpeername
+#  define getpeername getpeername_used_without_requesting_gnulib_module_getpeername
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef getpeername
 # if HAVE_RAW_DECL_GETPEERNAME
@@ -460,8 +470,10 @@ _GL_CXXALIAS_SYS_CAST (getsockname, int,
 _GL_CXXALIASWARN (getsockname);
 # endif
 #elif @HAVE_WINSOCK2_H@
-# undef getsockname
-# define getsockname getsockname_used_without_requesting_gnulib_module_getsockname
+# if !GNULIB_GETSOCKNAME
+#  undef getsockname
+#  define getsockname getsockname_used_without_requesting_gnulib_module_getsockname
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef getsockname
 # if HAVE_RAW_DECL_GETSOCKNAME
@@ -492,8 +504,10 @@ _GL_CXXALIAS_SYS_CAST (getsockopt, int,
 # endif
 _GL_CXXALIASWARN (getsockopt);
 #elif @HAVE_WINSOCK2_H@
-# undef getsockopt
-# define getsockopt getsockopt_used_without_requesting_gnulib_module_getsockopt
+# if !GNULIB_GETSOCKOPT
+#  undef getsockopt
+#  define getsockopt getsockopt_used_without_requesting_gnulib_module_getsockopt
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef getsockopt
 # if HAVE_RAW_DECL_GETSOCKOPT
@@ -515,8 +529,10 @@ _GL_CXXALIAS_SYS (listen, int, (int fd, int backlog));
 # endif
 _GL_CXXALIASWARN (listen);
 #elif @HAVE_WINSOCK2_H@
-# undef listen
-# define listen listen_used_without_requesting_gnulib_module_listen
+# if !GNULIB_LISTEN
+#  undef listen
+#  define listen listen_used_without_requesting_gnulib_module_listen
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef listen
 # if HAVE_RAW_DECL_LISTEN
@@ -542,8 +558,10 @@ _GL_CXXALIAS_SYS_CAST (recv, ssize_t, (int fd, void *buf, size_t len, int flags)
 # endif
 _GL_CXXALIASWARN (recv);
 #elif @HAVE_WINSOCK2_H@
-# undef recv
-# define recv recv_used_without_requesting_gnulib_module_recv
+# if !GNULIB_RECV
+#  undef recv
+#  define recv recv_used_without_requesting_gnulib_module_recv
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef recv
 # if HAVE_RAW_DECL_RECV
@@ -572,8 +590,10 @@ _GL_CXXALIAS_SYS_CAST (send, ssize_t,
 # endif
 _GL_CXXALIASWARN (send);
 #elif @HAVE_WINSOCK2_H@
-# undef send
-# define send send_used_without_requesting_gnulib_module_send
+# if !GNULIB_SEND
+#  undef send
+#  define send send_used_without_requesting_gnulib_module_send
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef send
 # if HAVE_RAW_DECL_SEND
@@ -609,8 +629,10 @@ _GL_CXXALIAS_SYS_CAST (recvfrom, ssize_t,
 _GL_CXXALIASWARN (recvfrom);
 # endif
 #elif @HAVE_WINSOCK2_H@
-# undef recvfrom
-# define recvfrom recvfrom_used_without_requesting_gnulib_module_recvfrom
+# if !GNULIB_RECVFROM
+#  undef recvfrom
+#  define recvfrom recvfrom_used_without_requesting_gnulib_module_recvfrom
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef recvfrom
 # if HAVE_RAW_DECL_RECVFROM
@@ -641,8 +663,10 @@ _GL_CXXALIAS_SYS_CAST (sendto, ssize_t,
 # endif
 _GL_CXXALIASWARN (sendto);
 #elif @HAVE_WINSOCK2_H@
-# undef sendto
-# define sendto sendto_used_without_requesting_gnulib_module_sendto
+# if !GNULIB_SENDTO
+#  undef sendto
+#  define sendto sendto_used_without_requesting_gnulib_module_sendto
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef sendto
 # if HAVE_RAW_DECL_SENDTO
@@ -671,8 +695,10 @@ _GL_CXXALIAS_SYS_CAST (setsockopt, int,
 # endif
 _GL_CXXALIASWARN (setsockopt);
 #elif @HAVE_WINSOCK2_H@
-# undef setsockopt
-# define setsockopt setsockopt_used_without_requesting_gnulib_module_setsockopt
+# if !GNULIB_SETSOCKOPT
+#  undef setsockopt
+#  define setsockopt setsockopt_used_without_requesting_gnulib_module_setsockopt
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef setsockopt
 # if HAVE_RAW_DECL_SETSOCKOPT
@@ -694,8 +720,10 @@ _GL_CXXALIAS_SYS (shutdown, int, (int fd, int how));
 # endif
 _GL_CXXALIASWARN (shutdown);
 #elif @HAVE_WINSOCK2_H@
-# undef shutdown
-# define shutdown shutdown_used_without_requesting_gnulib_module_shutdown
+# if !GNULIB_SHUTDOWN
+#  undef shutdown
+#  define shutdown shutdown_used_without_requesting_gnulib_module_shutdown
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef shutdown
 # if HAVE_RAW_DECL_SHUTDOWN

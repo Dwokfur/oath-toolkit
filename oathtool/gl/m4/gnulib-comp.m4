@@ -86,6 +86,9 @@ AC_DEFUN([gl_EARLY],
   AC_REQUIRE([AC_SYS_LARGEFILE])
   # Code from module libc-config:
   # Code from module limits-h:
+  # Code from module locale:
+  # Code from module localename-unsafe-limited:
+  # Code from module malloc-posix:
   # Code from module malloca:
   # Code from module mbszero:
   # Code from module memchr:
@@ -101,6 +104,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module pathmax:
   # Code from module progname:
   # Code from module setenv:
+  # Code from module setlocale-null-unlocked:
   # Code from module size_max:
   # Code from module snippet/_Noreturn:
   # Code from module snippet/arg-nonnull:
@@ -127,6 +131,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module sys_stat:
   # Code from module sys_time:
   # Code from module sys_types:
+  AC_REQUIRE([AC_USE_SYSTEM_EXTENSIONS])
   # Code from module time-h:
   # Code from module time_r:
   # Code from module time_rz:
@@ -174,6 +179,7 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_CLOSE
   gl_CONDITIONAL([GL_COND_OBJ_CLOSE], [test $REPLACE_CLOSE = 1])
   gl_UNISTD_MODULE_INDICATOR([close])
+  gl_MODULE_INDICATOR([close])
   gl_DOUBLE_SLASH_ROOT
   gl_FUNC_DUP2
   gl_CONDITIONAL([GL_COND_OBJ_DUP2], [test $REPLACE_DUP2 = 1])
@@ -228,6 +234,7 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_FSTAT
   ])
   gl_SYS_STAT_MODULE_INDICATOR([fstat])
+  gl_MODULE_INDICATOR([fstat])
   gl_FUNC_GETDELIM
   gl_CONDITIONAL([GL_COND_OBJ_GETDELIM],
                  [test $HAVE_GETDELIM = 0 || test $REPLACE_GETDELIM = 1])
@@ -274,6 +281,18 @@ AC_DEFUN([gl_INIT],
   gl_LIMITS_H
   gl_CONDITIONAL_HEADER([limits.h])
   AC_PROG_MKDIR_P
+  gl_LOCALE_H
+  gl_LOCALE_H_REQUIRE_DEFAULTS
+  AC_PROG_MKDIR_P
+  gl_LOCALENAME_UNSAFE_LIMITED
+  AC_REQUIRE([AC_CANONICAL_HOST])
+  gl_CONDITIONAL([GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED],
+                 [case "$host_os" in netbsd* | solaris*) true;; *) false;; esac])
+  AC_REQUIRE([gl_FUNC_MALLOC_POSIX])
+  if test $REPLACE_MALLOC_FOR_MALLOC_POSIX = 1; then
+    AC_LIBOBJ([malloc])
+  fi
+  gl_STDLIB_MODULE_INDICATOR([malloc-posix])
   gl_MALLOCA
   AC_REQUIRE([AC_TYPE_MBSTATE_T])
   gl_MBSTATE_T_BROKEN
@@ -332,6 +351,7 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_STAT
   ])
   gl_SYS_STAT_MODULE_INDICATOR([stat])
+  gl_MODULE_INDICATOR([stat])
   gl_STAT_TIME
   gl_STAT_BIRTHTIME
   gl_STDARG_H
@@ -420,7 +440,8 @@ AC_DEFUN([gl_INIT],
   ])
   gl_TIME_MODULE_INDICATOR([time_r])
   gl_TIME_RZ
-  gl_CONDITIONAL([GL_COND_OBJ_TIME_RZ], [test $HAVE_TIMEZONE_T = 0])
+  gl_CONDITIONAL([GL_COND_OBJ_TIME_RZ],
+                 [test $HAVE_TZALLOC = 0 || test $REPLACE_LOCALTIME_RZ = 1 || test $REPLACE_MKTIME_Z = 1])
   gl_TIME_MODULE_INDICATOR([time_rz])
   gl_FUNC_TIMEGM
   gl_CONDITIONAL([GL_COND_OBJ_TIMEGM],
@@ -671,6 +692,10 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/itold.c
   lib/libc-config.h
   lib/limits.in.h
+  lib/locale.in.h
+  lib/localename-unsafe.c
+  lib/localename.h
+  lib/malloc.c
   lib/malloca.c
   lib/malloca.h
   lib/mbszero.c
@@ -696,6 +721,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/progname.c
   lib/progname.h
   lib/setenv.c
+  lib/setlocale_null-unlocked.c
+  lib/setlocale_null.h
   lib/size_max.h
   lib/stat-time.c
   lib/stat-time.h
@@ -713,6 +740,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/strerror-override.c
   lib/strerror-override.h
   lib/strerror.c
+  lib/strftime.c
   lib/strftime.h
   lib/string.in.h
   lib/sys_stat.in.h
@@ -775,14 +803,19 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/gettimeofday.m4
   m4/gnulib-common.m4
   m4/include_next.m4
+  m4/intl-thread-locale.m4
   m4/intmax_t.m4
   m4/inttypes.m4
   m4/inttypes_h.m4
   m4/largefile.m4
+  m4/lcmessage.m4
   m4/limits-h.m4
   m4/locale-fr.m4
   m4/locale-ja.m4
   m4/locale-zh.m4
+  m4/locale_h.m4
+  m4/localename.m4
+  m4/malloc.m4
   m4/malloca.m4
   m4/math_h.m4
   m4/mbrtowc.m4
@@ -796,6 +829,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/multiarch.m4
   m4/musl.m4
   m4/nstrftime.m4
+  m4/off64_t.m4
   m4/off_t.m4
   m4/open-cloexec.m4
   m4/open-slash.m4
@@ -836,7 +870,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/version-etc.m4
   m4/warn-on-use.m4
   m4/wchar_h.m4
-  m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
   m4/zzgnulib.m4

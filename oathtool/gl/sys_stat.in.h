@@ -65,7 +65,7 @@
  */
 #ifndef _GL_ATTRIBUTE_NOTHROW
 # if defined __cplusplus
-#  if (__GNUC__ + (__GNUC_MINOR__ >= 8) > 2) || __clang_major >= 4
+#  if (__GNUC__ + (__GNUC_MINOR__ >= 8) > 2) || __clang_major__ >= 4
 #   if __cplusplus >= 201103L
 #    define _GL_ATTRIBUTE_NOTHROW noexcept (true)
 #   else
@@ -122,9 +122,11 @@
 # if @GNULIB_STAT@
 #  define stat rpl_stat
 # else
-   /* Provoke a clear link error if stat() is used as a function and
-      module 'stat' is not in use.  */
-#  define stat stat_used_without_requesting_gnulib_module_stat
+#  if !GNULIB_STAT
+    /* Provoke a clear link error if stat() is used as a function and
+       module 'stat' is not in use.  */
+#   define stat stat_used_without_requesting_gnulib_module_stat
+#  endif
 # endif
 
 # if !GNULIB_defined_struct_stat
@@ -516,8 +518,10 @@ _GL_CXXALIAS_SYS (fstat, int, (int fd, struct stat *buf));
 _GL_CXXALIASWARN (fstat);
 # endif
 #elif @GNULIB_OVERRIDES_STRUCT_STAT@
-# undef fstat
-# define fstat fstat_used_without_requesting_gnulib_module_fstat
+# if !GNULIB_FSTAT
+#  undef fstat
+#  define fstat fstat_used_without_requesting_gnulib_module_fstat
+# endif
 #elif @WINDOWS_64_BIT_ST_SIZE@
 /* Above, we define stat to _stati64.  */
 # define fstat _fstati64
@@ -556,8 +560,10 @@ _GL_CXXALIAS_SYS (fstatat, int,
 # endif
 _GL_CXXALIASWARN (fstatat);
 #elif @GNULIB_OVERRIDES_STRUCT_STAT@
-# undef fstatat
-# define fstatat fstatat_used_without_requesting_gnulib_module_fstatat
+# if !GNULIB_FSTATAT
+#  undef fstatat
+#  define fstatat fstatat_used_without_requesting_gnulib_module_fstatat
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef fstatat
 # if HAVE_RAW_DECL_FSTATAT
@@ -667,12 +673,6 @@ _GL_CXXALIAS_RPL (mkdir, int, (char const *name, mode_t mode));
 _GL_CXXALIAS_SYS (mkdir, int, (char const *name, mode_t mode));
 # endif
 _GL_CXXALIASWARN (mkdir);
-#elif defined GNULIB_POSIXCHECK
-# undef mkdir
-# if HAVE_RAW_DECL_MKDIR
-_GL_WARN_ON_USE (mkdir, "mkdir does not always support two parameters - "
-                 "use gnulib module mkdir for portability");
-# endif
 #elif @GNULIB_MDA_MKDIR@
 /* On native Windows, map 'mkdir' to '_mkdir', so that -loldnames is not
    required.  In C++ with GNULIB_NAMESPACE, avoid differences between
@@ -695,6 +695,12 @@ _GL_CXXALIAS_RPL (mkdir, int, (char const *name, mode_t mode));
 _GL_CXXALIAS_SYS (mkdir, int, (char const *name, mode_t mode));
 # endif
 _GL_CXXALIASWARN (mkdir);
+#elif defined GNULIB_POSIXCHECK
+# undef mkdir
+# if HAVE_RAW_DECL_MKDIR
+_GL_WARN_ON_USE (mkdir, "mkdir does not always support two parameters - "
+                 "use gnulib module mkdir for portability");
+# endif
 #endif
 
 
@@ -928,8 +934,10 @@ _GL_CXXALIAS_SYS (lstat, int,
 _GL_CXXALIASWARN (lstat);
 # endif
 #elif @GNULIB_OVERRIDES_STRUCT_STAT@
-# undef lstat
-# define lstat lstat_used_without_requesting_gnulib_module_lstat
+# if !GNULIB_LSTAT
+#  undef lstat
+#  define lstat lstat_used_without_requesting_gnulib_module_lstat
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef lstat
 # if HAVE_RAW_DECL_LSTAT

@@ -503,6 +503,7 @@ sc_prohibit_have_config_h:
 # Nearly all .c files must include <config.h>.  However, we also permit this
 # via inclusion of a package-specific header, if cfg.mk specified one.
 # config_h_header must be suitable for grep -E.
+# Rationale: The Gnulib documentation, node 'Include <config.h>'.
 config_h_header ?= <config\.h>
 sc_require_config_h:
 	@require='^# *include $(config_h_header)'			\
@@ -526,6 +527,7 @@ perl_config_h_first_ =							\
 
 # You must include <config.h> before including any other header file.
 # This can possibly be via a package-specific header, if given by cfg.mk.
+# Rationale: The Gnulib documentation, node 'Include <config.h>'.
 sc_require_config_h_first:
 	@if $(VC_LIST_EXCEPT) | $(GREP) '\.c$$' > /dev/null; then	\
 	  files=$$($(VC_LIST_EXCEPT) | $(GREP) '\.c$$') &&		\
@@ -534,6 +536,93 @@ sc_require_config_h_first:
 		'before <config.h>' 1>&2; exit 1; } || :;		\
 	else :;								\
 	fi
+
+# Generated headers that override system headers.
+# These are documented in gnulib-tool.texi.  Keep sorted.
+# sed -n -e 's/^@item[[:space:]]\{1,\}@code{\([^}]\{1,\}\)}$/\1/p' $GNULIB_SRCDIR/doc/gnulib-tool.texi  | sort -u
+gl_prefer_angle_bracket_headers_ ?= \
+  alloca.h		\
+  arpa/inet.h		\
+  assert.h		\
+  byteswap.h		\
+  ctype.h		\
+  dirent.h		\
+  endian.h		\
+  errno.h		\
+  error.h		\
+  fcntl.h		\
+  fenv.h		\
+  float.h		\
+  fnmatch.h		\
+  getopt.h		\
+  glob.h		\
+  iconv.h		\
+  inttypes.h		\
+  langinfo.h		\
+  limits.h		\
+  locale.h		\
+  malloc.h		\
+  math.h		\
+  monetary.h		\
+  netdb.h		\
+  net/if.h		\
+  netinet/in.h		\
+  omp.h			\
+  poll.h		\
+  pthread.h		\
+  pty.h			\
+  sched.h		\
+  search.h		\
+  selinux/selinux.h	\
+  signal.h		\
+  spawn.h		\
+  stdalign.h		\
+  stdarg.h		\
+  stdbit.h		\
+  stddef.h		\
+  stdint.h		\
+  stdio.h		\
+  stdlib.h		\
+  string.h		\
+  strings.h		\
+  sysexits.h		\
+  sys/file.h		\
+  sys/ioctl.h		\
+  sys/msg.h		\
+  sys/random.h		\
+  sys/resource.h	\
+  sys/select.h		\
+  sys/sem.h		\
+  sys/shm.h		\
+  sys/socket.h		\
+  sys/stat.h		\
+  sys/time.h		\
+  sys/times.h		\
+  sys/types.h		\
+  sys/uio.h		\
+  sys/utsname.h		\
+  sys/wait.h		\
+  termios.h		\
+  threads.h		\
+  time.h		\
+  uchar.h		\
+  unistd.h		\
+  utime.h		\
+  utmp.h		\
+  wchar.h		\
+  wctype.h
+
+# Remove each .h suffix and change each space to "|".
+angle_bracket_header_re = \
+  $(subst $(_sp),|,$(patsubst %.h,%,$(gl_prefer_angle_bracket_headers_)))
+
+# Suggest using '#include <header.h>' instead of '#include "header.h"' for
+# headers that override system headers.
+# Rationale: The Gnulib documentation, node 'Style of #include statements'.
+sc_prefer_angle_bracket_headers:
+	@prohibit='^ *# *include "($(angle_bracket_header_re))\.h"'	\
+	halt='Use #include <hdr.h>, not #include "hdr.h" for the above'	\
+	  $(_sc_search_regexp)
 
 sc_prohibit_HAVE_MBRTOWC:
 	@prohibit='\bHAVE_MBRTOWC\b'					\
@@ -769,6 +858,24 @@ sc_obsolete_symbols:
 	halt='do not use HAVE''_FCNTL_H or O'_NDELAY			\
 	  $(_sc_search_regexp)
 
+# Prohibit BSD4.3/SysV u_char, u_short, u_int and u_long usage.
+sc_unsigned_char:
+	@prohibit=u''_char \
+	halt='don'\''t use u''_char; instead use unsigned char'	\
+	  $(_sc_search_regexp)
+sc_unsigned_short:
+	@prohibit=u''_short \
+	halt='don'\''t use u''_short; instead use unsigned short' \
+	  $(_sc_search_regexp)
+sc_unsigned_int:
+	@prohibit=u''_int \
+	halt='don'\''t use u''_int; instead use unsigned int' \
+	  $(_sc_search_regexp)
+sc_unsigned_long:
+	@prohibit=u''_long \
+	halt='don'\''t use u''_long; instead use unsigned long'	\
+	  $(_sc_search_regexp)
+
 # FIXME: warn about definitions of EXIT_FAILURE, EXIT_SUCCESS, STREQ
 
 # Each nonempty ChangeLog line must start with a year number, or a TAB.
@@ -914,6 +1021,7 @@ sc_prohibit_always-defined_macros:
 		 exit 1; }						\
 	    || :;							\
 	fi
+
 # ==================================================================
 
 # Prohibit checked in backup files.
@@ -1398,7 +1506,7 @@ vc-diff-check:
 rel-files = $(DIST_ARCHIVES)
 
 gnulib-version = $$(cd $(gnulib_dir)				\
-                    && { git describe || git rev-parse --short=10 HEAD; } )
+                    && { git describe 2> /dev/null || git rev-parse --short=10 HEAD; } )
 bootstrap-tools ?= autoconf,automake,gnulib
 
 gpgv = $$(gpgv2 --version >/dev/null && echo gpgv2 || echo gpgv)
@@ -1660,7 +1768,7 @@ refresh-po:
 
 # Indentation
 
-indent_args ?= -ppi 1
+indent_args ?= --ignore-profile --preprocessor-indentation 1
 C_SOURCES ?= $$($(VC_LIST_EXCEPT) | grep '\.[ch]\(.in\)\?$$')
 INDENT_SOURCES ?= $(C_SOURCES)
 exclude_file_name_regexp--indent ?= $(exclude_file_name_regexp--sc_indent)
@@ -1780,7 +1888,7 @@ _gl_tight_scope: $(bin_PROGRAMS)
 	for sig in 1 2 3 13 15; do					\
 	  eval "trap 'v=`expr $$sig + 128`; (exit $$v); exit $$v' $$sig"; \
 	done;								\
-	src=`for f in $(SOURCES); do					\
+	src=`for f in $(sort $(SOURCES)); do				\
 	       test -f $$f && d= || d=$(srcdir)/; echo $$d$$f; done`;	\
 	hdr=`for f in $(_gl_TS_headers); do				\
 	       test -f $$f && d= || d=$(srcdir)/; echo $$d$$f; done`;	\

@@ -88,6 +88,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module strverscmp:
   # Code from module sys_time:
   # Code from module sys_types:
+  AC_REQUIRE([AC_USE_SYSTEM_EXTENSIONS])
   # Code from module time-h:
   # Code from module time_r:
   # Code from module unistd:
@@ -306,8 +307,6 @@ changequote([, ])dnl
   m4_pushdef([GL_MACRO_PREFIX], [gltests])
   m4_pushdef([GL_MODULE_INDICATOR_PREFIX], [GL])
   gl_COMMON
-  AC_REQUIRE([gl_CC_ALLOW_WARNINGS])
-  AC_REQUIRE([gl_CXX_ALLOW_WARNINGS])
   gl_source_base='gl/tests'
   gl_source_base_prefix=
 changequote(,)dnl
@@ -316,7 +315,6 @@ changequote([, ])dnl
   AC_SUBST([gltests_WITNESS])
   gl_module_indicator_condition=$gltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
-  gl_VALGRIND_TESTS
   m4_popdef([gl_MODULE_INDICATOR_CONDITION])
   m4_ifval(gltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gltests_LIBSOURCES_DIR])[ ||
@@ -363,8 +361,6 @@ changequote([, ])dnl
     AC_SUBST([gltests_LIBOBJDEPS], [$gltests_libobjdeps])
   ])
   AC_REQUIRE([gl_CC_GNULIB_WARNINGS])
-  LIBTESTS_LIBDEPS="$gltests_libdeps"
-  AC_SUBST([LIBTESTS_LIBDEPS])
 ])
 
 # Like AC_LIBOBJ, except that the module name goes
@@ -496,6 +492,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/minmax.m4
   m4/mmap-anon.m4
   m4/multiarch.m4
+  m4/off64_t.m4
   m4/off_t.m4
   m4/pid_t.m4
   m4/realloc.m4
@@ -522,12 +519,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/warn-on-use.m4
   m4/warnings.m4
   m4/wchar_h.m4
-  m4/wchar_t.m4
   m4/wint_t.m4
   m4/zzgnulib.m4
-  tests=lib/_Noreturn.h
-  tests=lib/arg-nonnull.h
-  tests=lib/c++defs.h
-  tests=lib/dummy.c
-  tests=lib/warn-on-use.h
 ])

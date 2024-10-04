@@ -172,6 +172,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module sys_stat:
   # Code from module sys_time:
   # Code from module sys_types:
+  AC_REQUIRE([AC_USE_SYSTEM_EXTENSIONS])
   # Code from module sys_uio:
   # Code from module time-h:
   # Code from module time_r:
@@ -180,6 +181,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module unlink:
   # Code from module valgrind-tests:
   # Code from module vasnprintf:
+  # Code from module vsnzprintf:
   # Code from module warnings:
   # Code from module wchar:
   # Code from module xalloc-oversized:
@@ -236,6 +238,7 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_CLOSE
   gl_CONDITIONAL([GL_COND_OBJ_CLOSE], [test $REPLACE_CLOSE = 1])
   gl_UNISTD_MODULE_INDICATOR([close])
+  gl_MODULE_INDICATOR([close])
   gl_AF_ALG
   gl_GC
   gl_CONDITIONAL([GL_COND_OBJ_GC_LIBGCRYPT], [test "$ac_cv_libgcrypt" = yes])
@@ -336,6 +339,7 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_FSTAT
   ])
   gl_SYS_STAT_MODULE_INDICATOR([fstat])
+  gl_MODULE_INDICATOR([fstat])
   gl_FUNC_FSYNC
   gl_CONDITIONAL([GL_COND_OBJ_FSYNC], [test $HAVE_FSYNC = 0])
   AM_COND_IF([GL_COND_OBJ_FSYNC], [
@@ -393,6 +397,7 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_LSTAT
   ])
   gl_SYS_STAT_MODULE_INDICATOR([lstat])
+  gl_MODULE_INDICATOR([lstat])
   gl_FUNC_MALLOC_GNU
   if test $REPLACE_MALLOC_FOR_MALLOC_GNU = 1; then
     AC_LIBOBJ([malloc])
@@ -492,6 +497,7 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_STAT
   ])
   gl_SYS_STAT_MODULE_INDICATOR([stat])
+  gl_MODULE_INDICATOR([stat])
   gl_STAT_TIME
   gl_STAT_BIRTHTIME
   gl_C_BOOL
@@ -618,6 +624,7 @@ AC_DEFUN([gl_INIT],
   gl_VALGRIND_TESTS
   AC_REQUIRE([AC_C_RESTRICT])
   gl_FUNC_VASNPRINTF
+  gl_STDIO_MODULE_INDICATOR([vsnzprintf])
   gl_WCHAR_H
   gl_WCHAR_H_REQUIRE_DEFAULTS
   AC_PROG_MKDIR_P
@@ -677,8 +684,6 @@ changequote([, ])dnl
   m4_pushdef([GL_MACRO_PREFIX], [gltests])
   m4_pushdef([GL_MODULE_INDICATOR_PREFIX], [GL])
   gl_COMMON
-  AC_REQUIRE([gl_CC_ALLOW_WARNINGS])
-  AC_REQUIRE([gl_CXX_ALLOW_WARNINGS])
   gl_source_base='gl/tests'
   gl_source_base_prefix=
 changequote(,)dnl
@@ -687,7 +692,6 @@ changequote([, ])dnl
   AC_SUBST([gltests_WITNESS])
   gl_module_indicator_condition=$gltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
-  gl_VALGRIND_TESTS
   m4_popdef([gl_MODULE_INDICATOR_CONDITION])
   m4_ifval(gltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gltests_LIBSOURCES_DIR])[ ||
@@ -734,8 +738,6 @@ changequote([, ])dnl
     AC_SUBST([gltests_LIBOBJDEPS], [$gltests_libobjdeps])
   ])
   AC_REQUIRE([gl_CC_GNULIB_WARNINGS])
-  LIBTESTS_LIBDEPS="$gltests_libdeps"
-  AC_SUBST([LIBTESTS_LIBDEPS])
 ])
 
 # Like AC_LIBOBJ, except that the module name goes
@@ -808,6 +810,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/base32.h
   lib/basename-lgpl.c
   lib/basename-lgpl.h
+  lib/byteswap.c
   lib/byteswap.in.h
   lib/c++defs.h
   lib/c-ctype.c
@@ -951,6 +954,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/verify.h
+  lib/vsnzprintf.c
   lib/warn-on-use.h
   lib/wchar.in.h
   lib/xalloc-oversized.h
@@ -1037,6 +1041,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/multiarch.m4
   m4/musl.m4
   m4/nocrash.m4
+  m4/off64_t.m4
   m4/off_t.m4
   m4/open-cloexec.m4
   m4/open-slash.m4
@@ -1091,13 +1096,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/warn-on-use.m4
   m4/warnings.m4
   m4/wchar_h.m4
-  m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
   m4/zzgnulib.m4
-  tests=lib/_Noreturn.h
-  tests=lib/arg-nonnull.h
-  tests=lib/c++defs.h
-  tests=lib/dummy.c
-  tests=lib/warn-on-use.h
 ])

@@ -27,7 +27,8 @@
 
 
 # Specification in the form of a command-line invocation:
-# gnulib-tool --import --local-dir=gl/override \
+# gnulib-tool --import \
+#  --local-dir=gl/override \
 #  --lib=libgnu \
 #  --source-base=gl \
 #  --m4-base=gl/m4 \
