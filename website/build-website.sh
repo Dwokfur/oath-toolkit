@@ -37,7 +37,7 @@ mkdir html
 
 cp *.css html/
 
-for txt in index.txt NEWS.txt download.txt docs.txt pam_oath.txt contrib.txt; do
+for txt in index.txt NEWS.txt download.txt docs.txt pam_oath.txt contrib.txt CVE-*.txt; do
     html=`echo $txt | sed 's/\.txt$/.html/'`
     asciidoc --backend=xhtml11 --conf-file=config.cfg -a index-only -o tmp $txt
     tr -d '\015' < tmp > tmp2
