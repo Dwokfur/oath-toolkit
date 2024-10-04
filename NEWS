@@ -1,6 +1,8 @@
 OATH Toolkit NEWS -- History of user-visible changes.           -*- outline -*-
 Copyright (C) 2009-2024 Simon Josefsson.  Licensed under the GPLv3+.
 
+* Version 2.6.13 (unreleased)
+
 * Version 2.6.12 (released 2024-10-03)
 
 ** pam_oath: Drop privs when ${HOME} is used in the usersfile= setting.
