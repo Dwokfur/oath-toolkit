@@ -3,7 +3,10 @@ Read the link:NEWS.html[NEWS file] for release highlights and a full
 list of changes.  See the link:download.html[Download page] for
 download links.
 
-'Simon Josefsson'
+IMPORTANT: Security advisory
+https://www.nongnu.org/oath-toolkit/CVE-2024-47191.html[CVE-2024-47191]
+about bug in OATH Toolkit version 2.6.7 to 2.6.11 inclusive.
+
 ************************************************************************
 
 Introduction
