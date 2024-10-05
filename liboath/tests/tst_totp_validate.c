@@ -26,7 +26,7 @@
 #include <stdio.h>
 
 /* *INDENT-OFF* */
-const struct {
+static const struct {
   time_t now;
   unsigned window;
   const char *otp;

@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 
-const char *pskc_mini =
+static const char *pskc_mini =
   "<?xml version=\"1.0\"?>\n"
   "<KeyContainer xmlns=\"urn:ietf:params:xml:ns:keyprov:pskc\"\n"
   "              Version=\"1.0\">\n" "  <KeyPackage/>\n" "</KeyContainer>\n";

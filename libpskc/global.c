@@ -33,7 +33,8 @@
 # include <xmlsec/crypto.h>
 #endif
 
-int _pskc_init = 0;
+static int _pskc_init = 0;
+static pskc_log_func _pskc_log_func;
 
 /**
  * pskc_global_init:
@@ -163,8 +164,6 @@ pskc_free (void *ptr)
 {
   free (ptr);
 }
-
-pskc_log_func _pskc_log_func;
 
 /**
  * pskc_global_log:

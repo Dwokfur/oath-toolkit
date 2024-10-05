@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 
-const char *pskc_expect =
+static const char *pskc_expect =
   "<?xml version=\"1.0\"?>\n"
   "<KeyContainer xmlns=\"urn:ietf:params:xml:ns:keyprov:pskc\" Version=\"42\" Id=\"MyID\"><KeyPackage><DeviceInfo><Manufacturer>iana.foo</Manufacturer><SerialNo>42</SerialNo><Model>model</Model><IssueNo>issueno</IssueNo><DeviceBinding>devbind</DeviceBinding><StartDate>1906-06-04T03:02:01Z</StartDate><ExpiryDate>1901-03-03T04:05:06Z</ExpiryDate><UserId>userid</UserId></DeviceInfo><CryptoModuleInfo><Id>cid</Id></CryptoModuleInfo><Key Id=\"keyid\" Algorithm=\"keyalg\"><Issuer>keyissuer</Issuer><AlgorithmParameters><Suite>keyalgparmsuite</Suite><ChallengeFormat Encoding=\"ALPHANUMERIC\" Min=\"4711\" Max=\"42\" CheckDigits=\"true\"/><ResponseFormat Encoding=\"BASE64\" Length=\"216\" CheckDigits=\"true\"/></AlgorithmParameters><KeyProfileId>profileid</KeyProfileId><KeyReference>keyref</KeyReference><FriendlyName>fname</FriendlyName><Data><Secret><PlainValue>Zm9v</PlainValue></Secret><Counter><PlainValue>4711</PlainValue></Counter><Time><PlainValue>12345</PlainValue></Time><TimeInterval><PlainValue>123456</PlainValue></TimeInterval><TimeDrift><PlainValue>321</PlainValue></TimeDrift></Data><UserId>keyuserid</UserId><Policy><StartDate>1906-06-04T03:02:01Z</StartDate><ExpiryDate>1901-03-03T04:05:06Z</ExpiryDate><PINPolicy PINKeyId=\"pinkeyid\" PINUsageMode=\"Append\" MaxFailedAttempts=\"123\" MinLength=\"24\" MaxLength=\"42\" PINEncoding=\"BASE64\"/><KeyUsage>Verify</KeyUsage><NumberOfTransactions>17</NumberOfTransactions></Policy></Key></KeyPackage></KeyContainer>\n";
 

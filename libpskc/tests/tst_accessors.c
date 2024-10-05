@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 
-const char *pskc_all =
+static const char *pskc_all =
   "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
   "<KeyContainerX Version=\"42.17\" Id=\"KCID\" foo=\"bar\""
   "              xmlns=\"urn:ietf:params:xml:ns:keyprov:pskc\">"

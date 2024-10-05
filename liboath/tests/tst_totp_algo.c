@@ -27,7 +27,7 @@
 #define DEBUG 1
 
 /* *INDENT-OFF* */
-const struct {
+static const struct {
   time_t secs;
   uint64_t T;
   const char *otp;

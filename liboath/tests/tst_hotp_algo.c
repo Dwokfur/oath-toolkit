@@ -28,7 +28,7 @@
 #define MAX_DIGIT 8
 #define MAX_ITER 20
 
-const char *expect[MAX_DIGIT + 1][MAX_ITER] = {
+static const char *expect[MAX_DIGIT + 1][MAX_ITER] = {
   /* digit 0 */
   {},
   /* digit 1 */
