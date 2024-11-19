@@ -357,6 +357,23 @@ AlmaLinux8-xmlsec:
   - make -j$(nproc) check V=1 VERBOSE=t
   - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
 
+AlmaLinux9-openssl:
+  image: almalinux:9
+  stage: test
+  needs: [B-Trisquel11]
+  before_script:
+  - dnf -y install make gcc diffutils file pam-devel
+  - dnf -y install libxml2-devel
+  - dnf -y install epel-release
+  - dnf -y --enablerepo=crb install libtool-ltdl-devel indent xmlsec1-openssl-devel
+  script:
+  - tar xfa oath-toolkit-*.tar.gz
+  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - ./configure -C --enable-gcc-warnings --disable-valgrind-tests --with-openssl --with-xmlsec-crypto-engine=openssl
+  - make -j$(nproc) syntax-check
+  - make -j$(nproc) check V=1 VERBOSE=t
+  - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
+
 RockyLinux9-ppc64:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
