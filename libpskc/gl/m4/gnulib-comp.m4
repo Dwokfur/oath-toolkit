@@ -53,12 +53,14 @@ AC_DEFUN([gl_EARLY],
   # Code from module extensions-aix:
   AC_REQUIRE([gl_USE_AIX_EXTENSIONS])
   # Code from module extern-inline:
+  # Code from module free-posix:
   # Code from module gen-header:
   # Code from module ialloc:
   # Code from module idx:
   # Code from module include_next:
   # Code from module intprops:
   # Code from module inttostr:
+  # Code from module inttypes-incomplete:
   # Code from module lib-symbol-versions:
   # Code from module lib-symbol-visibility:
   # Code from module libc-config:
@@ -95,6 +97,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module unistd:
   # Code from module valgrind-tests:
   # Code from module warnings:
+  # Code from module wchar:
 ])
 
 # This macro should be invoked from ./configure.ac, in the section
@@ -126,7 +129,16 @@ AC_DEFUN([gl_INIT],
   fi
   gl_STDLIB_MODULE_INDICATOR([calloc-posix])
   AC_REQUIRE([gl_EXTERN_INLINE])
+  gl_FUNC_FREE
+  gl_CONDITIONAL([GL_COND_OBJ_FREE], [test $REPLACE_FREE = 1])
+  AM_COND_IF([GL_COND_OBJ_FREE], [
+    gl_PREREQ_FREE
+  ])
+  gl_STDLIB_MODULE_INDICATOR([free-posix])
   gl_INTTOSTR
+  gl_INTTYPES_INCOMPLETE
+  gl_INTTYPES_H_REQUIRE_DEFAULTS
+  AC_PROG_MKDIR_P
   gl_LD_VERSION_SCRIPT
   gl_VISIBILITY
   gl___INLINE
@@ -234,6 +246,9 @@ AC_DEFUN([gl_INIT],
   gl_UNISTD_H_REQUIRE_DEFAULTS
   AC_PROG_MKDIR_P
   gl_VALGRIND_TESTS
+  gl_WCHAR_H
+  gl_WCHAR_H_REQUIRE_DEFAULTS
+  AC_PROG_MKDIR_P
   # End of code from modules
   m4_ifval(gl_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gl_LIBSOURCES_DIR])[ ||
@@ -410,6 +425,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/c++defs.h
   lib/calloc.c
   lib/cdefs.h
+  lib/free.c
   lib/ialloc.c
   lib/ialloc.h
   lib/idx.h
@@ -418,6 +434,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/intprops.h
   lib/inttostr.c
   lib/inttostr.h
+  lib/inttypes.in.h
   lib/libc-config.h
   lib/limits.in.h
   lib/malloc.c
@@ -447,6 +464,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/unistd.c
   lib/unistd.in.h
   lib/warn-on-use.h
+  lib/wchar.in.h
   m4/00gnulib.m4
   m4/__inline.m4
   m4/absolute-header.m4
@@ -457,9 +475,11 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/extensions-aix.m4
   m4/extensions.m4
   m4/extern-inline.m4
+  m4/free.m4
   m4/gnulib-common.m4
   m4/include_next.m4
   m4/inttostr.m4
+  m4/inttypes.m4
   m4/ld-version-script.m4
   m4/limits-h.m4
   m4/locale-en.m4
@@ -496,6 +516,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/visibility.m4
   m4/warn-on-use.m4
   m4/warnings.m4
+  m4/wchar_h.m4
   m4/wint_t.m4
   m4/zzgnulib.m4
 ])

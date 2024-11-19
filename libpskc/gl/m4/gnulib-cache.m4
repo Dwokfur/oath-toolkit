@@ -39,6 +39,7 @@
 #  --libtool \
 #  --macro-prefix=gl \
 #  base64 \
+#  free-posix \
 #  inttostr \
 #  lib-symbol-versions \
 #  lib-symbol-visibility \
@@ -52,6 +53,7 @@
 gl_LOCAL_DIR([])
 gl_MODULES([
   base64
+  free-posix
   inttostr
   lib-symbol-versions
   lib-symbol-visibility
