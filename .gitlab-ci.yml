@@ -362,7 +362,7 @@ AlmaLinux9-openssl:
   stage: test
   needs: [B-Trisquel11]
   before_script:
-  - dnf -y install make gcc diffutils file pam-devel
+  - dnf -y install make gcc diffutils file pam-devel openssl-devel
   - dnf -y install epel-release
   - dnf -y --enablerepo=crb install libtool-ltdl-devel indent
   script:
