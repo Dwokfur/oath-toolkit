@@ -28,8 +28,8 @@ OATH Toolkit is licensed under the GPLv3+ license, see the file
 [COPYING](COPYING).
 
 Liboath and libpskc are available under the LGPLv2.1+, see
-[liboath/COPYING](liboath/COPYING), although you may use it under the
-GPLv3+ license if you prefer.
+[COPYING.LESSERv2](COPYING.LESSERv2), although you may use them under
+the GPLv3+ license if you prefer.
 
 Many files in the official release tarball are automatically generated
 by various tools, for example Makefile.in by automake and
