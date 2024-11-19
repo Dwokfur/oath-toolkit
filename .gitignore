@@ -51,6 +51,7 @@
 /liboath/gl/assert.h
 /liboath/gl/byteswap.h
 /liboath/gl/fcntl.h
+/liboath/gl/float.h
 /liboath/gl/inttypes.h
 /liboath/gl/libgnu.la
 /liboath/gl/limits.h
@@ -422,6 +423,7 @@
 /oathtool/gl/c++defs.h
 /oathtool/gl/error.h
 /oathtool/gl/fcntl.h
+/oathtool/gl/float.h
 /oathtool/gl/inttypes.h
 /oathtool/gl/libgnu.la
 /oathtool/gl/limits.h
