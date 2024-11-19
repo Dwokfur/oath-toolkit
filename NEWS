@@ -3,6 +3,12 @@ Copyright (C) 2009-2024 Simon Josefsson.  Licensed under the GPLv3+.
 
 * Version 2.6.13 (unreleased)
 
+** liboath: Fix --with-openssl builds, and test for it in pipeline.
+Reported by Tomasz Kłoczko in
+<https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/36>.
+
+** Updated gnulib files.
+
 * Version 2.6.12 (released 2024-10-03)
 
 ** pam_oath: Drop privs when ${HOME} is used in the usersfile= setting.
