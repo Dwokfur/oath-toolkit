@@ -124,8 +124,10 @@ release_archive_dir ?= ../release
 # If RELEASE_TYPE is undefined, but RELEASE is, use its second word.
 # But overwrite VERSION.
 ifdef RELEASE
-  VERSION := $(word 1, $(RELEASE))
-  RELEASE_TYPE ?= $(word 2, $(RELEASE))
+  ifeq ($(origin RELEASE),command line)
+    VERSION := $(word 1,$(RELEASE))
+    RELEASE_TYPE ?= $(word 2,$(RELEASE))
+  endif
 endif
 
 # Validate and return $(RELEASE_TYPE), or die.
@@ -563,9 +565,10 @@ gl_prefer_angle_bracket_headers_ ?= \
   locale.h		\
   malloc.h		\
   math.h		\
+  mntent.h		\
   monetary.h		\
-  netdb.h		\
   net/if.h		\
+  netdb.h		\
   netinet/in.h		\
   omp.h			\
   poll.h		\
@@ -578,14 +581,12 @@ gl_prefer_angle_bracket_headers_ ?= \
   spawn.h		\
   stdalign.h		\
   stdarg.h		\
-  stdbit.h		\
   stddef.h		\
   stdint.h		\
   stdio.h		\
   stdlib.h		\
   string.h		\
   strings.h		\
-  sysexits.h		\
   sys/file.h		\
   sys/ioctl.h		\
   sys/msg.h		\
@@ -600,8 +601,10 @@ gl_prefer_angle_bracket_headers_ ?= \
   sys/times.h		\
   sys/types.h		\
   sys/uio.h		\
+  sys/un.h		\
   sys/utsname.h		\
   sys/wait.h		\
+  sysexits.h		\
   termios.h		\
   threads.h		\
   time.h		\
@@ -1043,6 +1046,13 @@ sc_GFDL_version:
 	@prohibit='$(_GFDL_regexp)'					\
 	halt='GFDL vN, N!=3'						\
 	  $(_sc_search_regexp)
+
+# Look out for FSF postal addresses -- use URLs instead:
+# https://www.gnu.org/prep/maintain/html_node/License-Notices-for-Code.html
+sc_fsf_postal:
+	@prohibit='(Mass Ave|Massachusetts Ave|Temple Pl|Franklin St|Milk St)' \
+	halt='use license URLs instead of FSF postal address' \
+	 $(_sc_search_regexp)
 
 # Don't use Texinfo's @acronym{}.
 # https://lists.gnu.org/r/bug-gnulib/2010-03/msg00321.html

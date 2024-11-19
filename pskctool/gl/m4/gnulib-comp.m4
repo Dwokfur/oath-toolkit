@@ -55,6 +55,10 @@ AC_DEFUN([gl_EARLY],
   # Code from module error:
   # Code from module error-h:
   # Code from module extensions:
+  # This is actually already done in the pre-early phase.
+  # AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
+  # Code from module extensions-aix:
+  AC_REQUIRE([gl_USE_AIX_EXTENSIONS])
   # Code from module extern-inline:
   # Code from module fcntl:
   # Code from module fcntl-h:
@@ -228,6 +232,7 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_GETDTABLESIZE
   ])
   gl_UNISTD_MODULE_INDICATOR([getdtablesize])
+  AC_REQUIRE([AC_CANONICAL_HOST])
   gl_FUNC_GETPROGNAME
   gl_CONDITIONAL([GL_COND_OBJ_GETPROGNAME],
                  [test $HAVE_GETPROGNAME = 0 || test $REPLACE_GETPROGNAME = 1])
@@ -279,9 +284,9 @@ AC_DEFUN([gl_INIT],
   AC_CHECK_DECLS([program_invocation_short_name], [], [], [#include <errno.h>])
   gl_PREREQ_READ_FILE
   gl_FUNC_REALLOC_POSIX
-  if test $REPLACE_REALLOC_FOR_REALLOC_POSIX = 1; then
-    AC_LIBOBJ([realloc])
-  fi
+  gl_FUNC_REALLOC_0_NONNULL
+  gl_CONDITIONAL([GL_COND_OBJ_REALLOC_POSIX],
+                 [test $REPLACE_REALLOC_FOR_REALLOC_POSIX != 0])
   gl_STDLIB_MODULE_INDICATOR([realloc-posix])
   gt_TYPE_SSIZE_T
   gl_FUNC_STAT
@@ -611,6 +616,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/stdio-read.c
   lib/stdio-write.c
   lib/stdio.in.h
+  lib/stdlib.c
   lib/stdlib.in.h
   lib/strerror-override.c
   lib/strerror-override.h
@@ -636,10 +642,10 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/codeset.m4
   m4/double-slash-root.m4
   m4/dup2.m4
-  m4/eealloc.m4
   m4/errno_h.m4
   m4/error.m4
   m4/error_h.m4
+  m4/extensions-aix.m4
   m4/extensions.m4
   m4/extern-inline.m4
   m4/fclose.m4
@@ -660,7 +666,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/inttypes.m4
   m4/largefile.m4
   m4/limits-h.m4
-  m4/locale-fr.m4
+  m4/locale-en.m4
   m4/lseek.m4
   m4/malloc.m4
   m4/malloca.m4

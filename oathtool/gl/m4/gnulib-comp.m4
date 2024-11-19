@@ -60,6 +60,10 @@ AC_DEFUN([gl_EARLY],
   # Code from module error:
   # Code from module error-h:
   # Code from module extensions:
+  # This is actually already done in the pre-early phase.
+  # AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
+  # Code from module extensions-aix:
+  AC_REQUIRE([gl_USE_AIX_EXTENSIONS])
   # Code from module extern-inline:
   # Code from module fcntl:
   # Code from module fcntl-h:
@@ -86,8 +90,6 @@ AC_DEFUN([gl_EARLY],
   AC_REQUIRE([AC_SYS_LARGEFILE])
   # Code from module libc-config:
   # Code from module limits-h:
-  # Code from module locale:
-  # Code from module localename-unsafe-limited:
   # Code from module malloc-posix:
   # Code from module malloca:
   # Code from module mbszero:
@@ -97,14 +99,12 @@ AC_DEFUN([gl_EARLY],
   # Code from module msvc-inval:
   # Code from module msvc-nothrow:
   # Code from module multiarch:
-  # Code from module nstrftime:
   # Code from module open:
   # Code from module parse-datetime:
   # Code from module parse-duration:
   # Code from module pathmax:
   # Code from module progname:
   # Code from module setenv:
-  # Code from module setlocale-null-unlocked:
   # Code from module size_max:
   # Code from module snippet/_Noreturn:
   # Code from module snippet/arg-nonnull:
@@ -143,7 +143,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module vararrays:
   # Code from module vasnprintf:
   # Code from module vasprintf:
-  # Code from module verify:
   # Code from module version-etc:
   # Code from module wchar:
   # Code from module xalloc-oversized:
@@ -215,8 +214,11 @@ AC_DEFUN([gl_INIT],
   gl_FLOAT_H
   gl_CONDITIONAL_HEADER([float.h])
   AC_PROG_MKDIR_P
-  gl_CONDITIONAL([GL_COND_OBJ_FLOAT], [test $REPLACE_FLOAT_LDBL = 1])
+  gl_CONDITIONAL([GL_COND_OBJ_FLOAT],
+                 [test $REPLACE_FLOAT_LDBL = 1 || test $REPLACE_FLOAT_SNAN = 1])
   gl_CONDITIONAL([GL_COND_OBJ_ITOLD], [test $REPLACE_ITOLD = 1])
+  dnl Prerequisites of lib/float.c.
+  AC_REQUIRE([gl_BIGENDIAN])
   gl_FUNC_FREE
   gl_CONDITIONAL([GL_COND_OBJ_FREE], [test $REPLACE_FREE = 1])
   AM_COND_IF([GL_COND_OBJ_FREE], [
@@ -255,6 +257,7 @@ AC_DEFUN([gl_INIT],
     gl_PREREQ_GETLINE
   ])
   gl_STDIO_MODULE_INDICATOR([getline])
+  AC_REQUIRE([AC_CANONICAL_HOST])
   gl_FUNC_GETPROGNAME
   gl_CONDITIONAL([GL_COND_OBJ_GETPROGNAME],
                  [test $HAVE_GETPROGNAME = 0 || test $REPLACE_GETPROGNAME = 1])
@@ -281,13 +284,6 @@ AC_DEFUN([gl_INIT],
   gl_LIMITS_H
   gl_CONDITIONAL_HEADER([limits.h])
   AC_PROG_MKDIR_P
-  gl_LOCALE_H
-  gl_LOCALE_H_REQUIRE_DEFAULTS
-  AC_PROG_MKDIR_P
-  gl_LOCALENAME_UNSAFE_LIMITED
-  AC_REQUIRE([AC_CANONICAL_HOST])
-  gl_CONDITIONAL([GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED],
-                 [case "$host_os" in netbsd* | solaris*) true;; *) false;; esac])
   AC_REQUIRE([gl_FUNC_MALLOC_POSIX])
   if test $REPLACE_MALLOC_FOR_MALLOC_POSIX = 1; then
     AC_LIBOBJ([malloc])
@@ -323,7 +319,6 @@ AC_DEFUN([gl_INIT],
                  [test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1])
   gl_MODULE_INDICATOR([msvc-nothrow])
   gl_MULTIARCH
-  gl_FUNC_GNU_STRFTIME
   gl_FUNC_OPEN
   gl_CONDITIONAL([GL_COND_OBJ_OPEN], [test $REPLACE_OPEN = 1])
   AM_COND_IF([GL_COND_OBJ_OPEN], [
@@ -692,9 +687,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/itold.c
   lib/libc-config.h
   lib/limits.in.h
-  lib/locale.in.h
-  lib/localename-unsafe.c
-  lib/localename.h
   lib/malloc.c
   lib/malloca.c
   lib/malloca.h
@@ -707,7 +699,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/msvc-inval.h
   lib/msvc-nothrow.c
   lib/msvc-nothrow.h
-  lib/nstrftime.c
   lib/open.c
   lib/parse-datetime.h
   lib/parse-datetime.y
@@ -721,8 +712,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/progname.c
   lib/progname.h
   lib/setenv.c
-  lib/setlocale_null-unlocked.c
-  lib/setlocale_null.h
   lib/size_max.h
   lib/stat-time.c
   lib/stat-time.h
@@ -736,12 +725,11 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/stdio-read.c
   lib/stdio-write.c
   lib/stdio.in.h
+  lib/stdlib.c
   lib/stdlib.in.h
   lib/strerror-override.c
   lib/strerror-override.h
   lib/strerror.c
-  lib/strftime.c
-  lib/strftime.h
   lib/string.in.h
   lib/sys_stat.in.h
   lib/sys_time.in.h
@@ -780,12 +768,12 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/codeset.m4
   m4/double-slash-root.m4
   m4/dup2.m4
-  m4/eealloc.m4
   m4/environ.m4
   m4/errno_h.m4
   m4/error.m4
   m4/error_h.m4
   m4/exponentd.m4
+  m4/extensions-aix.m4
   m4/extensions.m4
   m4/extern-inline.m4
   m4/fcntl-o.m4
@@ -803,18 +791,14 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/gettimeofday.m4
   m4/gnulib-common.m4
   m4/include_next.m4
-  m4/intl-thread-locale.m4
   m4/intmax_t.m4
   m4/inttypes.m4
   m4/inttypes_h.m4
   m4/largefile.m4
-  m4/lcmessage.m4
   m4/limits-h.m4
-  m4/locale-fr.m4
+  m4/locale-en.m4
   m4/locale-ja.m4
   m4/locale-zh.m4
-  m4/locale_h.m4
-  m4/localename.m4
   m4/malloc.m4
   m4/malloca.m4
   m4/math_h.m4
@@ -828,7 +812,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/msvc-nothrow.m4
   m4/multiarch.m4
   m4/musl.m4
-  m4/nstrftime.m4
   m4/off64_t.m4
   m4/off_t.m4
   m4/open-cloexec.m4

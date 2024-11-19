@@ -23,9 +23,6 @@
 #include <config.h>
 
 /* Specification.  */
-#if HAVE_OPENSSL_SHA256
-# define GL_OPENSSL_INLINE _GL_EXTERN_INLINE
-#endif
 #include "sha256.h"
 
 #include <stdlib.h>
@@ -136,10 +133,3 @@ sha224_stream (FILE *stream, void *resblock)
   return shaxxx_stream (stream, "sha224", resblock, SHA224_DIGEST_SIZE,
                         sha224_init_ctx, sha224_finish_ctx);
 }
-
-/*
- * Hey Emacs!
- * Local Variables:
- * coding: utf-8
- * End:
- */

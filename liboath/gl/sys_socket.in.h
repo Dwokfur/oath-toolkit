@@ -289,7 +289,7 @@ rpl_fd_isset (SOCKET fd, fd_set * set)
 #   undef socket
 #   define socket rpl_socket
 #  endif
-_GL_FUNCDECL_RPL (socket, int, (int domain, int type, int protocol));
+_GL_FUNCDECL_RPL (socket, int, (int domain, int type, int protocol), );
 _GL_CXXALIAS_RPL (socket, int, (int domain, int type, int protocol));
 # else
 _GL_CXXALIAS_SYS (socket, int, (int domain, int type, int protocol));
@@ -315,7 +315,7 @@ _GL_WARN_ON_USE (socket, "socket is not always POSIX compliant - "
 #   define connect rpl_connect
 #  endif
 _GL_FUNCDECL_RPL (connect, int,
-                  (int fd, const struct sockaddr *addr, socklen_t addrlen)
+                  (int fd, const struct sockaddr *addr, socklen_t addrlen),
                   _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (connect, int,
                   (int fd, const struct sockaddr *addr, socklen_t addrlen));
@@ -349,7 +349,7 @@ _GL_WARN_ON_USE (connect, "connect is not always POSIX compliant - "
 _GL_FUNCDECL_RPL (accept, int,
                   (int fd,
                    struct sockaddr *restrict addr,
-                   socklen_t *restrict addrlen));
+                   socklen_t *restrict addrlen), );
 _GL_CXXALIAS_RPL (accept, int,
                   (int fd,
                    struct sockaddr *restrict addr,
@@ -385,7 +385,7 @@ _GL_WARN_ON_USE (accept, "accept is not always POSIX compliant - "
 #   define bind rpl_bind
 #  endif
 _GL_FUNCDECL_RPL (bind, int,
-                  (int fd, const struct sockaddr *addr, socklen_t addrlen)
+                  (int fd, const struct sockaddr *addr, socklen_t addrlen),
                   _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (bind, int,
                   (int fd, const struct sockaddr *addr, socklen_t addrlen));
@@ -418,7 +418,7 @@ _GL_WARN_ON_USE (bind, "bind is not always POSIX compliant - "
 #  endif
 _GL_FUNCDECL_RPL (getpeername, int,
                   (int fd, struct sockaddr *restrict addr,
-                   socklen_t *restrict addrlen)
+                   socklen_t *restrict addrlen),
                   _GL_ARG_NONNULL ((2, 3)));
 _GL_CXXALIAS_RPL (getpeername, int,
                   (int fd, struct sockaddr *restrict addr,
@@ -454,7 +454,7 @@ _GL_WARN_ON_USE (getpeername, "getpeername is not always POSIX compliant - "
 #  endif
 _GL_FUNCDECL_RPL (getsockname, int,
                   (int fd, struct sockaddr *restrict addr,
-                   socklen_t *restrict addrlen)
+                   socklen_t *restrict addrlen),
                   _GL_ARG_NONNULL ((2, 3)));
 _GL_CXXALIAS_RPL (getsockname, int,
                   (int fd, struct sockaddr *restrict addr,
@@ -490,7 +490,7 @@ _GL_WARN_ON_USE (getsockname, "getsockname is not always POSIX compliant - "
 #  endif
 _GL_FUNCDECL_RPL (getsockopt, int,
                   (int fd, int level, int optname,
-                   void *restrict optval, socklen_t *restrict optlen)
+                   void *restrict optval, socklen_t *restrict optlen),
                   _GL_ARG_NONNULL ((4, 5)));
 _GL_CXXALIAS_RPL (getsockopt, int,
                   (int fd, int level, int optname,
@@ -522,7 +522,7 @@ _GL_WARN_ON_USE (getsockopt, "getsockopt is not always POSIX compliant - "
 #   undef listen
 #   define listen rpl_listen
 #  endif
-_GL_FUNCDECL_RPL (listen, int, (int fd, int backlog));
+_GL_FUNCDECL_RPL (listen, int, (int fd, int backlog), );
 _GL_CXXALIAS_RPL (listen, int, (int fd, int backlog));
 # else
 _GL_CXXALIAS_SYS (listen, int, (int fd, int backlog));
@@ -547,7 +547,7 @@ _GL_WARN_ON_USE (listen, "listen is not always POSIX compliant - "
 #   undef recv
 #   define recv rpl_recv
 #  endif
-_GL_FUNCDECL_RPL (recv, ssize_t, (int fd, void *buf, size_t len, int flags)
+_GL_FUNCDECL_RPL (recv, ssize_t, (int fd, void *buf, size_t len, int flags),
                                  _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (recv, ssize_t, (int fd, void *buf, size_t len, int flags));
 # else
@@ -577,7 +577,7 @@ _GL_WARN_ON_USE (recv, "recv is not always POSIX compliant - "
 #   define send rpl_send
 #  endif
 _GL_FUNCDECL_RPL (send, ssize_t,
-                  (int fd, const void *buf, size_t len, int flags)
+                  (int fd, const void *buf, size_t len, int flags),
                   _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (send, ssize_t,
                   (int fd, const void *buf, size_t len, int flags));
@@ -611,7 +611,7 @@ _GL_WARN_ON_USE (send, "send is not always POSIX compliant - "
 _GL_FUNCDECL_RPL (recvfrom, ssize_t,
                   (int fd, void *restrict buf, size_t len, int flags,
                    struct sockaddr *restrict from,
-                   socklen_t *restrict fromlen)
+                   socklen_t *restrict fromlen),
                   _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (recvfrom, ssize_t,
                   (int fd, void *restrict buf, size_t len, int flags,
@@ -649,7 +649,7 @@ _GL_WARN_ON_USE (recvfrom, "recvfrom is not always POSIX compliant - "
 #  endif
 _GL_FUNCDECL_RPL (sendto, ssize_t,
                   (int fd, const void *buf, size_t len, int flags,
-                   const struct sockaddr *to, socklen_t tolen)
+                   const struct sockaddr *to, socklen_t tolen),
                   _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (sendto, ssize_t,
                   (int fd, const void *buf, size_t len, int flags,
@@ -682,7 +682,7 @@ _GL_WARN_ON_USE (sendto, "sendto is not always POSIX compliant - "
 #   define setsockopt rpl_setsockopt
 #  endif
 _GL_FUNCDECL_RPL (setsockopt, int, (int fd, int level, int optname,
-                                    const void * optval, socklen_t optlen)
+                                    const void * optval, socklen_t optlen),
                                    _GL_ARG_NONNULL ((4)));
 _GL_CXXALIAS_RPL (setsockopt, int, (int fd, int level, int optname,
                                     const void * optval, socklen_t optlen));
@@ -713,7 +713,7 @@ _GL_WARN_ON_USE (setsockopt, "setsockopt is not always POSIX compliant - "
 #   undef shutdown
 #   define shutdown rpl_shutdown
 #  endif
-_GL_FUNCDECL_RPL (shutdown, int, (int fd, int how));
+_GL_FUNCDECL_RPL (shutdown, int, (int fd, int how), );
 _GL_CXXALIAS_RPL (shutdown, int, (int fd, int how));
 # else
 _GL_CXXALIAS_SYS (shutdown, int, (int fd, int how));
@@ -744,14 +744,14 @@ _GL_WARN_ON_USE (shutdown, "shutdown is not always POSIX compliant - "
 #  endif
 _GL_FUNCDECL_RPL (accept4, int,
                   (int sockfd, struct sockaddr *addr, socklen_t *addrlen,
-                   int flags));
+                   int flags), );
 _GL_CXXALIAS_RPL (accept4, int,
                   (int sockfd, struct sockaddr *addr, socklen_t *addrlen,
                    int flags));
 # else
 _GL_FUNCDECL_SYS (accept4, int,
                   (int sockfd, struct sockaddr *addr, socklen_t *addrlen,
-                   int flags));
+                   int flags), );
 _GL_CXXALIAS_SYS (accept4, int,
                   (int sockfd, struct sockaddr *addr, socklen_t *addrlen,
                    int flags));
