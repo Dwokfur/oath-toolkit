@@ -303,11 +303,11 @@ Debian12:
   - make -j$(nproc) check V=1 VERBOSE=t
   - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
 
-Ubuntu2310-xmlsec-ppc64:
+Ubuntu2410-xmlsec-ppc64:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
-  image: ubuntu:23.10
+  image: ubuntu:24.10
   tags: [ ppc64 ]
   stage: test
   needs: [B-Trisquel11]
