@@ -43,15 +43,6 @@ if ! diff -ur $srcdir/../../libpskc/examples/pskc-hotp-human.txt foo; then
     exit 1
 fi
 
-$PSKCTOOL --sign --sign-key $srcdir/pskc-ee-key.pem \
-    --sign-crt $srcdir/pskc-ee-crt.pem \
-    $srcdir/../../libpskc/examples/pskc-hotp.xml \
-    | sed 's,4</X509Cert,4\n</X509Cert,' > foo
-if ! diff -ur $srcdir/../../libpskc/examples/pskc-hotp-signed.xml foo; then
-    echo "FAIL: pskctool --sign output change, commit updated file."
-    exit 1
-fi
-
 $PSKCTOOL --info --debug --quiet $srcdir/pskc-figure6.xml > foo 2>&1
 if ! diff -ur $srcdir/../../libpskc/examples/pskc-figure6-debug.txt foo; then
     echo "FAIL: pskctool --info output change, commit updated file."

@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 TESTS = tst_pskctool.sh tst_hyphen.sh tst_roundtrip.sh tst_libexamples.sh \
-	tst_sign.sh
+	tst_libexamples2.sh tst_sign.sh
 dist_check_SCRIPTS = $(TESTS)
 
 EXTRA_DIST = pskc-figure2.xml pskc-figure3.xml pskc-figure4.xml	\

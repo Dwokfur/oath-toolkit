@@ -18,6 +18,9 @@
 
 set -e
 
+grep '#define USE_XMLSEC 1' ../../libpskc/config.h > /dev/null \
+    || exit 77
+
 PSKCTOOL=${PSKCTOOL:-../pskctool}
 
 srcdir="${srcdir:-.}"
