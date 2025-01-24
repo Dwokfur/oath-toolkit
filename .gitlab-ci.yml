@@ -24,9 +24,8 @@ default:
     when: always
     paths:
     - "*.tar.gz"
-    - ./*.log
-    - ./config.h
-    - ./**/*.log
+    - "**/config.h"
+    - "**/*.log"
     - website/html
     - coverage
     - clang-analyzer
