@@ -127,6 +127,7 @@ EXAMPLES_SOURCE_FILES=\
 	$(top_srcdir)/examples/pskc-hotp-human.txt
 
 $(content_files):
+	$(AM_V_GEN)mkdir -pv xml
 	$(AM_V_GEN)for i in $(EXAMPLES_SOURCE_FILES) ; do \
 	    file_name=`echo $$i | sed 's#.*/##' | sed 's#\..*$$##'`; \
 	    file_ext=`echo $$i | sed 's#.*/##' | sed 's#.*\.##'`; \
