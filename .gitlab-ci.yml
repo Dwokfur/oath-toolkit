@@ -76,6 +76,102 @@ B-clang:
   - git status
   - git diff --exit-code
 
+B-AlmaLinux8:
+  image: almalinux:8
+  stage: build
+  before_script:
+  - |
+    dnf -y install make git autoconf automake libtool bison diffutils
+    dnf -y install pam-devel valgrind
+    dnf -y --enablerepo=powertools install gtk-doc help2man
+    dnf -y install libxml2-devel libtool-ltdl-devel
+    dnf -y install --enablerepo=powertools xmlsec1-openssl-devel
+    dnf -y install epel-release
+    dnf -y --enablerepo=epel install faketime indent gengetopt
+    dnf -y install --enablerepo=baseos-debuginfo libxml2-debuginfo
+  script:
+  - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
+  - ./bootstrap
+  - ./configure -C --enable-gtk-doc --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
+  - make -j$(nproc) syntax-check
+  - make -j$(nproc) V=1
+  - make -j$(nproc) V=1 check VERBOSE=t
+  - grep '^PASS tst_sign.sh' pskctool/tests/tst_sign.sh.log
+  - make -j$(nproc) dist
+  - sha256sum oath-toolkit-*.tar.gz
+
+B-AlmaLinux9:
+  image: almalinux:9
+  stage: build
+  before_script:
+  - |
+    dnf -y install make git autoconf automake libtool bison diffutils
+    dnf -y install libxml2-devel
+    dnf -y install pam-devel valgrind
+    dnf -y install --enablerepo=crb gtk-doc help2man
+    dnf -y install epel-release
+    dnf -y install --enablerepo=epel gengetopt faketime indent
+    dnf -y install --enablerepo=baseos-debuginfo libxml2-debuginfo
+  script:
+  - ./bootstrap
+  - mkdir b
+  - cd b
+  - ../configure -C --enable-gtk-doc --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
+  - make -j$(nproc) syntax-check
+  - make -j$(nproc) V=1
+  - make -j$(nproc) V=1 check VERBOSE=t
+  - grep '^SKIP tst_sign.sh' pskctool/tests/tst_sign.sh.log
+  - make -j$(nproc) dist
+  - sha256sum oath-toolkit-*.tar.gz
+
+B-Rockylinux8:
+  image: rockylinux:8
+  stage: build
+  before_script:
+  - |
+    dnf -y install make git autoconf automake libtool bison diffutils
+    dnf -y install pam-devel valgrind
+    dnf -y --enablerepo=powertools install gtk-doc help2man
+    dnf -y install libxml2-devel libtool-ltdl-devel
+    dnf -y install --enablerepo=powertools xmlsec1-openssl-devel
+    dnf -y install epel-release
+    dnf -y --enablerepo=epel install faketime indent gengetopt
+    dnf -y install --enablerepo=baseos-debug libxml2-debuginfo
+  script:
+  - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
+  - ./bootstrap
+  - mkdir b
+  - cd b
+  - ../configure -C --enable-gtk-doc --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
+  - make -j$(nproc) syntax-check
+  - make -j$(nproc) V=1
+  - make -j$(nproc) V=1 check VERBOSE=t
+  - grep '^PASS tst_sign.sh' pskctool/tests/tst_sign.sh.log
+  - make -j$(nproc) dist
+  - sha256sum oath-toolkit-*.tar.gz
+
+B-Rockylinux9:
+  image: rockylinux:9
+  stage: build
+  before_script:
+  - |
+    dnf -y install make git autoconf automake libtool bison diffutils
+    dnf -y install pam-devel valgrind
+    dnf -y install libxml2-devel
+    dnf -y install --enablerepo=crb gtk-doc help2man
+    dnf -y install epel-release
+    dnf -y install --enablerepo=epel gengetopt faketime indent
+    dnf -y install --enablerepo=baseos-debug libxml2-debuginfo
+  script:
+  - ./bootstrap
+  - ./configure -C --enable-gtk-doc --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
+  - make -j$(nproc) syntax-check
+  - make -j$(nproc) V=1
+  - make -j$(nproc) V=1 check VERBOSE=t
+  - grep '^SKIP tst_sign.sh' pskctool/tests/tst_sign.sh.log
+  - make -j$(nproc) dist
+  - sha256sum oath-toolkit-*.tar.gz
+
 B-Trisquel11:
   image: registry.gitlab.com/oath-toolkit/build-images:Trisquel11
   stage: build
@@ -376,7 +472,7 @@ AlmaLinux8-xmlsec:
   - yum -y install make gcc diffutils file pam-devel
   - yum -y install libxml2-devel libtool-ltdl-devel
   - dnf -y install epel-release
-  - dnf -y --enablerepo=powertools install indent xmlsec1-openssl-devel
+  - dnf -y install --enablerepo=powertools indent xmlsec1-openssl-devel
   script:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
@@ -528,7 +624,7 @@ Mingw32:
   script:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
-  - ./configure --host=i686-w64-mingw32 CC='i686-w64-mingw32-gcc -static-libgcc'
+  - ./configure --host=i686-w64-mingw32 CC='i686-w64-mingw32-gcc -static-libgcc' CPPFLAGS=-D_FORTIFY_SOURCE=0
   - make -j$(nproc) V=1
   - make -j$(nproc) -C liboath/tests check VERBOSE=t
   - make -j$(nproc) -C oathtool/tests check VERBOSE=t
@@ -544,7 +640,7 @@ Mingw64:
   script:
   - tar xfa oath-toolkit-*.tar.gz
   - cd `ls -d oath-toolkit-* | grep -v tar.gz`
-  - ./configure --host=x86_64-w64-mingw32
+  - ./configure --host=x86_64-w64-mingw32 CPPFLAGS=-D_FORTIFY_SOURCE=0
   - make -j$(nproc) V=1
   - make -j$(nproc) -C liboath/tests check VERBOSE=t
   - make -j$(nproc) -C oathtool/tests check VERBOSE=T
