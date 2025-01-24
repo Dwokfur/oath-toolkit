@@ -3,6 +3,13 @@ Copyright (C) 2009-2024 Simon Josefsson.  Licensed under the GPLv3+.
 
 * Version 2.6.13 (unreleased)
 
+** liboath/libpskc: Fix _FORTIFY_SOURCE build problem and allow configuration.
+Some platforms (e.g., Ubuntu 24.10) set _FORTIFY_SOURCE in the default
+compiler settings, and this caused build failures since our code
+unconditionally #define'd _FORTIFY_SOURCE to 2.  We now allow you to
+override the desired level by running, for example ./configure
+CPPFLAGS=-D_FORTIFY_SOURCE=3 or CPPFLAGS=-D_FORTIFY_SOURCE=0.
+
 ** liboath: Fix --with-openssl builds, and test for it in pipeline.
 Reported by Tomasz Kłoczko in
 <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/36>.

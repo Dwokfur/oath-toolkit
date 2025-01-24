@@ -129,8 +129,13 @@ if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-Wno-error=tautological-constant-out-of-range-compare])
   AC_SUBST([WARN_CFLAGS])
 
-  AC_DEFINE([_FORTIFY_SOURCE], [2],
-    [enable compile-time and run-time bounds-checking, and some warnings])
+  AH_VERBATIM([_FORTIFY_SOURCE], [
+/* enable compile-time and run-time bounds-checking, and some warnings:
+https://www.gnu.org/software/libc/manual/html_node/Source-Fortification.html */
+#ifndef _FORTIFY_SOURCE
+# define _FORTIFY_SOURCE 2
+#endif
+])
   AC_DEFINE([GNULIB_POSIXCHECK], [1], [enable some gnulib portability checks])
 fi
 
