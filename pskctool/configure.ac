@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_INIT([pskctool],
-  m4_esyscmd([../build-aux/oath-toolkit-version ../.tarball-version]),
+  m4_esyscmd([../build-aux/git-version-gen --prefix oath-toolkit- ../.tarball-version]),
   [oath-toolkit-help@nongnu.org],,
   [https://www.nongnu.org/oath-toolkit/])
 

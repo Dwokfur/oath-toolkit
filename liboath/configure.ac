@@ -15,11 +15,14 @@
 # <https://www.gnu.org/licenses/>.
 
 AC_INIT([liboath],
-  m4_esyscmd([../build-aux/oath-toolkit-version ../.tarball-version]),
+  m4_esyscmd([../build-aux/git-version-gen --prefix oath-toolkit- ../.tarball-version]),
   [oath-toolkit-help@nongnu.org],,
   [https://www.nongnu.org/oath-toolkit/])
 
-VERSION_NUMBER=`"$srcdir"/../build-aux/oath-toolkit-version "$srcdir"/../.tarball-version vn`
+MAJOR=$(echo $PACKAGE_VERSION | cut -d. -f1)
+MINOR=$(echo $PACKAGE_VERSION | cut -d. -f2)
+PATCH=$(echo $PACKAGE_VERSION | cut -d. -f3)
+VERSION_NUMBER=$(printf "0x%02x%02x%02x00" $MAJOR $MINOR $PATCH)
 AC_SUBST(VERSION_NUMBER)
 
 # Library code modified:                              REVISION++

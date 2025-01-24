@@ -48,7 +48,7 @@ if test -f $ETCUSRCFG; then
     exit 1
 fi
 
-so_path_rel="${srcdir}/../.libs/pam_oath.so"
+so_path_rel="../.libs/pam_oath.so"
 so_path="$(readlink -f "${so_path_rel}")"
 if test -z "${so_path}"; then
     echo "Unable to resolve path to pam_oath.so: ${so_path_rel}"

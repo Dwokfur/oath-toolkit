@@ -29,7 +29,7 @@ endif
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4
 
 EXTRA_DIST = GNUmakefile cfg.mk maint.mk
-EXTRA_DIST += build-aux/oath-toolkit-version m4/dummy.m4
+EXTRA_DIST += m4/dummy.m4
 EXTRA_DIST += CONTRIBUTING.md
 
 # Website
