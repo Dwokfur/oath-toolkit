@@ -303,12 +303,41 @@ Debian12:
   - make -j$(nproc) check V=1 VERBOSE=t
   - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
 
-Ubuntu2410-xmlsec-ppc64:
+Debian-testing:
+  image: debian:testing-slim
+  stage: test
+  needs: [B-Trisquel11]
+  before_script:
+  - apt-get update -qq
+  - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
+  script:
+  - tar xfa oath-toolkit-*.tar.gz
+  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - ./configure --enable-gcc-warnings --disable-valgrind-tests
+  - make -j$(nproc) check V=1 VERBOSE=t
+  - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
+
+Ubuntu2410-ppc64:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
   image: ubuntu:24.10
   tags: [ ppc64 ]
+  stage: test
+  needs: [B-Trisquel11]
+  variables:
+    DEBIAN_FRONTEND: noninteractive
+  before_script:
+  - apt-get update -qq
+  - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxml2-utils datefudge
+  script:
+  - tar xfa oath-toolkit-*.tar.gz
+  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - ./configure -C --enable-gcc-warnings --disable-valgrind-tests
+  - make -j$(nproc) check V=1 VERBOSE=t
+
+Ubuntu2410-xmlsec:
+  image: ubuntu:24.10
   stage: test
   needs: [B-Trisquel11]
   variables:
