@@ -23,7 +23,7 @@ default:
     expire_in: 2 weeks
     when: always
     paths:
-    - "*.tar.gz"
+    - "**/*.tar.gz"
     - "**/config.h"
     - "**/*.log"
     - website/html
