@@ -14,7 +14,7 @@ CPPFLAGS=-D_FORTIFY_SOURCE=3 or CPPFLAGS=-D_FORTIFY_SOURCE=0.
 Reported by Tomasz Kłoczko in
 <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/36>.
 
-** Updated gnulib files.
+** Various build fixes including updated gnulib files.
 
 * Version 2.6.12 (released 2024-10-03)
 
