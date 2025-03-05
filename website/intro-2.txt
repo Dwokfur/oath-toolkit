@@ -16,7 +16,7 @@ and I'll add them to the list.
 - https://www.openauthentication.org/[Initiative for Open
   Authentication (OATH)] is the umbrella organization that published
   the HOTP/TOTP/PSKC technology.
-- The https://openauthentication.org/specifications-technical-resources/[OATH
+- The https://www.openauthentication.org/specifications.html[OATH
   Specifications] page for list of published documents.
 - https://tools.ietf.org/html/rfc4226[RFC 4226 on HOTP: An HMAC-Based One-Time
   Password Algorithm].
