@@ -588,11 +588,11 @@ Gentoo:
   - ../configure --enable-gcc-warnings
   - make -j$(nproc) check V=1 VERBOSE=t
 
-macOS13Xcode14:
+macOS15Xcode16:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
-  image: macos-13-xcode-14
+  image: macos-15-xcode-16
   tags: [ saas-macos-medium-m1 ]
   stage: test
   needs: [B-Trisquel11]
