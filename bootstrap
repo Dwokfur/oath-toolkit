@@ -38,14 +38,21 @@ gnulib-tool --import \
   --tests-base=gl/tests \
   --aux-dir=build-aux \
   --no-conditional-dependencies \
-  --no-libtool \
+  --libtool \
   --macro-prefix=gl \
-  --no-vc-files \
   autobuild \
+  error \
+  getline \
   git-version-gen \
   gitlog-to-changelog \
   maintainer-makefile \
-  update-copyright
+  parse-datetime \
+  parse-duration \
+  progname \
+  read-file \
+  update-copyright \
+  vasprintf \
+  version-etc
 
 cd liboath
 gnulib-tool --import \
@@ -84,29 +91,6 @@ gnulib-tool --import \
   valgrind-tests
 cd ..
 
-cd oathtool
-gnulib-tool --import \
-  --lib=libgnu \
-  --source-base=gl \
-  --m4-base=gl/m4 \
-  --doc-base=doc \
-  --tests-base=gl/tests \
-  --aux-dir=build-aux \
-  --no-conditional-dependencies \
-  --libtool \
-  --macro-prefix=gl \
-  --avoid=strtoll-tests \
-  error \
-  getline \
-  inttypes-h \
-  parse-datetime \
-  parse-duration \
-  progname \
-  vasprintf \
-  version-etc
-rm -rf doc
-cd ..
-
 cd libpskc
 gnulib-tool --import \
   --lib=libgnu \
@@ -129,23 +113,6 @@ gnulib-tool --import \
   strptime \
   strverscmp \
   valgrind-tests
-cd ..
-
-cd pskctool
-gnulib-tool --import \
-  --lib=libgnu \
-  --source-base=gl \
-  --m4-base=gl/m4 \
-  --doc-base=doc \
-  --tests-base=gl/tests \
-  --aux-dir=build-aux \
-  --no-conditional-dependencies \
-  --libtool \
-  --macro-prefix=gl \
-  error \
-  progname \
-  read-file \
-  version-etc
 cd ..
 
 autoreconf --force --install

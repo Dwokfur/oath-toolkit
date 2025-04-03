@@ -15,18 +15,19 @@
 
 .NOTPARALLEL:
 
-SUBDIRS = gl . tests
+SUBDIRS = . tests
 
-AM_CPPFLAGS = -I$(builddir)/../liboath -I$(srcdir)/gl -I$(builddir)/gl
+AM_CPPFLAGS = -I$(builddir)/../liboath
+AM_CPPFLAGS += -I$(srcdir)/../gl -I$(builddir)/../gl
 
 bin_PROGRAMS = oathtool
 oathtool_SOURCES = oathtool.c
-oathtool_LDADD = ../liboath/liboath.la gl/libgnu.la liboathtool_cmd.la
+oathtool_LDADD = ../liboath/liboath.la ../gl/libgnu.la liboathtool_cmd.la
 
 noinst_LTLIBRARIES = liboathtool_cmd.la
 BUILT_SOURCES = oathtool_cmd.c oathtool_cmd.h
 liboathtool_cmd_la_SOURCES = $(BUILT_SOURCES) oathtool.ggo
-liboathtool_cmd_la_LIBADD = gl/libgnu.la
+liboathtool_cmd_la_LIBADD = ../gl/libgnu.la
 liboathtool_cmd_la_CFLAGS =
 
 oathtool_cmd.h oathtool_cmd.c: oathtool.ggo Makefile.am
@@ -41,8 +42,8 @@ dist_man_MANS = oathtool.1
 MAINTAINERCLEANFILES = $(dist_man_MANS)
 EXTRA_DIST = oathtool.h2m
 
-oathtool.1: $(srcdir)/oathtool.c $(srcdir)/oathtool.ggo $(srcdir)/oathtool.h2m $(srcdir)/configure.ac
+oathtool.1: $(srcdir)/oathtool.c $(srcdir)/oathtool.ggo $(srcdir)/oathtool.h2m $(top_srcdir)/.version
 	$(AM_V_GEN)$(HELP2MAN) \
 		--include $(srcdir)/oathtool.h2m \
 		--no-info \
-		--output=$@ $(top_builddir)/oathtool$(EXEEXT)
+		--output=$@ $(builddir)/oathtool$(EXEEXT)

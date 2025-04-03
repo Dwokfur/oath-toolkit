@@ -15,19 +15,19 @@
 
 .NOTPARALLEL:
 
-SUBDIRS = gl . tests
+SUBDIRS = . tests
 
 AM_CPPFLAGS = -I$(builddir)/../libpskc/include -I$(srcdir)/../libpskc/include
-AM_CPPFLAGS += -I$(srcdir)/gl -I$(builddir)/gl
+AM_CPPFLAGS += -I$(srcdir)/../gl -I$(builddir)/../gl
 
 bin_PROGRAMS = pskctool
 pskctool_SOURCES = pskctool.c
-pskctool_LDADD = ../libpskc/libpskc.la gl/libgnu.la libpskctool_cmd.la
+pskctool_LDADD = ../libpskc/libpskc.la ../gl/libgnu.la libpskctool_cmd.la
 
 noinst_LTLIBRARIES = libpskctool_cmd.la
 BUILT_SOURCES = pskctool_cmd.c pskctool_cmd.h
 libpskctool_cmd_la_SOURCES = $(BUILT_SOURCES) pskctool.ggo
-libpskctool_cmd_la_LIBADD = gl/libgnu.la
+libpskctool_cmd_la_LIBADD = ../gl/libgnu.la
 libpskctool_cmd_la_CFLAGS =
 
 pskctool_cmd.h pskctool_cmd.c: pskctool.ggo Makefile.am
@@ -39,8 +39,8 @@ dist_man_MANS = pskctool.1
 MAINTAINERCLEANFILES = $(dist_man_MANS)
 EXTRA_DIST = pskctool.h2m
 
-pskctool.1: $(srcdir)/pskctool.c $(srcdir)/pskctool.ggo $(srcdir)/pskctool.h2m $(srcdir)/configure.ac
+pskctool.1: $(srcdir)/pskctool.c $(srcdir)/pskctool.ggo $(srcdir)/pskctool.h2m $(top_srcdir)/.version
 	$(AM_V_GEN)$(HELP2MAN) \
 		--include $(srcdir)/pskctool.h2m \
 		--no-info \
-		--output=$@ $(top_builddir)/pskctool$(EXEEXT)
+		--output=$@ $(builddir)/pskctool$(EXEEXT)

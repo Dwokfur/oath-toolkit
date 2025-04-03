@@ -19,8 +19,17 @@ AC_INIT([oath-toolkit],
   [https://www.nongnu.org/oath-toolkit/])
 
 AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIRS([m4 gl/m4])
 AM_INIT_AUTOMAKE([1.13 -Wall])
+
+AM_MISSING_PROG(HELP2MAN, help2man, $missing_dir)
+
+AC_PROG_CC
+gl_EARLY
+AM_PROG_AR
+LT_INIT([win32-dll])
+gl_INIT
 
 AC_CHECK_HEADERS_ONCE([security/pam_appl.h])
 AC_ARG_ENABLE([pam],
@@ -36,16 +45,11 @@ AC_ARG_ENABLE([pskc],
    [enable_pskc=yes])
 AM_CONDITIONAL([ENABLE_PSKC], [test "x$enable_pskc" = xyes])
 
-gl_EARLY
-gl_INIT
-
 AC_CONFIG_SUBDIRS([
   liboath
-  oathtool
 ])
 if test "x$enable_pskc" = xyes; then
   AC_CONFIG_SUBDIRS([libpskc])
-  AC_CONFIG_SUBDIRS([pskctool])
 fi
 if test "x$enable_pam" = xyes; then
   AC_CONFIG_SUBDIRS([pam_oath])
@@ -53,6 +57,10 @@ fi
 AC_CONFIG_FILES([
   Makefile
   gl/Makefile
+  oathtool/Makefile
+  oathtool/tests/Makefile
+  pskctool/Makefile
+  pskctool/tests/Makefile
 ])
 AC_OUTPUT
 
