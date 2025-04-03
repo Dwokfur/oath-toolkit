@@ -32,6 +32,7 @@ libpskctool_cmd_la_CFLAGS =
 
 pskctool_cmd.h pskctool_cmd.c: pskctool.ggo Makefile.am
 	$(AM_V_GEN)gengetopt --unamed-opts="FILE" \
+		--set-package="pskctool" \
 		--no-handle-version --no-handle-help \
 		--input $< --file-name pskctool_cmd
 

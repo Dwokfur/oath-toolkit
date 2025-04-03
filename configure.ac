@@ -13,9 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([oath-toolkit],
+AC_INIT([OATH Toolkit],
   m4_esyscmd([build-aux/git-version-gen --prefix oath-toolkit- .tarball-version]),
-  [oath-toolkit-help@nongnu.org],,
+  [oath-toolkit-help@nongnu.org],
+  [oath-toolkit],
   [https://www.nongnu.org/oath-toolkit/])
 
 AC_CONFIG_AUX_DIR([build-aux])

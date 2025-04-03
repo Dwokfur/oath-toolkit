@@ -32,6 +32,7 @@ liboathtool_cmd_la_CFLAGS =
 
 oathtool_cmd.h oathtool_cmd.c: oathtool.ggo Makefile.am
 	$(AM_V_GEN)gengetopt --unamed-opts="KEY [OTP]" \
+		--set-package="oathtool" \
 		--no-handle-version --no-handle-help \
 		--input $< --file-name oathtool_cmd && \
 	perl -pi -e 's/HAVE_LONG_LONG/HAVE_UNSIGNED_LONG_LONG/g' oathtool_cmd.h oathtool_cmd.c && \

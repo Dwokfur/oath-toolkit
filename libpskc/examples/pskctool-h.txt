@@ -32,5 +32,4 @@ Selecting one of the following modes is required:
       --verify-crt=FILE  Trusted X.509 certificate for verification
 
 Report bugs to: oath-toolkit-help@nongnu.org
-pskctool home page: <https://www.nongnu.org/oath-toolkit/>
-General help using GNU software: <https://www.gnu.org/gethelp/>
+OATH Toolkit home page: <https://www.nongnu.org/oath-toolkit/>
