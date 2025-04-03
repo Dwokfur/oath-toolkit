@@ -37,7 +37,8 @@ gnulib-tool --import \
   maintainer-makefile \
   update-copyright
 
-cd liboath && gnulib-tool --import \
+cd liboath
+gnulib-tool --import \
   --local-dir=gl/override \
   --lib=libgnu \
   --source-base=gl \
@@ -71,5 +72,28 @@ cd liboath && gnulib-tool --import \
   sys_stat \
   unlink \
   valgrind-tests
+cd ..
+
+cd oathtool
+gnulib-tool --import \
+  --lib=libgnu \
+  --source-base=gl \
+  --m4-base=gl/m4 \
+  --doc-base=doc \
+  --tests-base=gl/tests \
+  --aux-dir=build-aux \
+  --no-conditional-dependencies \
+  --libtool \
+  --macro-prefix=gl \
+  --avoid=strtoll-tests \
+  error \
+  getline \
+  inttypes \
+  parse-datetime \
+  parse-duration \
+  progname \
+  vasprintf \
+  version-etc
+cd ..
 
 autoreconf --force --install
