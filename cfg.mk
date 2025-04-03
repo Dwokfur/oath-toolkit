@@ -18,31 +18,35 @@ CFGFLAGS = --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings	\
 
 INDENT_SOURCES = `find . -name '*.[ch]' | grep -v -e /gl/ -e build-aux -e /config.h -e _cmd.`
 
-# syntax-check
-VC_LIST_ALWAYS_EXCLUDE_REGEX = ^GNUmakefile|maint.mk|build-aux/|gl/|m4/libxml2.m4|oathtool/doc/parse-datetime.texi|(liboath|libpskc)/man/gdoc|liboath/gtk-doc.make|libpskc/gtk-doc.make|libpskc/schemas/|(oathtool|liboath)/(build-aux|gl)/.*$$
-# syntax-check: Project wide exceptions on philosophical grounds.
-local-checks-to-skip = sc_GPL_version sc_immutable_NEWS	\
-	sc_prohibit_strcmp
-# syntax-check: Re-add when we have translation.
+old_NEWS_hash = d41d8cd98f00b204e9800998ecf8427e
+
+# syntax-check.
+VC_LIST_ALWAYS_EXCLUDE_REGEX = ^(liboath|libpskc)/man/gdoc|libpskc/schemas/$$
+
+# Project wide exceptions on philosophical grounds.
+local-checks-to-skip = sc_GPL_version sc_prohibit_strcmp
+# Re-add when we have translation.
 local-checks-to-skip += sc_unmarked_diagnostics sc_bindtextdomain
-# syntax-check: Revisit these soon.
+# Revisit these soon.
 local-checks-to-skip += sc_prohibit_atoi_atof sc_prohibit_gnu_make_extensions
-# syntax-check: The following requires gnulib-srcdir.
-local-checks-to-skip += sc_prohibit_intprops_without_use sc_prohibit_always-defined_macros
+# The following requires gnulib-srcdir.
+local-checks-to-skip += sc_prohibit_intprops_without_use sc_prohibit_always-defined_macros sc_prohibit_always_true_header_tests
+
 # syntax-check: Explicit syntax-check exceptions.
-exclude_file_name_regexp--sc_program_name = ^liboath/tests/|libpskc/examples/|libpskc/tests/|pam_oath/tests/
-exclude_file_name_regexp--sc_texinfo_acronym = ^oathtool/doc/parse-datetime.texi
-exclude_file_name_regexp--sc_error_message_uppercase = ^oathtool/oathtool.c|pskctool/pskctool.c
-exclude_file_name_regexp--sc_require_config_h = ^libpskc/examples/
-exclude_file_name_regexp--sc_require_config_h_first = $(exclude_file_name_regexp--sc_require_config_h)
-exclude_file_name_regexp--sc_trailing_blank = ^m4/pkg.m4|libpskc/examples/pskctool-h.txt$$
-exclude_file_name_regexp--sc_two_space_separator_in_usage = ^pskctool/tests/
-exclude_file_name_regexp--sc_space_tab = ^m4/pkg.m4$$
 exclude_file_name_regexp--sc_avoid_if_before_free = ^pam_oath/pam_modutil.c$$
+exclude_file_name_regexp--sc_codespell = ^m4/pkg.m4$$
+exclude_file_name_regexp--sc_error_message_uppercase = ^oathtool/oathtool.c|pskctool/pskctool.c$$
+exclude_file_name_regexp--sc_fsf_postal = ^m4/pkg.m4$$
+exclude_file_name_regexp--sc_program_name = ^liboath/tests/|libpskc/examples/|libpskc/tests/|pam_oath/tests/
+exclude_file_name_regexp--sc_prohibit_empty_lines_at_EOF = ^gl/override/lib/version-etc.c.diff|liboath/gl/override/lib/base32.c.diff|libpskc/schemas/xenc-schema.xsd$$
+exclude_file_name_regexp--sc_prohibit_have_config_h = ^liboath/tests/tst_fopen-wx.c$$
 exclude_file_name_regexp--sc_readme_link_copying = ^libpskc/README|pam_oath/README$$
 exclude_file_name_regexp--sc_readme_link_install = $(exclude_file_name_regexp--sc_readme_link_copying)
-exclude_file_name_regexp--sc_prohibit_have_config_h = ^liboath/tests/tst_fopen-wx.c$$
-exclude_file_name_regexp--sc_fsf_postal = ^m4/pkg.m4$$
+exclude_file_name_regexp--sc_require_config_h = ^libpskc/examples/
+exclude_file_name_regexp--sc_require_config_h_first = $(exclude_file_name_regexp--sc_require_config_h)
+exclude_file_name_regexp--sc_space_tab = ^m4/pkg.m4$$
+exclude_file_name_regexp--sc_trailing_blank = ^m4/pkg.m4|libpskc/examples/pskctool-h.txt|libpskc/schemas/xmldsig-core-schema.xsd|gl/override/lib/version-etc.c.diff|liboath/gl/override/lib/base32.c.diff|libpskc/gl/override/m4/valgrind-tests.m4.diff|libpskc/schemas/xenc-schema.xsd$$
+exclude_file_name_regexp--sc_two_space_separator_in_usage = ^pskctool/tests/
 
 update-copyright-env = UPDATE_COPYRIGHT_HOLDER="Simon Josefsson" UPDATE_COPYRIGHT_USE_INTERVALS=2
 

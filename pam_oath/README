@@ -243,7 +243,7 @@ The exception is when a ${HOME} string is used.  In this case the PAM
 module will temporarily drop the effective user id to the user that is
 being logged in via PAM before accessing and rewriting the file.
 
-The following are the typicaly scenarios for the usersfile placement,
+The following are the typically scenarios for the usersfile placement,
 and its recommended file protection.  Note that a root-owned file
 below a path controlled by a non-root user lead to a vulnerable
 configuration.
