@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2024 Simon Josefsson
+# Copyright (C) 2012-2025 Simon Josefsson
 
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as
@@ -28,7 +28,7 @@ GDOC_MAN_EXTRA_ARGS = -module $(PACKAGE) -sourceversion $(VERSION) \
         -bugsto $(PACKAGE_BUGREPORT) \
 	-pkg-name "$(PACKAGE_NAME)" -pkg-url "$(PACKAGE_URL)" \
 	-includefuncprefix \
-        -copyright "2009-2020 Simon Josefsson" \
+        -copyright "2009-2025 Simon Josefsson" \
         -verbatimcopying
 
 include $(srcdir)/gdoc.mk

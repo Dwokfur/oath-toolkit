@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2024 Simon Josefsson
+# Copyright (C) 2009-2025 Simon Josefsson
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,6 +49,9 @@ exclude_file_name_regexp--sc_trailing_blank = ^m4/pkg.m4|libpskc/examples/pskcto
 exclude_file_name_regexp--sc_two_space_separator_in_usage = ^pskctool/tests/
 
 update-copyright-env = UPDATE_COPYRIGHT_HOLDER="Simon Josefsson" UPDATE_COPYRIGHT_USE_INTERVALS=2
+
+my-update-copyright: update-copyright
+	perl -pi -e "s/-20.. Simon Josefsson/-`(date +%Y)` Simon Josefsson/" liboath/man/Makefile.am libpskc/man/Makefile.am
 
 review-diff:
 	git diff `git describe --abbrev=0`.. \

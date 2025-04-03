@@ -68,7 +68,7 @@ To build from version controlled sources, and other information for
 developers, read the file [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ```
-Copyright (C) 2009-2024 Simon Josefsson
+Copyright (C) 2009-2025 Simon Josefsson
 
 This file is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
