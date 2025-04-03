@@ -19,7 +19,7 @@ AC_INIT([oath-toolkit],
   [https://www.nongnu.org/oath-toolkit/])
 
 AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_MACRO_DIRS([m4 gl/m4])
 AM_INIT_AUTOMAKE([1.13 -Wall])
 
 AC_CHECK_HEADERS_ONCE([security/pam_appl.h])

@@ -46,21 +46,6 @@ exclude_file_name_regexp--sc_fsf_postal = ^m4/pkg.m4$$
 
 update-copyright-env = UPDATE_COPYRIGHT_HOLDER="Simon Josefsson" UPDATE_COPYRIGHT_USE_INTERVALS=2
 
-# maint.mk's public-submodule-commit breaks on shallow gnulib
-# https://lists.gnu.org/archive/html/bug-gnulib/2022-08/msg00040.html
-# so let's disable it - XXX FIXME let's revisit this later
-submodule-checks =
-gl_public_submodule_commit =
-
-glimport:
-	cd liboath && gtkdocize --copy
-	cd libpskc && gtkdocize --copy
-	gnulib-tool --add-import
-	cd liboath && gnulib-tool --add-import
-	cd oathtool && gnulib-tool --add-import
-	cd libpskc && gnulib-tool --add-import
-	cd pskctool && gnulib-tool --add-import
-
 review-diff:
 	git diff `git describe --abbrev=0`.. \
 	| grep -v -e ^index -e '^diff --git' \

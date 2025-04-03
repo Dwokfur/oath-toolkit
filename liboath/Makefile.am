@@ -18,8 +18,6 @@ AM_DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 SUBDIRS = gl . tests gtk-doc man
 
-ACLOCAL_AMFLAGS = -I m4 -I ../m4 -I gl/m4
-
 AM_CPPFLAGS = -DLIBOATH_BUILDING
 AM_CPPFLAGS += -I$(srcdir)/gl -I$(builddir)/gl
 

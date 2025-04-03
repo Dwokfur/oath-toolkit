@@ -17,8 +17,6 @@
 
 SUBDIRS = gl . tests
 
-ACLOCAL_AMFLAGS = -I gl/m4
-
 AM_CPPFLAGS = -I$(builddir)/../libpskc/include -I$(srcdir)/../libpskc/include
 AM_CPPFLAGS += -I$(srcdir)/gl -I$(builddir)/gl
 

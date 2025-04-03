@@ -20,7 +20,7 @@ AC_INIT([pam_oath],
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_MACRO_DIRS([m4])
 AM_INIT_AUTOMAKE([1.13 -Wall foreign])
 
 AC_PROG_CC

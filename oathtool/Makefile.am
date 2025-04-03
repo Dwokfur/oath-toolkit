@@ -17,8 +17,6 @@
 
 SUBDIRS = gl . tests
 
-ACLOCAL_AMFLAGS = -I gl/m4
-
 AM_CPPFLAGS = -I$(builddir)/../liboath -I$(srcdir)/gl -I$(builddir)/gl
 
 bin_PROGRAMS = oathtool

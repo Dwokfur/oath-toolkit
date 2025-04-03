@@ -20,6 +20,16 @@ printf "gdoc_MANS =\ngdoc_TEXINFOS =\n" > libpskc/man/Makefile.gdoc
 
 touch ChangeLog
 
+mkdir -pv liboath/m4 oathtool/m4 libpskc/m4 pskctool/m4 pam_oath/m4
+
+cd liboath
+gtkdocize --copy
+cd ..
+
+cd libpskc
+gtkdocize --copy
+cd ..
+
 gnulib-tool --import \
   --lib=libgnu \
   --source-base=gl \
@@ -69,7 +79,7 @@ gnulib-tool --import \
   strptime \
   strtok_r \
   strverscmp \
-  sys_stat \
+  sys_stat-h \
   unlink \
   valgrind-tests
 cd ..
@@ -88,12 +98,13 @@ gnulib-tool --import \
   --avoid=strtoll-tests \
   error \
   getline \
-  inttypes \
+  inttypes-h \
   parse-datetime \
   parse-duration \
   progname \
   vasprintf \
   version-etc
+rm -rf doc
 cd ..
 
 cd libpskc

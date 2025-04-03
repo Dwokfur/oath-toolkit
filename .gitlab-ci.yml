@@ -30,6 +30,14 @@ default:
     - coverage
     - clang-analyzer
 
+.gnulib-fetch:
+  script:
+  - GNULIB_REVISION=c89cd2fbd3b9f3d7c5a146247256599714c91ec7
+  - wget -nv https://gitlab.com/libidn/gnulib-mirror/-/archive/$GNULIB_REVISION/gnulib-mirror-$GNULIB_REVISION.tar.gz
+  - gzip -cd gnulib-mirror-$GNULIB_REVISION.tar.gz | tar xf -
+  - rm -fv gnulib-mirror-$GNULIB_REVISION.tar.gz
+  - export PATH=$PWD/gnulib-mirror-$GNULIB_REVISION:$PATH
+
 stages:
  - build
  - test
@@ -48,9 +56,9 @@ B-gcc:
   before_script:
   - gcc --version
   - apt-get update -qq
-  - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt datefudge
+  - apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt datefudge
   script:
-  - gcc --version
+  - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - ./configure CC="gcc -std=gnu2x" --enable-gcc-warnings WARN_CFLAGS=-Werror
   - make -j$(nproc) V=1
@@ -65,9 +73,9 @@ B-clang:
   before_script:
   - clang --version
   - apt-get update -qq
-  - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt faketime
+  - apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt faketime
   script:
-  - clang --version
+  - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - ./configure CC="clang -std=gnu2x" --enable-gcc-warnings WARN_CFLAGS=-Werror
   - make -j$(nproc) V=1
@@ -81,16 +89,17 @@ B-AlmaLinux8:
   stage: build
   before_script:
   - |
-    dnf -y install make git autoconf automake libtool bison diffutils
+    dnf -y install wget make git autoconf automake libtool bison diffutils patch
     dnf -y install pam-devel valgrind
     dnf -y --enablerepo=powertools install gtk-doc help2man
     dnf -y install libxml2-devel libtool-ltdl-devel
     dnf -y install --enablerepo=powertools xmlsec1-openssl-devel
     dnf -y install epel-release
-    dnf -y --enablerepo=epel install faketime indent gengetopt
+    dnf -y --enablerepo=epel install faketime gengetopt
     dnf -y install --enablerepo=baseos-debuginfo libxml2-debuginfo
   script:
   - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
+  - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - ./configure -C --enable-gtk-doc --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
   - make -j$(nproc) syntax-check
@@ -105,7 +114,7 @@ B-AlmaLinux9:
   stage: build
   before_script:
   - |
-    dnf -y install make git autoconf automake libtool bison diffutils
+    dnf -y install wget make git autoconf automake libtool bison diffutils patch
     dnf -y install libxml2-devel
     dnf -y install pam-devel valgrind
     dnf -y install --enablerepo=crb gtk-doc help2man
@@ -113,6 +122,7 @@ B-AlmaLinux9:
     dnf -y install --enablerepo=epel gengetopt faketime indent
     dnf -y install --enablerepo=baseos-debuginfo libxml2-debuginfo
   script:
+  - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - mkdir b
   - cd b
@@ -129,16 +139,17 @@ B-Rockylinux8:
   stage: build
   before_script:
   - |
-    dnf -y install make git autoconf automake libtool bison diffutils
+    dnf -y install wget make git autoconf automake libtool bison diffutils patch
     dnf -y install pam-devel valgrind
     dnf -y --enablerepo=powertools install gtk-doc help2man
     dnf -y install libxml2-devel libtool-ltdl-devel
     dnf -y install --enablerepo=powertools xmlsec1-openssl-devel
     dnf -y install epel-release
-    dnf -y --enablerepo=epel install faketime indent gengetopt
+    dnf -y --enablerepo=epel install faketime gengetopt
     dnf -y install --enablerepo=baseos-debug libxml2-debuginfo
   script:
   - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
+  - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - mkdir b
   - cd b
@@ -155,14 +166,15 @@ B-Rockylinux9:
   stage: build
   before_script:
   - |
-    dnf -y install make git autoconf automake libtool bison diffutils
+    dnf -y install wget make git autoconf automake libtool bison diffutils patch
     dnf -y install pam-devel valgrind
     dnf -y install libxml2-devel
     dnf -y install --enablerepo=crb gtk-doc help2man
     dnf -y install epel-release
-    dnf -y install --enablerepo=epel gengetopt faketime indent
+    dnf -y install --enablerepo=epel gengetopt faketime
     dnf -y install --enablerepo=baseos-debug libxml2-debuginfo
   script:
+  - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - ./configure -C --enable-gtk-doc --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
   - make -j$(nproc) syntax-check
@@ -173,12 +185,16 @@ B-Rockylinux9:
   - sha256sum oath-toolkit-*.tar.gz
 
 B-Trisquel11:
-  image: registry.gitlab.com/oath-toolkit/build-images:Trisquel11
+  image: kpengboy/trisquel:11.0
   stage: build
   before_script:
-  - apt-get remove -y -qq --purge indent
+  - apt-get update -qq
+  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools dblatex valgrind gengetopt
+  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq faketime libpam-wrapper
+  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq asciidoc groff xsltproc
   script:
   - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
+  - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - ./configure -C --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
   - make -j$(nproc) syntax-check
@@ -198,8 +214,9 @@ B-Debian13-arm64:
   stage: build
   before_script:
   - apt-get update -qq
-  - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt indent
+  - apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt indent
   script:
+  - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - ./configure -C --enable-gcc-warnings
   - make -j$(nproc) syntax-check
@@ -215,8 +232,9 @@ B-Ubuntu2204-ppc64:
   stage: build
   before_script:
   - apt-get update -qq
-  - apt-get install -y -qq make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt
+  - apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt
   script:
+  - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - ./configure -C --enable-gcc-warnings
   - make -j$(nproc) syntax-check
@@ -224,10 +242,15 @@ B-Ubuntu2204-ppc64:
   - make -j$(nproc) V=1 check VERBOSE=t
 
 B-Debian12-coverage:
-  image: registry.gitlab.com/oath-toolkit/build-images:Debian12-coverage
+  image: debian:12-slim
   stage: build
+  before_script:
+  - apt-get update -qq
+  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt
+  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq faketime lcov libpam-wrapper
   script:
   - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
+  - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - ./configure --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests CFLAGS="-g --coverage"
   - lcov --directory . --zerocounters
@@ -240,9 +263,14 @@ B-Debian12-coverage:
   - genhtml --output-directory coverage coverage/oath-toolkit_filtered.info --highlight --frames --legend --title "OATH Toolkit"
 
 B-Fedora39-clanganalyzer:
-  image: registry.gitlab.com/oath-toolkit/build-images:Fedora39-clanganalyzer
+  image: fedora:39
   stage: build
+  before_script:
+  - dnf update -y
+  - dnf install -y wget make patch git autoconf automake libtool bison pam-devel xmlsec1-openssl-devel libtool-ltdl-devel libxml2-devel help2man gtk-doc valgrind gengetopt
+  - dnf install -y datefudge clang clang-analyzer
   script:
+  - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - scan-build ./configure --with-xmlsec-crypto-engine=openssl
   - scan-build -o clang-analyzer make -j$(nproc) V=1
@@ -264,6 +292,7 @@ B-macOS14Xcode15:
   - brew install autoconf automake libtool gengetopt bison gtk-doc help2man libxmlsec1
   script:
   - PATH="/opt/homebrew/opt/bison/bin:$PATH" # brew bison is keg-only
+  - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - ./configure --enable-gcc-warnings
   - make -j$(nproc) syntax-check
@@ -299,6 +328,11 @@ B-Windows-UCRT64:
     git rm -rf --cached . | tail
     git reset --hard HEAD
     file configure.ac
+    GNULIB_REVISION=c89cd2fbd3b9f3d7c5a146247256599714c91ec7
+    wget -nv https://gitlab.com/libidn/gnulib-mirror/-/archive/$GNULIB_REVISION/gnulib-mirror-$GNULIB_REVISION.tar.gz
+    gzip -cd gnulib-mirror-$GNULIB_REVISION.tar.gz | tar xf -
+    rm -fv gnulib-mirror-$GNULIB_REVISION.tar.gz
+    export PATH=$PWD/gnulib-mirror-$GNULIB_REVISION:$PATH
     ./bootstrap
     ./configure -C --enable-gcc-warnings
     make -j$(nproc) V=1 -k check VERBOSE=t'
@@ -308,11 +342,13 @@ Coverity:
   rules:
   - if: $CI_COMMIT_REF_PROTECTED == "true"
   - when: manual
-  image: registry.gitlab.com/oath-toolkit/build-images:Debian12-coverage
+  image: debian:12-slim
   stage: build
   allow_failure: true
   before_script:
-  - apt-get update -qq -y
+  - apt-get update -qq
+  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt
+  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq faketime lcov libpam-wrapper
   - apt-get install -y -q curl
   script:
   - test -n "$COVERITY_SCAN_TOKEN" && test -n "$COVERITY_SCAN_PROJECT_NAME"
@@ -320,6 +356,7 @@ Coverity:
     --form project="$COVERITY_SCAN_PROJECT_NAME" --form token="$COVERITY_SCAN_TOKEN"
   - md5sum /tmp/cov-analysis-linux64.tgz
   - tar xfz /tmp/cov-analysis-linux64.tgz
+  - !reference [.gnulib-fetch, script]
   - time ./bootstrap --skip-po
   - time ./configure --enable-gcc-warnings --disable-doc --enable-root-tests CFLAGS="-g -Og"
   - cov-analysis-linux64-*/bin/cov-build --dir cov-int make check -j$(nproc)
