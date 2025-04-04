@@ -4,6 +4,8 @@ Copyright (C) 2009-2025 Simon Josefsson.  Licensed under the GPLv3+.
 ----
 git clone https://gitlab.com/oath-toolkit/oath-toolkit.git
 cd oath-toolkit
+./bootstrap
+./configure
 make
 make check
 ----
@@ -23,6 +25,7 @@ project:
 
 We rely on several tools to build the software, including:
 
+- Gnulib <https://www.gnu.org/software/gnulib/>
 - Make <https://www.gnu.org/software/make/>
 - C compiler <https://www.gnu.org/software/gcc/>
 - Automake <https://www.gnu.org/software/automake/>
@@ -46,7 +49,7 @@ the instructions for installing them differ.  Here are some hints:
 -----
 apt-get install make git autoconf automake libtool bison gengetopt valgrind
 apt-get install libpam0g-dev libxmlsec1-dev libxml2-utils
-apt-get install help2man gtk-doc-tools libglib2.0-dev dblatex
+apt-get install gnulib help2man gtk-doc-tools libglib2.0-dev dblatex
 -----
 
 If you have hints on how to install the required dependencies on other
@@ -81,16 +84,8 @@ apt-get install groff asciidoc xsltproc lcov clang rsync
 The release rules are implemented in cfg.mk, and to make new official
 release the following steps are made:
 
-x. Make sure you have updated to latest gnulib files.
-
-```
-rm -rf gl liboath/gl libpskc/gl oathtool/gl pskctool/gl/
-git restore {.,liboath,libpskc,oathtool,pskctool}/gl/m4/gnulib-cache.m4
-git restore */gl/override/*/*.diff
-PATH=$PATH:/path/to/where/gnulib-tool/lives make -f cfg.mk glimport
-git add .
-git commit -m "Update gnulib files." -a
-```
+x. Make sure you have updated to latest gnulib files.  The GitLab
+   CI/CD pipeline uses the GNULIB_REVISION setting in .gitlab-ci.yml.
 
 x. Make sure you have pushed git to GitLab and that CI/CD passes.
    https://gitlab.com/oath-toolkit/oath-toolkit/-/pipelines
