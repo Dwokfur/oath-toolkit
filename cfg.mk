@@ -13,9 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CFGFLAGS = --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings	\
-	--enable-root-tests --enable-valgrind-tests
-
 old_NEWS_hash = d41d8cd98f00b204e9800998ecf8427e
 
 # syntax-check.
@@ -57,20 +54,6 @@ review-diff:
 	| filterdiff -p 1 -x 'build-aux/*' -x '*/build-aux/*' -x 'gl/*' -x '*/gl/*' -x 'gltests/*' -x '*/gltests/*' -x 'maint.mk' -x '.gitignore' -x '.x-sc*' -x 'ChangeLog' -x 'GNUmakefile' \
 	| less
 
-# Release
-
-tag = $(PACKAGE)-$(VERSION)
-htmldir = ../www-$(PACKAGE)
-
-srcdist:
-	git archive --prefix=$(PACKAGE)-$$(git describe | sed 's,oath-toolkit-,v,')/ \
-	       -o $(PACKAGE)-$$(git describe | sed 's,oath-toolkit-,,')-src.tar.gz HEAD
-
-tarball:
-	test `git describe` = `git tag -l $(tag)`
-	$(MAKE) distcheck
-
-.PHONY: website
 website:
 	cd website && ./build-website.sh
 
@@ -86,24 +69,9 @@ website-upload:
 		git commit -m "Auto-update." && \
 		git push
 
-release-check: syntax-check tarball srcdist website website-copy
-
-release-upload-www: website-upload
+release-upload-www: website website-copy website-upload
 
 release-upload-ftp:
-	gpg -b $(distdir).tar.gz
-	gpg --verify $(distdir).tar.gz.sig
-	gpg -b $(distdir)-src.tar.gz
-	gpg --verify $(distdir)-src.tar.gz.sig
 	mkdir -p ../releases/$(PACKAGE)/
 	cp -v $(distdir).tar.gz $(distdir).tar.gz.sig $(distdir)-src.tar.gz $(distdir)-src.tar.gz.sig ../releases/$(PACKAGE)/
 	scp $(distdir).tar.gz $(distdir).tar.gz.sig $(distdir)-src.tar.gz $(distdir)-src.tar.gz.sig jas@dl.sv.nongnu.org:/releases/oath-toolkit/
-	git push
-	git push --tags
-	sha1sum $(distdir)*.tar.gz
-	sha224sum $(distdir)*.tar.gz
-
-tag: # Use "make tag VERSION=1.2.3"
-	git tag -s -m $(VERSION) $(tag)
-
-release: release-check release-upload-www release-upload-ftp

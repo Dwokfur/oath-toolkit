@@ -40,9 +40,13 @@ EXTRA_DIST += $(top_srcdir)/.version
 BUILT_SOURCES = $(top_srcdir)/.version
 $(top_srcdir)/.version:
 	echo $(VERSION) > $@-t && mv $@-t $@
-dist-hook: gen-ChangeLog
-	echo $(VERSION) > $(distdir)/.tarball-version
 
+dist-hook: dist-tarball-version
+.PHONY: dist-tarball-version
+dist-tarball-version:
+	echo '$(VERSION)' > $(distdir)/.tarball-version
+
+dist-hook: gen-ChangeLog
 .PHONY: gen-ChangeLog
 gen-ChangeLog:
 	$(AM_V_GEN)if test -d .git; then				\

@@ -1,14 +1,17 @@
 Copyright (C) 2009-2025 Simon Josefsson.  Licensed under the GPLv3+.
 
-.Download, build and self-check version controlled sources:
-----
+# OATH Toolkit Developer Information
+
+Download, build and self-check version controlled sources:
+
+```
 git clone https://gitlab.com/oath-toolkit/oath-toolkit.git
 cd oath-toolkit
 ./bootstrap
 ./configure
 make
 make check
-----
+```
 
 Links to resources that may be useful if you want to get involved the
 project:
@@ -22,6 +25,8 @@ project:
 - Code coverage report: https://oath-toolkit.gitlab.io/oath-toolkit/coverage/
 - Clang code analysis: https://oath-toolkit.gitlab.io/oath-toolkit/clang-analyzer/
 - Pre-release version of website: https://oath-toolkit.gitlab.io/oath-toolkit/
+
+# Dependencies
 
 We rely on several tools to build the software, including:
 
@@ -43,17 +48,20 @@ We rely on several tools to build the software, including:
 - XMLSec <https://www.aleksey.com/xmlsec/> (optional, for libpskc)
 
 The software is typically distributed with your operating system, and
-the instructions for installing them differ.  Here are some hints:
+the instructions for installing them differ.  Below are some hints.
+If you have hints on how to install the required dependencies on other
+operating systems, please provide a patch explaining it.  Find
+inspiration from build rules in `.gitlab-ci.yml`.
 
-.Debian/Ubuntu dependencies:
------
+## Debian/Ubuntu dependencies
+
+```
 apt-get install make git autoconf automake libtool bison gengetopt valgrind
 apt-get install libpam0g-dev libxmlsec1-dev libxml2-utils
 apt-get install gnulib help2man gtk-doc-tools libglib2.0-dev dblatex
------
+```
 
-If you have hints on how to install the required dependencies on other
-operating systems, please let us know.
+# Valgrind suppression
 
 When building from version controlled sources, some developer specific
 flags are automatically enabled.  For example, the self-checks are run
@@ -61,14 +69,17 @@ under valgrind if available.  For various reasons, you may run into
 valgrind false positives that will cause self-checks to fail.  First
 be sure to install debug symbols for system libraries.  We ship a
 Valgrind suppression file to address common issues.  You can use it by
-putting the following in your ~/.valgrindrc:
+putting the following in your `~/.valgrindrc`:
 
-----
+```
 --suppressions=/path/to/oath-toolkit/libpskc/tests/libpskc.supp
-----
+```
+
+# Release Process
 
 To prepare a release you need some additional tools:
 
+- Guix <https://guix.gnu.org/>
 - Groff <https://www.gnu.org/software/groff/>
 - Asciidoc <http://www.methods.co.nz/asciidoc/>
 - XSLT <http://xmlsoft.org/xslt/>
@@ -76,47 +87,106 @@ To prepare a release you need some additional tools:
 - Clang (to produce clang analysis)
 - rsync <https://rsync.samba.org/>
 
-.Debian/Ubuntu dependencies:
------
+Debian/Ubuntu dependencies:
+
+```
 apt-get install groff asciidoc xsltproc lcov clang rsync
------
+```
 
-The release rules are implemented in cfg.mk, and to make new official
-release the following steps are made:
+Most of the release process rely on gnulib scripts and maint.mk rules,
+and the steps below are inspired by gnulib's README-release.
 
-x. Make sure you have updated to latest gnulib files.  The GitLab
-   CI/CD pipeline uses the GNULIB_REVISION setting in .gitlab-ci.yml.
+Here are most of the steps we (maintainers) follow when making a release.
 
-x. Make sure you have pushed git to GitLab and that CI/CD passes.
-   https://gitlab.com/oath-toolkit/oath-toolkit/-/pipelines
+* Start from a clean, up-to-date git directory on "master":
 
-x. Make sure NEWS reflect all changes made since the last release.
+```
+git checkout master
+git pull origin master
+git clean -d -x -f
+git restore --staged .
+git reset --hard
+```
+
+* Ensure that the latest stable versions of autoconf, automake, etc.
+  are in your PATH.
+
+* Make sure you have updated to latest gnulib files.  The GitLab CI/CD
+  pipeline uses the GNULIB_REVISION setting from `.gitlab-ci.yml`, and
+  you ought to use the same locally to be able to reproduce the
+  release tarball.
+
+* Make sure `NEWS` reflect all changes made since the last release.
 
 ```
 make review-diff
 ```
 
-x. Make sure the '(unreleased)' string in NEWS is changed into
-   '(released XXXX-YY-ZZ)' for the release.
-
-x. Make sure you have committed everything and have a clean checkout.
+* Ensure that you have no uncommitted diffs.  This should produce no
+  output:
 
 ```
-git clean -d -x -f
-git status
-git reset --hard
+git diff
 ```
 
-x. Run `make tag VERSION=1.2.3` for the version number.
-   Use `git tag -d ...` to remove tags if you made mistakes.
+* Ensure that you've pushed all changes that belong in the release:
 
 ```
-make -f cfg.mk tag PACKAGE=oath-toolkit VERSION=2.6.11
+git push origin master
 ```
 
-x. Make sure ../www-oath-toolkit/ contains a git checkout of the
-   website git repository, and ../www-oath-toolkit-cvs/ contains a CVS
-   checkout of the website.
+* Check that the GitLab CI/CD Pipeline is reporting all is well:
+
+https://gitlab.com/oath-toolkit/oath-toolkit/-/pipelines
+
+* Run the following commands:
+
+```
+./bootstrap
+./configure
+make check syntax-check distcheck
+```
+
+* To (i) set the date, version number, and release TYPE on line 3 of
+  NEWS, (ii) commit that, and (iii) tag the release, run
+
+```
+# "TYPE" must be stable, beta or alpha
+make release-commit RELEASE='X.Y.Z TYPE'
+```
+
+* Run the following to create release tarballs.
+
+```
+make release RELEASE='X.Y.Z TYPE'
+```
+
+* Test the tarball.  Copy it to a few odd-ball systems and ensure that
+  it builds and passes all tests.
+
+* Push the NEWS-updating changes and the new tag:
+
+```
+v=$(cat .prev-version)
+git push origin master tag v$v
+```
+
+* Write the release announcement that you will soon post.  Start with
+  the template, $HOME/announce-oath-toolkit-X.Y.Z that was just
+  created by that "make" command.
+
+* Confirm that the pipeline passes and that your local tarballs are
+  bit-by-bit identical to the B-Guix and R-Guix pipeline jobs.
+
+* To upload the tarballs to the Savannah download area run:
+
+```
+make release-upload-ftp
+```
+
+* Make sure ../www-oath-toolkit/ contains a git checkout of the
+  website git repository, and ../www-oath-toolkit-cvs/ contains a CVS
+  checkout of the website.
 
 ```
 cd ..
@@ -124,23 +194,14 @@ git clone git@gitlab.com:oath-toolkit/website.git www-oath-toolkit
 cvs -z3 -d:ext:USER@cvs.savannah.nongnu.org:/web/oath-toolkit co -d www-oath-toolkit-cvs oath-toolkit
 ```
 
-x. Create release artifacts.
+* Run the following to upload the website:
 
 ```
-./bootstrap
-./configure --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
-make
-make release-check
+make release-upload-www
 ```
 
-x. Upload release artifacts.
-
-```
-make release-upload-www release-upload-ftp
-```
-
-x. Manually update the CVS website that will be synchronized to the
-   main website via savannah
+* Manually update the CVS website that will be synchronized to the
+  main website via savannah
 
 ```
 cd ../www-oath-toolkit-cvs/
@@ -151,12 +212,15 @@ cvs rm -f ...
 cvs commit -mUpdate.
 ```
 
-x. Post release announcement based on doc/announce.txt, updating
-   announcement in git.
+* Send the announcement email message.
 
-x. On major releases, update webpages with information.
+* Start next development cycle by pushing the post-release commit.
 
-x. Start next development cycle by bumping version number in NEWS and
-   use the '(unreleased)' to indicate that it is not released yet.
+```
+git push master
+```
+
+* Commit and push updates of the release process depending on your
+  experience following these steps.
 
 Happy hacking!

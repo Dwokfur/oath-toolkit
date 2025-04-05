@@ -42,7 +42,9 @@ gnulib-tool --import \
   --libtool \
   --macro-prefix=gl \
   --no-vc-files \
+  announce-gen \
   autobuild \
+  do-release-commit-and-tag \
   error \
   getline \
   git-version-gen \
