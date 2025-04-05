@@ -16,8 +16,6 @@
 CFGFLAGS = --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings	\
 	--enable-root-tests --enable-valgrind-tests
 
-INDENT_SOURCES = `find . -name '*.[ch]' | grep -v -e /gl/ -e build-aux -e /config.h -e _cmd.`
-
 old_NEWS_hash = d41d8cd98f00b204e9800998ecf8427e
 
 # syntax-check.
