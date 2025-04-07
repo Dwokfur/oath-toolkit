@@ -221,6 +221,41 @@ B-RockyLinux9:
   - make -j$(nproc) dist
   - !reference [.save-artifacts, script]
 
+.pureosdebian: &pureosdebian
+  tags: [ saas-linux-medium-amd64 ]
+  stage: build
+  variables:
+    DEBIAN_FRONTEND: noninteractive
+  before_script:
+  - cat /etc/os-release
+  - time apt-get update -q
+  - time apt-get install -y -q eatmydata
+  - time eatmydata apt-get install -y -q --no-install-recommends wget ca-certificates make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt datefudge patch valgrind
+  script:
+  - !reference [.gnulib-fetch, script]
+  - time ./bootstrap
+  - time ./configure --enable-gcc-warnings --enable-valgrind-tests
+  - time make syntax-check
+  - time make -j$(nproc) V=1 VERBOSE=t check
+  - time make -j$(nproc) V=1 VERBOSE=t distcheck AM_DISTCHECK_DVI_TARGET=
+  - !reference [.save-artifacts, script]
+
+B-PureOS10:
+  image: pureos/byzantium:latest
+  extends: .pureosdebian
+
+B-Debian11:
+  image: debian:11-slim
+  extends: .pureosdebian
+
+B-Devuan5:
+  image: devuan/devuan:daedalus
+  extends: .pureosdebian
+
+B-Debian12:
+  image: debian:12-slim
+  extends: .pureosdebian
+
 B-Trisquel11:
   image: kpengboy/trisquel:11.0
   stage: build
@@ -228,7 +263,7 @@ B-Trisquel11:
   - sed -i 's,http://archive.trisquel.info/trisquel,http://ftp.acc.umu.se/mirror/trisquel/packages,' /etc/apt/sources.list
   - time apt-get update -q
   - time apt-get install -y -q eatmydata
-  - time eatmydata env DEBIAN_FRONTEND=noninteractive apt-get install -y -q wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools dblatex valgrind gengetopt
+  - time eatmydata env DEBIAN_FRONTEND=noninteractive apt-get install -y -q wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt
   - time eatmydata env DEBIAN_FRONTEND=noninteractive apt-get install -y -q faketime libpam-wrapper
   - time eatmydata env DEBIAN_FRONTEND=noninteractive apt-get install -y -q asciidoc groff xsltproc
   script:
@@ -251,7 +286,7 @@ B-Ubuntu2204:
   stage: build
   before_script:
   - apt-get update -qq
-  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools dblatex valgrind gengetopt
+  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt
   - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq faketime libpam-wrapper
   - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq asciidoc groff xsltproc
   script:
@@ -439,7 +474,7 @@ Coverity:
 0-compare:
   image: alpine:latest
   stage: repro
-  needs: [ B-AlmaLinux8, B-AlmaLinux9, B-RockyLinux8, B-RockyLinux9, B-Trisquel11, B-Ubuntu2204, B-Guix, R-Guix, R-Debian12, R-Ubuntu2404, S-Trisquel10, S-Ubuntu2004, T-Trisquel10, T-Ubuntu2004 ]
+  needs: [ B-PureOS10, B-Debian11, B-Devuan5, B-Debian12, B-AlmaLinux8, B-AlmaLinux9, B-RockyLinux8, B-RockyLinux9, B-Trisquel11, B-Ubuntu2204, B-Guix, R-Guix, R-Debian12, R-Ubuntu2404, S-Trisquel10, S-Ubuntu2004, T-Trisquel10, T-Ubuntu2004 ]
   script:
   - cd out
   - sha256sum */*.tar.* */*/*.tar.* | sort | grep    -- -src.tar.
@@ -451,15 +486,20 @@ Coverity:
   - cmp b-almalinux8/src/*.tar.gz b-almalinux9/src/*.tar.gz
   - cmp b-almalinux8/src/*.tar.gz b-rockylinux8/src/*.tar.gz
   - cmp b-almalinux8/src/*.tar.gz b-rockylinux9/src/*.tar.gz
-  - cmp b-almalinux8/src/*.tar.gz r-debian12/src/*.tar.gz
+  - cmp b-almalinux8/src/*.tar.gz b-debian12/src/*.tar.gz
+  - cmp b-almalinux8/src/*.tar.gz b-devuan5/src/*.tar.gz
   - cmp b-almalinux8/src/*.tar.gz r-guix/src/*.tar.gz
   - cmp b-almalinux8/src/*.tar.gz r-ubuntu2404/src/*v2.*.tar.gz
 # Confirm old git-archive (export-subst but long git describe) tarball reproducibility
   - cmp b-trisquel11/src/*.tar.gz b-ubuntu2204/src/*.tar.gz
+# Confirm really old git-archive (no export-subst) tarball reproducibility
+  - cmp b-debian11/src/*.tar.gz b-pureos10/src/*.tar.gz
 # Confirm 'make dist' generated tarball reproducibility
-  - cmp b-almalinux8/*.tar.gz b-rockylinux8/*.tar.gz || true # flaky
+  - cmp b-almalinux8/*.tar.gz b-rockylinux8/*.tar.gz
   - cmp b-almalinux9/*.tar.gz b-rockylinux9/*.tar.gz
+  - cmp b-devuan5/*.tar.gz b-debian12/*.tar.gz
   - cmp b-guix/*.tar.gz r-guix/*.tar.gz
+  - cmp b-pureos10/*.tar.gz b-debian11/*.tar.gz
   - cmp b-trisquel11/*.tar.gz b-ubuntu2204/*.tar.gz
   - cmp t-trisquel10/*.tar.gz t-ubuntu2004/*.tar.gz
 # Confirm 'make dist' from git-archive tarball reproducibility
