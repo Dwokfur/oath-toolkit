@@ -45,6 +45,11 @@ exclude_file_name_regexp--sc_two_space_separator_in_usage = ^pskctool/tests/
 
 update-copyright-env = UPDATE_COPYRIGHT_HOLDER="Simon Josefsson" UPDATE_COPYRIGHT_USE_INTERVALS=2
 
+DIST_ARCHIVES += $(shell \
+	if test -e $(srcdir)/.git && command -v git > /dev/null; then \
+		echo $(PACKAGE)-v$(VERSION)-src.tar.gz; \
+	fi)
+
 my-update-copyright: update-copyright
 	perl -pi -e "s/-20.. Simon Josefsson/-`(date +%Y)` Simon Josefsson/" liboath/man/Makefile.am libpskc/man/Makefile.am
 

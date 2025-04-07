@@ -55,3 +55,13 @@ gen-ChangeLog:
 	    { rm -f $(distdir)/ChangeLog &&				\
 	      mv $(distdir)/cl-t $(distdir)/ChangeLog; }		\
 	fi
+
+dist-hook: srcdist
+.PHONY: srcdist
+srcdist:
+	$(AM_V_GEN)if test -e $(srcdir)/.git \
+			&& command -v git > /dev/null; then \
+	 cd $(srcdir) && \
+	   git archive --prefix=$(PACKAGE)-v$(VERSION)/ \
+	       -o $(abs_builddir)/$(PACKAGE)-v$(VERSION)-src.tar.gz HEAD; \
+	fi
