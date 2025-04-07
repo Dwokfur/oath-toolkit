@@ -113,6 +113,7 @@
 /liboath/man/oath_totp_validate4.3
 /liboath/man/oath_totp_validate4_callback.3
 /liboath/man/oath_totp_validate_callback.3
+/liboath/man/stamp-gdoc
 /liboath/oath.h
 /liboath/stamp-h1
 /liboath/tests/.deps/
@@ -321,6 +322,7 @@
 /libpskc/man/pskc_validate.3
 /libpskc/man/pskc_valueformat2str.3
 /libpskc/man/pskc_verify_x509crt.3
+/libpskc/man/stamp-gdoc
 /libpskc/schemas/catalog-pskc.xml
 /libpskc/stamp-h1
 /libpskc/tests/.deps/

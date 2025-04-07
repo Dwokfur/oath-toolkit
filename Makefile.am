@@ -45,16 +45,6 @@ dist-hook: dist-tarball-version
 dist-tarball-version:
 	echo '$(VERSION)' > $(distdir)/.tarball-version
 
-dist-hook: gen-ChangeLog
-.PHONY: gen-ChangeLog
-gen-ChangeLog:
-	$(AM_V_GEN)if test -d .git; then				\
-	  $(top_srcdir)/build-aux/gitlog-to-changelog			\
-						> $(distdir)/cl-t &&	\
-	    { rm -f $(distdir)/ChangeLog &&				\
-	      mv $(distdir)/cl-t $(distdir)/ChangeLog; }		\
-	fi
-
 dist-hook: srcdist
 .PHONY: srcdist
 srcdist:
@@ -63,4 +53,18 @@ srcdist:
 	 cd $(srcdir) && \
 	   git archive --prefix=$(PACKAGE)-v$(VERSION)/ \
 	       -o $(abs_builddir)/$(PACKAGE)-v$(VERSION)-src.tar.gz HEAD; \
+	fi
+
+dist-hook: gen-ChangeLog
+.PHONY: gen-ChangeLog
+gen-ChangeLog:
+	$(AM_V_GEN)if test -e $(srcdir)/.git; then			\
+	  LC_ALL=en_US.UTF-8 TZ=UTC0					\
+	    $(top_srcdir)/build-aux/gitlog-to-changelog			\
+	      --srcdir=$(srcdir) --					\
+	      v$(PREV_VERSION)~.. > $(distdir)/cl-t &&			\
+	    { printf '\n\nSee the source repo for older entries\n'	\
+	      >> $(distdir)/cl-t &&					\
+	      rm -f $(distdir)/ChangeLog &&				\
+	      mv $(distdir)/cl-t $(distdir)/ChangeLog; }		\
 	fi

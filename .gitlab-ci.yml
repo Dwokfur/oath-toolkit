@@ -237,6 +237,8 @@ B-RockyLinux9:
   - time ./configure --enable-gcc-warnings --enable-valgrind-tests
   - time make syntax-check
   - time make -j$(nproc) V=1 VERBOSE=t check
+  - make -C liboath/man compare-makefile
+  - make -C libpskc/man compare-makefile
   - time make -j$(nproc) V=1 VERBOSE=t distcheck AM_DISTCHECK_DVI_TARGET=
   - !reference [.save-artifacts, script]
 
