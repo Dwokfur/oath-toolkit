@@ -15,6 +15,9 @@
 
 old_NEWS_hash = d41d8cd98f00b204e9800998ecf8427e
 
+guix = $(shell command -v guix > /dev/null && echo ,guix)
+bootstrap-tools = git,gnulib,autoconf,automake,libtoolize,make,bison,help2man,gengetopt,gtkdocize,tar,gzip$(guix)
+
 # syntax-check.
 VC_LIST_ALWAYS_EXCLUDE_REGEX = ^(liboath|libpskc)/man/gdoc|libpskc/schemas/$$
 
@@ -45,12 +48,15 @@ exclude_file_name_regexp--sc_two_space_separator_in_usage = ^pskctool/tests/
 
 TAR_OPTIONS += --mode=go+u,go-w --mtime=$(abs_top_srcdir)/NEWS
 
-update-copyright-env = UPDATE_COPYRIGHT_HOLDER="Simon Josefsson" UPDATE_COPYRIGHT_USE_INTERVALS=2
+announce_gen_args = --cksum-checksums
+url_dir_list = https://download.savannah.nongnu.org/releases/oath-toolkit
 
 DIST_ARCHIVES += $(shell \
 	if test -e $(srcdir)/.git && command -v git > /dev/null; then \
 		echo $(PACKAGE)-v$(VERSION)-src.tar.gz; \
 	fi)
+
+update-copyright-env = UPDATE_COPYRIGHT_HOLDER="Simon Josefsson" UPDATE_COPYRIGHT_USE_INTERVALS=2
 
 my-update-copyright: update-copyright
 	perl -pi -e "s/-20.. Simon Josefsson/-`(date +%Y)` Simon Josefsson/" liboath/man/Makefile.am libpskc/man/Makefile.am
