@@ -46,6 +46,22 @@ AC_ARG_ENABLE([pskc],
    [enable_pskc=yes])
 AM_CONDITIONAL([ENABLE_PSKC], [test "x$enable_pskc" = xyes])
 
+st_help2man=0
+st_touch=197001010000.00
+AC_MSG_CHECKING([for timestamps of last git commit])
+if test -e "$srcdir"/.git && command -v git > /dev/null; then
+   if tmp=$(git log -1 --format=%cd --date=unix); then
+     st_help2man="$tmp"
+   fi
+   if tmp=$(env TZ=UTC0 git log -1 --format=%cd --date=format-local:%Y%m%d%H%M.%S); then
+      st_touch="$tmp"
+   fi
+fi
+AC_SUBST(SOURCETIME_HELP2MAN, "${SOURCETIME_HELP2MAN:-$st_help2man}")
+AC_SUBST(SOURCETIME_TOUCH, "${SOURCETIME_TOUCH:-$st_touch}")
+AC_MSG_RESULT(help2man $SOURCETIME_HELP2MAN touch $SOURCETIME_TOUCH)
+env TZ=UTC0 touch -m -t "$SOURCETIME_TOUCH" "$srcdir"/NEWS
+
 AC_CONFIG_SUBDIRS([
   liboath
 ])

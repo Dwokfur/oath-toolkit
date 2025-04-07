@@ -41,7 +41,7 @@ MAINTAINERCLEANFILES = $(dist_man_MANS)
 EXTRA_DIST = pskctool.h2m
 
 pskctool.1: $(srcdir)/pskctool.c $(srcdir)/pskctool.ggo $(srcdir)/pskctool.h2m $(top_srcdir)/.version
-	$(AM_V_GEN)$(HELP2MAN) \
+	$(AM_V_GEN)env SOURCE_DATE_EPOCH=$(SOURCETIME_HELP2MAN) $(HELP2MAN) \
 		--include $(srcdir)/pskctool.h2m \
 		--no-info \
 		--output=$@ $(builddir)/pskctool$(EXEEXT)

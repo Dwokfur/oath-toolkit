@@ -43,6 +43,8 @@ exclude_file_name_regexp--sc_space_tab = ^m4/pkg.m4$$
 exclude_file_name_regexp--sc_trailing_blank = ^m4/pkg.m4|libpskc/examples/pskctool-h.txt|libpskc/schemas/xmldsig-core-schema.xsd|gl/override/lib/version-etc.c.diff|liboath/gl/override/lib/base32.c.diff|libpskc/gl/override/m4/valgrind-tests.m4.diff|libpskc/schemas/xenc-schema.xsd$$
 exclude_file_name_regexp--sc_two_space_separator_in_usage = ^pskctool/tests/
 
+TAR_OPTIONS += --mode=go+u,go-w --mtime=$(abs_top_srcdir)/NEWS
+
 update-copyright-env = UPDATE_COPYRIGHT_HOLDER="Simon Josefsson" UPDATE_COPYRIGHT_USE_INTERVALS=2
 
 DIST_ARCHIVES += $(shell \

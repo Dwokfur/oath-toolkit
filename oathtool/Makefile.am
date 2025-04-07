@@ -44,7 +44,7 @@ MAINTAINERCLEANFILES = $(dist_man_MANS)
 EXTRA_DIST = oathtool.h2m
 
 oathtool.1: $(srcdir)/oathtool.c $(srcdir)/oathtool.ggo $(srcdir)/oathtool.h2m $(top_srcdir)/.version
-	$(AM_V_GEN)$(HELP2MAN) \
+	$(AM_V_GEN)env SOURCE_DATE_EPOCH=$(SOURCETIME_HELP2MAN) $(HELP2MAN) \
 		--include $(srcdir)/oathtool.h2m \
 		--no-info \
 		--output=$@ $(builddir)/oathtool$(EXEEXT)
