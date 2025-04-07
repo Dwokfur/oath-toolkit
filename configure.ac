@@ -63,6 +63,7 @@ AC_CONFIG_FILES([
   pskctool/Makefile
   pskctool/tests/Makefile
 ])
+gl_CONFIG_VERSION_STAMP
 AC_OUTPUT
 
 AC_MSG_NOTICE([summary of build options:

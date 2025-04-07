@@ -56,7 +56,8 @@ gnulib-tool --import \
   read-file \
   update-copyright \
   vasprintf \
-  version-etc
+  version-etc \
+  version-stamp
 rm -fv doc/parse-datetime.texi
 
 cd liboath

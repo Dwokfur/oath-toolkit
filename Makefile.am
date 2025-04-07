@@ -35,12 +35,11 @@ EXTRA_DIST += website/asciidoc.css website/build-website.sh		\
 	website/intro-2.txt website/config.cfg website/layout.css	\
 	website/oath-toolkit.xsl website/style.css
 
-# git-version-gen
+# gnulib version-stamp
 EXTRA_DIST += $(top_srcdir)/.version
 BUILT_SOURCES = $(top_srcdir)/.version
-$(top_srcdir)/.version:
-	echo $(VERSION) > $@-t && mv $@-t $@
 
+# git-version-gen
 dist-hook: dist-tarball-version
 .PHONY: dist-tarball-version
 dist-tarball-version:
