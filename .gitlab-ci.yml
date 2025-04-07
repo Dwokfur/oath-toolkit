@@ -34,21 +34,22 @@ default:
 
 .gnulib-fetch:
   script:
-  - GNULIB_REVISION=c89cd2fbd3b9f3d7c5a146247256599714c91ec7
+  - GNULIB_REVISION=ba4e57eea99f57370842f8a1dd31ced242ba5598
   - wget -nv https://gitlab.com/libidn/gnulib-mirror/-/archive/$GNULIB_REVISION/gnulib-mirror-$GNULIB_REVISION.tar.gz
   - gzip -cd gnulib-mirror-$GNULIB_REVISION.tar.gz | tar xf -
   - rm -fv gnulib-mirror-$GNULIB_REVISION.tar.gz
+  - export GNULIB_SRCDIR=$PWD/gnulib-mirror-$GNULIB_REVISION
   - export PATH=$PWD/gnulib-mirror-$GNULIB_REVISION:$PATH
 
 .save-artifacts:
   script:
-  - (! command -v git > /dev/null) || git status
-  - (! command -v git > /dev/null) || git diff --exit-code # nothing should change version controlled files
+  - (! command -v git > /dev/null) || git -C $CI_PROJECT_DIR status
+  - (! command -v git > /dev/null) || git -C $CI_PROJECT_DIR diff --exit-code # nothing should change version controlled files
   - sha256sum *.tar.* || true
-  - mkdir -pv out/$CI_JOB_NAME_SLUG/{src,log}
-  - find . -name out -prune -o -name '*.log' -print | xargs mv --backup=numbered -v -t out/$CI_JOB_NAME_SLUG/log config.h
-  - mv -v *-src.tar.* out/$CI_JOB_NAME_SLUG/src/ || true
-  - mv -v *.tar.* out/$CI_JOB_NAME_SLUG/ || true
+  - mkdir -pv $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/{src,log}
+  - find . -name out -prune -o -name '*.log' -print -o -name 'config.h' -print | xargs --no-run-if-empty mv --backup=numbered -v -t $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log
+  - mv -v *-src.tar.* $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/src/ || true
+  - mv -v *.tar.* $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/ || true
 
 sast:
   stage: build
@@ -64,18 +65,23 @@ B-Guix:
   stage: build
   before_script:
   - cp -rL /gnu/store/*profile/etc/* /etc/
-  - echo 'root:x:0:0:root:/:/bin/sh' >> /etc/passwd
+  - . /etc/profile
+  - echo 'root:x:0:0:root:/:/bin/sh' > /etc/passwd
+  - echo 'root:x:0:' > /etc/group
   - groupadd --system guixbuild
   - for i in $(seq -w 1 10); do useradd -g guixbuild -G guixbuild -d /var/empty -s $(command -v nologin) -c "Guix build user $i" --system guixbuilder$i; done
-  - export HOME=/
   - env LANG=C.UTF-8 guix-daemon --build-users-group=guixbuild &
   - guix archive --authorize < /share/guix/ci.guix.gnu.org.pub
   - guix archive --authorize < /share/guix/bordeaux.guix.gnu.org.pub
   - guix describe
+  - guix install --verbosity=0 linux-pam
+  - GUIX_PROFILE="//.guix-profile"
+  - . "$GUIX_PROFILE/etc/profile"
+  - . /etc/profile
   script:
   - !reference [.gnulib-fetch, script]
   - time ./bootstrap
-  - time ./configure --enable-gcc-warnings
+  - time ./configure --enable-gcc-warnings CPPFLAGS="$(pkg-config --cflags pam)" LDFLAGS="$(pkg-config --libs pam)"
   - time make -j$(nproc) syntax-check
   - time make -j$(nproc) check V=1 VERBOSE=t
   - time make V=1 dist
@@ -236,9 +242,9 @@ B-Trisquel11:
   - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
   - make -j$(nproc) dist
   - sha224sum oath-toolkit-*.tar.gz
-  - cd website && ./build-website.sh
+  - cd website; ./build-website.sh; cd ..
   - !reference [.save-artifacts, script]
-  - mv website/html out/$CI_JOB_NAME_SLUG/
+  - mv -v website/html out/$CI_JOB_NAME_SLUG/
 
 B-Ubuntu2204:
   image: ubuntu:22.04
@@ -259,6 +265,8 @@ B-Ubuntu2204:
   - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
   - make -j$(nproc) dist
   - !reference [.save-artifacts, script]
+  - cd website; ./build-website.sh; cd ..
+  - mv -v website/html out/$CI_JOB_NAME_SLUG/
 
 B-Debian13-arm64:
   rules:
@@ -308,16 +316,14 @@ B-Debian12-coverage:
   - !reference [.gnulib-fetch, script]
   - ./bootstrap
   - ./configure --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests CFLAGS="-g --coverage"
-  - lcov --directory . --zerocounters
-  - make -j$(nproc) check V=1 VERBOSE=t
+  - make init-coverage
+  - make -j$(nproc) V=1 VERBOSE=t build-coverage
   - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
   - grep '^PASS run-root-tests.sh' pam_oath/tests/run-root-tests.sh.log
-  - mkdir coverage
-  - lcov --directory . --output-file coverage/oath-toolkit.info --capture
-  - lcov --remove coverage/oath-toolkit.info '/usr/include/*' '*/liboath/gl/*' '*/liboath/tests/*' '*/libpskc/gl/*' '*/libpskc/tests/*' '*/oathtool/gl/*' '*/pam_oath/tests/*' '*/pskctool/gl/*' -o coverage/oath-toolkit_filtered.info
-  - genhtml --output-directory coverage coverage/oath-toolkit_filtered.info --highlight --frames --legend --title "OATH Toolkit"
+  - lcov --remove doc/coverage/oath-toolkit.info '/usr/include/*' '*/liboath/gl/*' '*/liboath/tests/*' '*/libpskc/gl/*' '*/libpskc/tests/*' '*/oathtool/gl/*' '*/pam_oath/tests/*' '*/pskctool/gl/*' -o doc/coverage/oath-toolkit-filtered.info
+  - make gen-coverage PACKAGE=oath-toolkit-filtered
   - !reference [.save-artifacts, script]
-  - mv coverage/ out/$CI_JOB_NAME_SLUG/
+  - mv doc/coverage/ out/$CI_JOB_NAME_SLUG/
 
 B-Fedora39-clanganalyzer:
   image: fedora:39
@@ -416,7 +422,7 @@ Coverity:
   - md5sum /tmp/cov-analysis-linux64.tgz
   - tar xfz /tmp/cov-analysis-linux64.tgz
   - !reference [.gnulib-fetch, script]
-  - time ./bootstrap --skip-po
+  - time ./bootstrap
   - time ./configure --enable-gcc-warnings --disable-doc --enable-root-tests CFLAGS="-g -Og"
   - cov-analysis-linux64-*/bin/cov-build --dir cov-int make check -j$(nproc)
   - tar cfz cov-int.tar.gz cov-int
@@ -471,19 +477,23 @@ R-Guix:
   needs: []
   before_script:
   - cp -rL /gnu/store/*profile/etc/* /etc/
+  - . /etc/profile
   - echo 'root:x:0:0:root:/:/bin/sh' > /etc/passwd
   - echo 'root:x:0:' > /etc/group
   - groupadd --system guixbuild
   - for i in $(seq -w 1 10); do useradd -g guixbuild -G guixbuild -d /var/empty -s $(command -v nologin) -c "Guix build user $i" --system guixbuilder$i; done
-  - export HOME=/
   - env LANG=C.UTF-8 guix-daemon --build-users-group=guixbuild &
   - guix archive --authorize < /share/guix/ci.guix.gnu.org.pub
   - guix archive --authorize < /share/guix/bordeaux.guix.gnu.org.pub
   - guix describe
+  - guix install --verbosity=0 linux-pam
+  - GUIX_PROFILE="//.guix-profile"
+  - . "$GUIX_PROFILE/etc/profile"
+  - . /etc/profile
   script:
   - !reference [.gnulib-fetch, script]
   - time ./bootstrap
-  - time ./configure
+  - time ./configure --enable-gcc-warnings CPPFLAGS="$(pkg-config --cflags pam)" LDFLAGS="$(pkg-config --libs pam)"
   - time make V=1 syntax-check
   - time make -j$(nproc) check V=1 VERBOSE=t
   - time make -j$(nproc) dist V=1 VERBOSE=t
@@ -510,7 +520,7 @@ R-Guix:
   - git diff --exit-code # nothing should change version controlled files
   - sha256sum *.tar.*
   - mkdir -pv out/$CI_JOB_NAME_SLUG/{src,rel,log}
-  - find config.h *.log tests/*.log -exec mv -v {} out/$CI_JOB_NAME_SLUG/log \;
+  - find . -name out -prune -o -name '*.log' -print -o -name 'config.h' -print | xargs --no-run-if-empty mv --backup=numbered -v -t $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log
   - test "$relver" != "97.23.42" || mv -v *97.23.42* out/$CI_JOB_NAME_SLUG/rel/
   - mv -v *-src.tar.* out/$CI_JOB_NAME_SLUG/src/
   - mv -v *.tar.* ~/announce-* out/$CI_JOB_NAME_SLUG/
@@ -557,7 +567,7 @@ R-Debian12:
   - git diff --exit-code # nothing should change version controlled files
   - sha256sum *.tar.*
   - mkdir -pv out/$CI_JOB_NAME_SLUG/{src,rel,log}
-  - find config.h *.log tests/*.log -exec mv -v {} out/$CI_JOB_NAME_SLUG/log \;
+  - find . -name out -prune -o -name '*.log' -print -o -name 'config.h' -print | xargs --no-run-if-empty mv --backup=numbered -v -t out/$CI_JOB_NAME_SLUG/log
   - test "$relver" != "97.23.42" || mv -v *97.23.42* out/$CI_JOB_NAME_SLUG/rel/
   - mv -v *-src.tar.* out/$CI_JOB_NAME_SLUG/src/
   - mv -v *.tar.* ~/announce-* out/$CI_JOB_NAME_SLUG/
@@ -604,7 +614,7 @@ R-Ubuntu2404:
   - git diff --exit-code # nothing should change version controlled files
   - sha256sum *.tar.*
   - mkdir -pv out/$CI_JOB_NAME_SLUG/{src,rel,log}
-  - find config.h *.log tests/*.log -exec mv -v {} out/$CI_JOB_NAME_SLUG/log \;
+  - find . -name out -prune -o -name '*.log' -print -o -name 'config.h' -print | xargs --no-run-if-empty mv --backup=numbered -v -t out/$CI_JOB_NAME_SLUG/log
   - test "$relver" != "97.23.42" || mv -v *97.23.42* out/$CI_JOB_NAME_SLUG/rel/
   - mv -v *-src.tar.* out/$CI_JOB_NAME_SLUG/src/
   - mv -v *.tar.* ~/announce-* out/$CI_JOB_NAME_SLUG/
@@ -618,7 +628,8 @@ T-Trisquel10:
   - cat /etc/os-release
   - sed -i 's,http://archive.trisquel.info/trisquel,http://ftp.acc.umu.se/mirror/trisquel/packages,' /etc/apt/sources.list
   - time apt-get update -q
-  - time eatmydata apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt datefudge
+  - time apt-get install -y -q eatmydata
+  - time eatmydata apt-get install -y -q wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt datefudge
   script:
   - mkdir -pv ../b
   - cd ../b
@@ -627,15 +638,13 @@ T-Trisquel10:
   - !reference [.gnulib-fetch, script]
   - time datefudge "5 years" ./bootstrap
   - time datefudge "5 years" ./configure --enable-gcc-warnings
-  - grep '^HAVE_DOTNET = $' Makefile > /dev/null
-  - grep '^HAVE_MONO = 1$' Makefile > /dev/null
   - time datefudge "5 years" make -j$(nproc)
   - time datefudge "5 years" make -j$(nproc) check V=1 VERBOSE=t
   - time datefudge "5 years" make -j$(nproc) distcheck
   - sha256sum *.tar.*
-  - mkdir -pv ../../oath-toolkit/out/$CI_JOB_NAME_SLUG/src ../../oath-toolkit/out/$CI_JOB_NAME_SLUG/log
-  - find config.h *.log tests/*.log -exec mv -v {} ../out/$CI_JOB_NAME_SLUG/log \;
-  - mv -v *.tar.* ../../oath-toolkit/out/$CI_JOB_NAME_SLUG/
+  - mkdir -pv $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log
+  - find . -name out -prune -o -name '*.log' -print -o -name 'config.h' -print | xargs --no-run-if-empty mv --backup=numbered -v -t $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log
+  - mv -v *.tar.* $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/
 
 T-Ubuntu2004:
   tags: [ saas-linux-medium-amd64 ]
@@ -646,23 +655,22 @@ T-Ubuntu2004:
     DEBIAN_FRONTEND: noninteractive
   before_script:
   - cat /etc/os-release
-  - time apt-get update -qq
-  - time eatmydata apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt datefudge
+  - time apt-get update -q
+  - time apt-get install -y -q eatmydata
+  - time eatmydata apt-get install -y -q wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt datefudge
   script:
   - tar xfz out/b-guix/src/*-*.tar.gz
   - cd $(tar tfa out/b-guix/src/*-*.tar.gz | head -n1)
   - !reference [.gnulib-fetch, script]
   - time datefudge "5 years ago" ./bootstrap
   - time datefudge "5 years ago" ./configure --enable-gcc-warnings
-  - grep '^HAVE_DOTNET = $' Makefile > /dev/null
-  - grep '^HAVE_MONO = 1$' Makefile > /dev/null
   - time datefudge "5 years ago" make -j$(nproc) syntax-check
   - time datefudge "5 years ago" make -j$(nproc) check V=1 VERBOSE=t
   - time datefudge "5 years ago" make -j$(nproc) distcheck V=1 VERBOSE=t
   - sha256sum *.tar.*
-  - mkdir -pv ../out/$CI_JOB_NAME_SLUG/log
-  - find config.h *.log tests/*.log -exec mv -v {} ../out/$CI_JOB_NAME_SLUG/log \;
-  - mv -v *.tar.* ../out/$CI_JOB_NAME_SLUG/
+  - mkdir -pv $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log
+  - find . -name out -prune -o -name '*.log' -print -o -name 'config.h' -print | xargs --no-run-if-empty mv --backup=numbered -v -t $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log
+  - mv -v *.tar.* $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/
 
 S-Trisquel10:
   tags: [ saas-linux-medium-amd64 ]
@@ -674,22 +682,21 @@ S-Trisquel10:
   - sed -i 's,http://archive.trisquel.info/trisquel,http://ftp.acc.umu.se/mirror/trisquel/packages,' /etc/apt/sources.list
   - time apt-get update -y
   - time apt-get install -y -q eatmydata
-  - time eatmydata apt-get install -y make git wget autoconf automake libtool gettext autopoint cvs texinfo help2man gtk-doc-tools valgrind gengetopt graphviz mono-mcs gperf default-jdk-headless codespell
+  - time eatmydata apt-get install -y -q wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt datefudge
   script:
   - mkdir -pv ../b
   - cd ../b
   - tar xfz ../*/out/b-guix/src/*-*.tar.gz
   - cd $(tar tfa ../*/out/b-guix/src/*-*.tar.gz | head -n1)
   - !reference [.gnulib-fetch, script]
-  - time ./bootstrap --no-git
+  - time ./bootstrap
   - time ./configure --enable-gcc-warnings
   - grep '^VERSION = ' Makefile | grep -v UNKNOWN
   - time make -j$(nproc) check V=1 VERBOSE=t
-  - src/idn --version | head -1 | grep -v UNKNOWN
   - time make -j$(nproc) dist AM_DISTCHECK_DVI_TARGET=
   - sha256sum *.tar.*
   - mkdir -pv $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/{src,log}
-  - find config.h *.log tests/*.log -exec mv -v {} $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log \;
+  - find . -name out -prune -o -name '*.log' -print -o -name 'config.h' -print | xargs --no-run-if-empty mv --backup=numbered -v -t $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log
   - mv -v *.tar.* $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/
 
 S-Ubuntu2004:
@@ -703,20 +710,19 @@ S-Ubuntu2004:
   - cat /etc/os-release
   - time apt-get update -y
   - time apt-get install -y -q eatmydata
-  - time eatmydata apt-get install -y make git wget autoconf automake libtool gettext autopoint cvs texinfo help2man gtk-doc-tools valgrind gengetopt graphviz mono-mcs gperf default-jdk-headless codespell
+  - time eatmydata apt-get install -y -q wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt datefudge
   script:
   - tar xfz out/b-guix/src/*-*.tar.gz
   - cd $(tar tfa out/b-guix/src/*-*.tar.gz | head -n1)
   - !reference [.gnulib-fetch, script]
-  - time ./bootstrap --no-git
+  - time ./bootstrap
   - time ./configure --enable-gcc-warnings
   - grep '^VERSION = ' Makefile | grep -v UNKNOWN
   - time make -j$(nproc) check V=1 VERBOSE=t
-  - src/idn --version | head -1 | grep -v UNKNOWN
   - time make -j$(nproc) dist AM_DISTCHECK_DVI_TARGET=
   - sha256sum *.tar.*
   - mkdir -pv ../out/$CI_JOB_NAME_SLUG/{src,log}
-  - find config.h *.log tests/*.log -exec mv -v {} ../out/$CI_JOB_NAME_SLUG/log \;
+  - find . -name out -prune -o -name '*.log' -print -o -name 'config.h' -print | xargs --no-run-if-empty mv --backup=numbered -v -t $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log
   - mv -v *.tar.* ../out/$CI_JOB_NAME_SLUG/
 
 Windows-MSYS:
@@ -738,8 +744,8 @@ Windows-MSYS:
   - |
     C:\msys64\usr\bin\bash -lcx '
     pacman --noconfirm -Syu make gcc
-    tar xfa oath-toolkit-*.tar.gz
-    cd `ls -d oath-toolkit-* | grep -v tar.gz`
+    tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+    cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
     ./configure -C --enable-gcc-warnings
     make -j$(nproc) V=1 -k check VERBOSE=t'
 
@@ -762,8 +768,8 @@ Windows-MINGW64:
   - |
     C:\msys64\usr\bin\bash -lcx '
     pacman --noconfirm -Syu make mingw-w64-x86_64-gcc
-    tar xfa oath-toolkit-*.tar.gz
-    cd `ls -d oath-toolkit-* | grep -v tar.gz`
+    tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+    cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
     ./configure -C --enable-gcc-warnings
     make -j$(nproc) V=1 -k check VERBOSE=t'
 
@@ -775,8 +781,8 @@ Debian12:
   - apt-get update -qq
   - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
   script:
-  - tar xfa oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings --disable-valgrind-tests
@@ -791,8 +797,8 @@ Debian-testing:
   - apt-get update -qq
   - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
   script:
-  - tar xfa oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - ./configure --enable-gcc-warnings --disable-valgrind-tests
   - make -j$(nproc) check V=1 VERBOSE=t
   - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
@@ -811,8 +817,8 @@ Ubuntu2410-ppc64:
   - apt-get update -qq
   - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxml2-utils datefudge
   script:
-  - tar xfa oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings --disable-valgrind-tests
   - make -j$(nproc) check V=1 VERBOSE=t
 
@@ -826,8 +832,8 @@ Ubuntu2410-xmlsec:
   - apt-get update -qq
   - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
   script:
-  - tar xfa oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings --disable-valgrind-tests
   - make -j$(nproc) check V=1 VERBOSE=t
   - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
@@ -842,8 +848,8 @@ Ubuntu-xmlsec:
   - apt-get update -qq
   - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
   script:
-  - tar xfa oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings --disable-valgrind-tests
@@ -859,8 +865,8 @@ AlmaLinux8-xmlsec:
   - dnf -y install epel-release
   - dnf -y install --enablerepo=powertools indent xmlsec1-openssl-devel
   script:
-  - tar xfa oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings --disable-valgrind-tests --with-xmlsec-crypto-engine=openssl
   - make -j$(nproc) syntax-check
   - make -j$(nproc) check V=1 VERBOSE=t
@@ -875,8 +881,8 @@ AlmaLinux9-openssl:
   - dnf -y install epel-release
   - dnf -y --enablerepo=crb install libtool-ltdl-devel indent
   script:
-  - tar xfa oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings --disable-valgrind-tests --with-openssl
   - make -j$(nproc) syntax-check
   - make -j$(nproc) check V=1 VERBOSE=t
@@ -892,8 +898,8 @@ RockyLinux9-ppc64:
   before_script:
   - dnf -y install make gcc diffutils file pam-devel
   script:
-  - tar xfa oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings
   - make -j$(nproc) check V=1 VERBOSE=t
 
@@ -905,8 +911,8 @@ Alpine-mold:
   - apk update
   - apk add build-base datefudge xmlsec-dev mold
   script:
-  - tar xfz oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings CC='cc -fuse-ld=mold'
   - make -j$(nproc) check V=1 VERBOSE=t 2>&1 | tee build.log
   - (! grep -E 'mold. warning' build.log)
@@ -924,8 +930,8 @@ Alpine-arm64:
   - apk update
   - apk add build-base datefudge xmlsec-dev
   script:
-  - tar xfz oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings
   - make -j$(nproc) check V=1 VERBOSE=t
 
@@ -936,8 +942,8 @@ ArchLinux-xmlsec:
   before_script:
   - pacman -Suy --noconfirm make gcc diffutils file xmlsec pkg-config
   script:
-  - tar xfz oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings
@@ -956,8 +962,8 @@ Fedora39-arm64:
   - dnf install -y make gcc diffutils file pam-devel
   - dnf install -y libxml2-devel xmlsec1-devel xmlsec1-openssl libtool-ltdl-devel
   script:
-  - tar xfz oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings
   - make -j$(nproc) check V=1 VERBOSE=t
 
@@ -966,8 +972,8 @@ Gentoo:
   stage: test
   needs: [B-Trisquel11]
   script:
-  - tar xfz oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings
@@ -989,8 +995,8 @@ macOS15Xcode16:
   before_script:
   - brew install libxmlsec1
   script:
-  - gzip -cd oath-toolkit-*.tar.gz | tar xf -
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - gzip -cd out/b-trisquel11/oath-toolkit-*.tar.gz | tar xf -
+  - cd $(gzip -cd out/b-trisquel11/oath-toolkit-*.tar.gz | tar tf - | head -n1)
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings
@@ -1007,8 +1013,8 @@ Mingw32:
   - apt-get install -y -qq make mingw-w64 wine wine32 wine64 libwine libwine:i386 binfmt-support wine-binfmt
   - update-binfmts --enable wine
   script:
-  - tar xfa oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - ./configure --host=i686-w64-mingw32 CC='i686-w64-mingw32-gcc -static-libgcc' CPPFLAGS=-D_FORTIFY_SOURCE=0
   - make -j$(nproc) V=1
   - make -j$(nproc) -C liboath/tests check VERBOSE=t
@@ -1023,8 +1029,8 @@ Mingw64:
   - apt-get install -y -qq make mingw-w64 wine wine64 binfmt-support wine-binfmt
   - update-binfmts --enable wine
   script:
-  - tar xfa oath-toolkit-*.tar.gz
-  - cd `ls -d oath-toolkit-* | grep -v tar.gz`
+  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
   - ./configure --host=x86_64-w64-mingw32 CPPFLAGS=-D_FORTIFY_SOURCE=0
   - make -j$(nproc) V=1
   - make -j$(nproc) -C liboath/tests check VERBOSE=t
@@ -1038,7 +1044,7 @@ Mingw64:
   - mkdir public
   - mv out/b-debian12-coverage/coverage/ public/
   - mv out/b-fedora39-clanganalyzer/clang-analyzer public/
-  - mv out/b-trisquel11/website/html/* public/
+  - mv out/b-trisquel11/html/* public/
   artifacts:
     paths:
     - public
