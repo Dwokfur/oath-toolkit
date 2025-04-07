@@ -15,7 +15,7 @@
 # <https://www.gnu.org/licenses/>.
 
 AC_INIT([libpskc],
-  m4_esyscmd([../build-aux/git-version-gen --prefix oath-toolkit- ../.tarball-version]),
+  m4_esyscmd([../build-aux/git-version-gen ../.tarball-version]),
   [oath-toolkit-help@nongnu.org],,
   [https://www.nongnu.org/oath-toolkit/])
 
