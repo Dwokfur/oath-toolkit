@@ -50,25 +50,6 @@ const char version_etc_copyright[] =
 # define OATH_ATTR_NO_RETURN __attribute__ ((__noreturn__))
 #endif
 
-/* *INDENT-OFF* */
-static void
-usage (int status)
-  OATH_ATTR_NO_RETURN;
-/* *INDENT-ON* */
-
-static void
-usage (int status)
-{
-  if (status != EXIT_SUCCESS)
-    fprintf (stderr, "Try `%s --help' for more information.\n", program_name);
-  else
-    {
-      cmdline_parser_print_help ();
-      emit_bug_reporting_address ();
-    }
-  exit (status);
-}
-
 static time_t
 parse_time (const char *p, const time_t now)
 {
@@ -128,7 +109,7 @@ verbose_totp (oath_totp_flags flags, time_t t0, time_t time_step_size,
 /* Return newly allocated string with args_info->inputs[i] or, if that
    string starts with '-' or '@', a line read from stdin (-) or file
    (@...). */
-const char *
+char *
 maybe_read_input (const struct gengetopt_args_info *args_info, int i)
 {
   const char *given;
@@ -182,7 +163,7 @@ main (int argc, char *argv[])
   char otp[10];
   time_t now, when, t0, time_step_size;
   int totpflags = 0;
-  const char *inputs[2];
+  char *inputs[2];
 
   set_program_name (argv[0]);
 
@@ -203,16 +184,15 @@ main (int argc, char *argv[])
 		   PACKAGE_VERSION, "Simon Josefsson", (char *) NULL);
       if (l != -1)
 	free (p);
+      cmdline_parser_free (&args_info);
       return EXIT_SUCCESS;
     }
 
-  if (args_info.help_given)
-    usage (EXIT_SUCCESS);
-
-  if (args_info.inputs_num == 0)
+  if (args_info.help_given || args_info.inputs_num == 0)
     {
       cmdline_parser_print_help ();
       emit_bug_reporting_address ();
+      cmdline_parser_free (&args_info);
       return EXIT_SUCCESS;
     }
 
@@ -410,5 +390,8 @@ main (int argc, char *argv[])
   free (secret);
   oath_done ();
 
+  free (inputs[0]);
+  free (inputs[1]);
+  cmdline_parser_free (&args_info);
   return EXIT_SUCCESS;
 }

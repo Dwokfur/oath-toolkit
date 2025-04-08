@@ -263,5 +263,6 @@ main (int argc, char *argv[])
 
   pskc_global_done ();
 
+  cmdline_parser_free (&args_info);
   return EXIT_SUCCESS;
 }
