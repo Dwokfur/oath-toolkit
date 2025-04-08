@@ -39,11 +39,13 @@ AC_ARG_ENABLE([pam],
    [enable_pam=$ac_cv_header_security_pam_appl_h])
 AM_CONDITIONAL([ENABLE_PAM], [test "x$enable_pam" = xyes])
 
-PKG_CHECK_MODULES(XML2, libxml-2.0, enable_pskc=yes, enable_pskc=no)
 AC_ARG_ENABLE([pskc],
   [AS_HELP_STRING([--disable-pskc], [disable PSKC support])],
    [enable_pskc=$enableval],
    [enable_pskc=yes])
+if test x"$enable_pskc" != xno; then
+  PKG_CHECK_MODULES(XML2, libxml-2.0, enable_pskc=yes, enable_pskc=no)
+fi
 AM_CONDITIONAL([ENABLE_PSKC], [test "x$enable_pskc" = xyes])
 
 st_help2man=0
