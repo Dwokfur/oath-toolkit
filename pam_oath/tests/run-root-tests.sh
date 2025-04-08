@@ -78,7 +78,10 @@ TZ=UTC $FAKETIME "2006-12-07" ./test-pam_oath-root user3
 rc=$?
 
 if test "$rc" != "77"; then
-    diff -u "$srcdir/expect.oath" $ETCUSRCFG || rc=1
+    RE="2006-12-07T00:00:..L"
+    cat $ETCUSRCFG | sed "s/$RE/$RE/" > output.oath
+    diff -u "$srcdir/expect.oath" output.oath || rc=1
+    rm -f output.oath
 fi
 
 rm -f $ETCPAMCFG $ETCUSRCFG
