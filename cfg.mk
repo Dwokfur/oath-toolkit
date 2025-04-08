@@ -36,14 +36,14 @@ exclude_file_name_regexp--sc_codespell = ^m4/pkg.m4$$
 exclude_file_name_regexp--sc_error_message_uppercase = ^oathtool/oathtool.c|pskctool/pskctool.c$$
 exclude_file_name_regexp--sc_fsf_postal = ^m4/pkg.m4$$
 exclude_file_name_regexp--sc_program_name = ^liboath/tests/|libpskc/examples/|libpskc/tests/|pam_oath/tests/
-exclude_file_name_regexp--sc_prohibit_empty_lines_at_EOF = ^gl/override/lib/version-etc.c.diff|liboath/gl/override/lib/base32.c.diff|libpskc/schemas/xenc-schema.xsd$$
+exclude_file_name_regexp--sc_prohibit_empty_lines_at_EOF = ^(liboath/|libpskc/|)gl/override/.*|libpskc/schemas/xenc-schema.xsd$$
 exclude_file_name_regexp--sc_prohibit_have_config_h = ^liboath/tests/tst_fopen-wx.c$$
 exclude_file_name_regexp--sc_readme_link_copying = ^libpskc/README|pam_oath/README$$
 exclude_file_name_regexp--sc_readme_link_install = $(exclude_file_name_regexp--sc_readme_link_copying)
 exclude_file_name_regexp--sc_require_config_h = ^libpskc/examples/
 exclude_file_name_regexp--sc_require_config_h_first = $(exclude_file_name_regexp--sc_require_config_h)
 exclude_file_name_regexp--sc_space_tab = ^m4/pkg.m4$$
-exclude_file_name_regexp--sc_trailing_blank = ^m4/pkg.m4|libpskc/examples/pskctool-h.txt|libpskc/schemas/xmldsig-core-schema.xsd|gl/override/lib/version-etc.c.diff|liboath/gl/override/lib/base32.c.diff|libpskc/gl/override/m4/valgrind-tests.m4.diff|libpskc/schemas/xenc-schema.xsd$$
+exclude_file_name_regexp--sc_trailing_blank = ^m4/pkg.m4|libpskc/examples/pskctool-h.txt|libpskc/schemas/xmldsig-core-schema.xsd|(liboath/|libpskc/|)gl/override/.*|libpskc/schemas/xenc-schema.xsd$$
 exclude_file_name_regexp--sc_two_space_separator_in_usage = ^pskctool/tests/
 
 TAR_OPTIONS += --mode=go+u,go-w --mtime=$(abs_top_srcdir)/NEWS

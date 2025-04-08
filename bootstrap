@@ -99,6 +99,7 @@ cd ..
 
 cd libpskc
 gnulib-tool --import \
+  --local-dir=gl/override \
   --lib=libgnu \
   --source-base=gl \
   --m4-base=gl/m4 \
