@@ -31,10 +31,12 @@ libpskctool_cmd_la_LIBADD = ../gl/libgnu.la
 libpskctool_cmd_la_CFLAGS =
 
 pskctool_cmd.h pskctool_cmd.c: pskctool.ggo Makefile.am
-	$(AM_V_GEN)gengetopt --unamed-opts="FILE" \
+	$(AM_V_GEN)cp -v $(srcdir)/pskctool.ggo repro-gengetopt.ggo && \
+	gengetopt --unamed-opts="FILE" \
 		--set-package="pskctool" \
 		--no-handle-version --no-handle-help \
-		--input $< --file-name pskctool_cmd
+		--input repro-gengetopt.ggo --file-name pskctool_cmd && \
+	rm -v repro-gengetopt.ggo
 
 dist_man_MANS = pskctool.1
 MAINTAINERCLEANFILES = $(dist_man_MANS)

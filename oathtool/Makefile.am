@@ -31,10 +31,12 @@ liboathtool_cmd_la_LIBADD = ../gl/libgnu.la
 liboathtool_cmd_la_CFLAGS =
 
 oathtool_cmd.h oathtool_cmd.c: oathtool.ggo Makefile.am
-	$(AM_V_GEN)gengetopt --unamed-opts="KEY [OTP]" \
+	$(AM_V_GEN)cp -v $(srcdir)/oathtool.ggo repro-gengetopt.ggo && \
+	gengetopt --unamed-opts="KEY [OTP]" \
 		--set-package="oathtool" \
 		--no-handle-version --no-handle-help \
-		--input $< --file-name oathtool_cmd && \
+		--input repro-gengetopt.ggo --file-name oathtool_cmd && \
+	rm -v repro-gengetopt.ggo && \
 	perl -pi -e 's/HAVE_LONG_LONG/HAVE_UNSIGNED_LONG_LONG/g' oathtool_cmd.h oathtool_cmd.c && \
 	perl -pi -e 's/  long long int/  unsigned long long int/g' oathtool_cmd.h oathtool_cmd.c && \
 	perl -pi -e 's/int\) strtoll /int\) strtoull /' oathtool_cmd.c
