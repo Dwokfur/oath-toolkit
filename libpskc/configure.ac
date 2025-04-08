@@ -44,8 +44,11 @@ AM_PROG_AR
 LT_INIT([win32-dll])
 gl_INIT
 
-# https://developer.gnome.org/gtk-doc-manual/stable/settingup_autoconf.html.en
+m4_ifdef([GTK_DOC_CHECK], [
 GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
+],[
+AM_CONDITIONAL([ENABLE_GTK_DOC], false)
+])
 
 AC_ARG_WITH(xmlsec-crypto-engine,
   AS_HELP_STRING([--with-xmlsec-crypto-engine=ENGINE],

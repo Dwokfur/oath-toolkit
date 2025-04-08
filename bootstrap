@@ -20,15 +20,30 @@ printf "gdoc_MANS =\ngdoc_TEXINFOS =\n" > libpskc/man/Makefile.gdoc
 
 touch ChangeLog
 
-mkdir -pv liboath/m4 oathtool/m4 libpskc/m4 pskctool/m4 pam_oath/m4
+mkdir liboath/m4 oathtool/m4 libpskc/m4 pskctool/m4 pam_oath/m4
 
-cd liboath
-gtkdocize --copy
-cd ..
+if command -v gtkdocize > /dev/null; then
+    cd liboath
+    gtkdocize --copy
+    cd ..
 
-cd libpskc
-gtkdocize --copy
-cd ..
+    cd libpskc
+    gtkdocize --copy
+    cd ..
+else
+    echo "warning: gtkdocize missing -- gtk-doc manual will be missing"
+
+    # Pacify autoreconf's invocation of gtkdocize.
+    GTKDOCIZE="true gtkdocize"
+    export GTKDOCIZE
+
+    # rm because gtk-doc.make might be a link to a protected file
+    rm -f liboath/gtk-doc.make libpskc/gtk-doc.make
+    echo "EXTRA_DIST =" > liboath/gtk-doc.make
+    echo "CLEANFILES =" >> liboath/gtk-doc.make
+    echo "EXTRA_DIST =" > libpskc/gtk-doc.make
+    echo "CLEANFILES =" >> libpskc/gtk-doc.make
+fi
 
 gnulib-tool --import \
   --local-dir=gl/override \
