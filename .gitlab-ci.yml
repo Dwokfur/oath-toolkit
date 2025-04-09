@@ -519,7 +519,8 @@ B-Windows-UCRT64:
   tags: [ saas-windows-medium-amd64 ]
   stage: build
   script: # https://www.msys2.org/docs/ci/#other-systems
-  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/2025-02-21/msys2-base-x86_64-20250221.sfx.exe
+  - Get-FileHash ./msys2.exe -Algorithm SHA256 | Format-List
   - ./msys2.exe -y -oC:\
   - Remove-Item msys2.exe
   - $env:CHERE_INVOKING = 'yes'
@@ -559,23 +560,25 @@ Windows-MINGW64:
   stage: test
   needs: [B-Guix]
   script: # https://www.msys2.org/docs/ci/#other-systems
-  - wget.exe --no-check-certificate -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/2025-02-21/msys2-base-x86_64-20250221.sfx.exe
+  - Get-FileHash ./msys2.exe -Algorithm SHA256 | Format-List
   - ./msys2.exe -y -oC:\
   - Remove-Item msys2.exe
   - $env:CHERE_INVOKING = 'yes'
   - $env:MSYSTEM = 'MINGW64' # https://www.msys2.org/docs/environments/
   - C:\msys64\usr\bin\bash -lc ' '
   - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
-  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
   - |
     C:\msys64\usr\bin\bash -lcx '
-    pacman --noconfirm -Syu make mingw-w64-x86_64-gcc
+    pacman --noconfirm -Syu make diffutils mingw-w64-x86_64-gcc
     tar xfa out/b-guix/oath-toolkit-*.tar.gz
     cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
     ./configure -C --enable-gcc-warnings
     make -j$(nproc) V=1 -k check VERBOSE=t'
+  - C:\msys64\usr\bin\bash -lc 'grep ^PASS liboath/tests/tst_totp_validate.log'
 
 Windows-MSYS:
+  allow_failure: true # gnulib wint_t issue, last worked in b1c8aaa5c
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
@@ -583,21 +586,22 @@ Windows-MSYS:
   stage: test
   needs: [B-Guix]
   script: # https://www.msys2.org/docs/ci/#other-systems
-  - wget.exe --no-check-certificate -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/2025-02-21/msys2-base-x86_64-20250221.sfx.exe
+  - Get-FileHash ./msys2.exe -Algorithm SHA256 | Format-List
   - ./msys2.exe -y -oC:\
   - Remove-Item msys2.exe
   - $env:CHERE_INVOKING = 'yes'
   - $env:MSYSTEM = 'MSYS' # https://www.msys2.org/docs/environments/
   - C:\msys64\usr\bin\bash -lc ' '
   - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
-  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
   - |
     C:\msys64\usr\bin\bash -lcx '
-    pacman --noconfirm -Syu make gcc
+    pacman --noconfirm -Syu make diffutils gcc
     tar xfa out/b-guix/oath-toolkit-*.tar.gz
     cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
     ./configure -C --enable-gcc-warnings
     make -j$(nproc) V=1 -k check VERBOSE=t'
+  - C:\msys64\usr\bin\bash -lc 'grep ^PASS liboath/tests/tst_totp_validate.log'
 
 # https://www.synopsys.com/blogs/software-security/integrating-coverity-scan-with-gitlab-ci/
 Coverity:
