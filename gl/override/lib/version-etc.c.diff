@@ -1,0 +1,23 @@
+From e314eec7174a9c8afca7f8c3ae6399dab8dc882d Mon Sep 17 00:00:00 2001
+From: Simon Josefsson <simon@josefsson.org>
+Date: Thu, 3 Apr 2025 22:29:06 +0200
+Subject: [PATCH] Drop GNU-specific --help URL.
+
+---
+ lib/version-etc.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/lib/version-etc.c b/lib/version-etc.c
+index 703d7fcf4e..ac9e5590df 100644
+--- a/lib/version-etc.c
++++ b/lib/version-etc.c
+@@ -257,6 +257,4 @@ emit_bug_reporting_address (void)
+   printf (_("%s home page: <%s>\n"),
+           PACKAGE_NAME, "https://www.gnu.org/software/" PACKAGE "/");
+ #endif
+-  printf (_("General help using GNU software: <%s>\n"),
+-          "https://www.gnu.org/gethelp/");
+ }
+-- 
+2.49.0
+

@@ -1,5 +1,5 @@
 OATH Toolkit pam_oath/README
-Copyright (C) 2009-2024 Simon Josefsson.  Licensed under the GPLv3+.
+Copyright (C) 2009-2025 Simon Josefsson.  Licensed under the GPLv3+.
 
 This directory holds an PAM module for authenticating users using OATH
 one-time password technology.
@@ -243,7 +243,7 @@ The exception is when a ${HOME} string is used.  In this case the PAM
 module will temporarily drop the effective user id to the user that is
 being logged in via PAM before accessing and rewriting the file.
 
-The following are the typicaly scenarios for the usersfile placement,
+The following are the typically scenarios for the usersfile placement,
 and its recommended file protection.  Note that a root-owned file
 below a path controlled by a non-root user lead to a vulnerable
 configuration.

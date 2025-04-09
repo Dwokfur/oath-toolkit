@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2024 Simon Josefsson
+# Copyright (C) 2012-2025 Simon Josefsson
 
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as
@@ -17,8 +17,6 @@
 AM_DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 
 SUBDIRS = gl schemas include . examples tests gtk-doc man
-
-ACLOCAL_AMFLAGS = -I m4 -I../m4 -I gl/m4
 
 AM_CPPFLAGS = -DPSKC_BUILDING
 AM_CPPFLAGS += -I$(srcdir)/gl -I$(builddir)/gl

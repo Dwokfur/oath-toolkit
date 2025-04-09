@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2023-2024 Simon Josefsson
+# Copyright (C) 2023-2025 Simon Josefsson
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,5 +19,122 @@ printf "gdoc_MANS =\ngdoc_TEXINFOS =\n" > liboath/man/Makefile.gdoc
 printf "gdoc_MANS =\ngdoc_TEXINFOS =\n" > libpskc/man/Makefile.gdoc
 
 touch ChangeLog
+
+mkdir liboath/m4 oathtool/m4 libpskc/m4 pskctool/m4 pam_oath/m4
+
+if command -v gtkdocize > /dev/null; then
+    cd liboath
+    gtkdocize --copy
+    cd ..
+
+    cd libpskc
+    gtkdocize --copy
+    cd ..
+else
+    echo "warning: gtkdocize missing -- gtk-doc manual will be missing"
+
+    # Pacify autoreconf's invocation of gtkdocize.
+    GTKDOCIZE="true gtkdocize"
+    export GTKDOCIZE
+
+    # rm because gtk-doc.make might be a link to a protected file
+    rm -f liboath/gtk-doc.make libpskc/gtk-doc.make
+    echo "EXTRA_DIST =" > liboath/gtk-doc.make
+    echo "CLEANFILES =" >> liboath/gtk-doc.make
+    echo "EXTRA_DIST =" > libpskc/gtk-doc.make
+    echo "CLEANFILES =" >> libpskc/gtk-doc.make
+fi
+
+gnulib-tool --import \
+  --local-dir=gl/override \
+  --lib=libgnu \
+  --source-base=gl \
+  --m4-base=gl/m4 \
+  --doc-base=doc \
+  --tests-base=gl/tests \
+  --aux-dir=build-aux \
+  --no-conditional-dependencies \
+  --libtool \
+  --macro-prefix=gl \
+  --no-vc-files \
+  announce-gen \
+  autobuild \
+  do-release-commit-and-tag \
+  error \
+  getline \
+  git-version-gen \
+  gitlog-to-changelog \
+  maintainer-makefile \
+  parse-datetime \
+  parse-duration \
+  progname \
+  read-file \
+  update-copyright \
+  vasprintf \
+  version-etc \
+  version-stamp
+rm -fv doc/parse-datetime.texi
+
+cd liboath
+gnulib-tool --import \
+  --local-dir=gl/override \
+  --lib=libgnu \
+  --source-base=gl \
+  --m4-base=gl/m4 \
+  --doc-base=doc \
+  --tests-base=gl/tests \
+  --aux-dir=build-aux \
+  --lgpl=2 \
+  --no-conditional-dependencies \
+  --libtool \
+  --macro-prefix=gl \
+  base32 \
+  c-ctype \
+  crypto/gc-hmac-sha1 \
+  crypto/gc-hmac-sha256 \
+  crypto/gc-hmac-sha512 \
+  fclose \
+  fopen-gnu \
+  fseeko \
+  fsync \
+  getline \
+  lib-symbol-versions \
+  lib-symbol-visibility \
+  manywarnings \
+  rename \
+  snprintf \
+  strdup-posix \
+  strptime \
+  strtok_r \
+  strverscmp \
+  sys_stat-h \
+  unlink \
+  valgrind-tests
+cd ..
+
+cd libpskc
+gnulib-tool --import \
+  --local-dir=gl/override \
+  --lib=libgnu \
+  --source-base=gl \
+  --m4-base=gl/m4 \
+  --doc-base=doc \
+  --tests-base=gl/tests \
+  --aux-dir=build-aux \
+  --lgpl=2 \
+  --no-conditional-dependencies \
+  --libtool \
+  --macro-prefix=gl \
+  base64 \
+  free-posix \
+  inttostr \
+  lib-symbol-versions \
+  lib-symbol-visibility \
+  manywarnings \
+  minmax \
+  strptime \
+  strverscmp \
+  valgrind-tests
+cd ..
 
 autoreconf --force --install

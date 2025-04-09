@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2024 Simon Josefsson
+# Copyright (C) 2009-2025 Simon Josefsson
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,53 +13,53 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CFGFLAGS = --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings	\
-	--enable-root-tests --enable-valgrind-tests
+old_NEWS_hash = d41d8cd98f00b204e9800998ecf8427e
 
-INDENT_SOURCES = `find . -name '*.[ch]' | grep -v -e /gl/ -e build-aux -e /config.h -e _cmd.`
+guix = $(shell command -v guix > /dev/null && echo ,guix)
+bootstrap-tools = git,gnulib,autoconf,automake,libtoolize,make,bison,help2man,gengetopt,gtkdocize,tar,gzip$(guix)
 
-# syntax-check
-VC_LIST_ALWAYS_EXCLUDE_REGEX = ^GNUmakefile|maint.mk|build-aux/|gl/|m4/libxml2.m4|oathtool/doc/parse-datetime.texi|(liboath|libpskc)/man/gdoc|liboath/gtk-doc.make|libpskc/gtk-doc.make|libpskc/schemas/|(oathtool|liboath)/(build-aux|gl)/.*$$
-# syntax-check: Project wide exceptions on philosophical grounds.
-local-checks-to-skip = sc_GPL_version sc_immutable_NEWS	\
-	sc_prohibit_strcmp
-# syntax-check: Re-add when we have translation.
+# syntax-check.
+VC_LIST_ALWAYS_EXCLUDE_REGEX = ^(liboath|libpskc)/man/gdoc|libpskc/schemas/$$
+
+# Project wide exceptions on philosophical grounds.
+local-checks-to-skip = sc_GPL_version sc_prohibit_strcmp
+# Re-add when we have translation.
 local-checks-to-skip += sc_unmarked_diagnostics sc_bindtextdomain
-# syntax-check: Revisit these soon.
+# Revisit these soon.
 local-checks-to-skip += sc_prohibit_atoi_atof sc_prohibit_gnu_make_extensions
-# syntax-check: The following requires gnulib-srcdir.
-local-checks-to-skip += sc_prohibit_intprops_without_use sc_prohibit_always-defined_macros
+# The following requires gnulib-srcdir.
+local-checks-to-skip += sc_prohibit_intprops_without_use sc_prohibit_always-defined_macros sc_prohibit_always_true_header_tests
+
 # syntax-check: Explicit syntax-check exceptions.
-exclude_file_name_regexp--sc_program_name = ^liboath/tests/|libpskc/examples/|libpskc/tests/|pam_oath/tests/
-exclude_file_name_regexp--sc_texinfo_acronym = ^oathtool/doc/parse-datetime.texi
-exclude_file_name_regexp--sc_error_message_uppercase = ^oathtool/oathtool.c|pskctool/pskctool.c
-exclude_file_name_regexp--sc_require_config_h = ^libpskc/examples/
-exclude_file_name_regexp--sc_require_config_h_first = $(exclude_file_name_regexp--sc_require_config_h)
-exclude_file_name_regexp--sc_trailing_blank = ^m4/pkg.m4|libpskc/examples/pskctool-h.txt$$
-exclude_file_name_regexp--sc_two_space_separator_in_usage = ^pskctool/tests/
-exclude_file_name_regexp--sc_space_tab = ^m4/pkg.m4$$
 exclude_file_name_regexp--sc_avoid_if_before_free = ^pam_oath/pam_modutil.c$$
+exclude_file_name_regexp--sc_codespell = ^m4/pkg.m4$$
+exclude_file_name_regexp--sc_error_message_uppercase = ^oathtool/oathtool.c|pskctool/pskctool.c$$
+exclude_file_name_regexp--sc_fsf_postal = ^m4/pkg.m4$$
+exclude_file_name_regexp--sc_program_name = ^liboath/tests/|libpskc/examples/|libpskc/tests/|pam_oath/tests/
+exclude_file_name_regexp--sc_prohibit_empty_lines_at_EOF = ^(liboath/|libpskc/|)gl/override/.*|libpskc/schemas/xenc-schema.xsd$$
+exclude_file_name_regexp--sc_prohibit_have_config_h = ^liboath/tests/tst_fopen-wx.c$$
 exclude_file_name_regexp--sc_readme_link_copying = ^libpskc/README|pam_oath/README$$
 exclude_file_name_regexp--sc_readme_link_install = $(exclude_file_name_regexp--sc_readme_link_copying)
-exclude_file_name_regexp--sc_prohibit_have_config_h = ^liboath/tests/tst_fopen-wx.c$$
-exclude_file_name_regexp--sc_fsf_postal = ^m4/pkg.m4$$
+exclude_file_name_regexp--sc_require_config_h = ^libpskc/examples/
+exclude_file_name_regexp--sc_require_config_h_first = $(exclude_file_name_regexp--sc_require_config_h)
+exclude_file_name_regexp--sc_space_tab = ^m4/pkg.m4$$
+exclude_file_name_regexp--sc_trailing_blank = ^m4/pkg.m4|libpskc/examples/pskctool-h.txt|libpskc/schemas/xmldsig-core-schema.xsd|(liboath/|libpskc/|)gl/override/.*|libpskc/schemas/xenc-schema.xsd$$
+exclude_file_name_regexp--sc_two_space_separator_in_usage = ^pskctool/tests/
+
+TAR_OPTIONS += --mode=go+u,go-w --mtime=$(abs_top_srcdir)/NEWS
+
+announce_gen_args = --cksum-checksums
+url_dir_list = https://download.savannah.nongnu.org/releases/oath-toolkit
+
+DIST_ARCHIVES += $(shell \
+	if test -e $(srcdir)/.git && command -v git > /dev/null; then \
+		echo $(PACKAGE)-v$(VERSION)-src.tar.gz; \
+	fi)
 
 update-copyright-env = UPDATE_COPYRIGHT_HOLDER="Simon Josefsson" UPDATE_COPYRIGHT_USE_INTERVALS=2
 
-# maint.mk's public-submodule-commit breaks on shallow gnulib
-# https://lists.gnu.org/archive/html/bug-gnulib/2022-08/msg00040.html
-# so let's disable it - XXX FIXME let's revisit this later
-submodule-checks =
-gl_public_submodule_commit =
-
-glimport:
-	cd liboath && gtkdocize --copy
-	cd libpskc && gtkdocize --copy
-	gnulib-tool --add-import
-	cd liboath && gnulib-tool --add-import
-	cd oathtool && gnulib-tool --add-import
-	cd libpskc && gnulib-tool --add-import
-	cd pskctool && gnulib-tool --add-import
+my-update-copyright: update-copyright
+	perl -pi -e "s/-20.. Simon Josefsson/-`(date +%Y)` Simon Josefsson/" liboath/man/Makefile.am libpskc/man/Makefile.am
 
 review-diff:
 	git diff `git describe --abbrev=0`.. \
@@ -67,20 +67,6 @@ review-diff:
 	| filterdiff -p 1 -x 'build-aux/*' -x '*/build-aux/*' -x 'gl/*' -x '*/gl/*' -x 'gltests/*' -x '*/gltests/*' -x 'maint.mk' -x '.gitignore' -x '.x-sc*' -x 'ChangeLog' -x 'GNUmakefile' \
 	| less
 
-# Release
-
-tag = $(PACKAGE)-$(VERSION)
-htmldir = ../www-$(PACKAGE)
-
-srcdist:
-	git archive --prefix=$(PACKAGE)-$$(git describe | sed 's,oath-toolkit-,v,')/ \
-	       -o $(PACKAGE)-$$(git describe | sed 's,oath-toolkit-,,')-src.tar.gz HEAD
-
-tarball:
-	test `git describe` = `git tag -l $(tag)`
-	$(MAKE) distcheck
-
-.PHONY: website
 website:
 	cd website && ./build-website.sh
 
@@ -96,24 +82,9 @@ website-upload:
 		git commit -m "Auto-update." && \
 		git push
 
-release-check: syntax-check tarball srcdist website website-copy
-
-release-upload-www: website-upload
+release-upload-www: website website-copy website-upload
 
 release-upload-ftp:
-	gpg -b $(distdir).tar.gz
-	gpg --verify $(distdir).tar.gz.sig
-	gpg -b $(distdir)-src.tar.gz
-	gpg --verify $(distdir)-src.tar.gz.sig
 	mkdir -p ../releases/$(PACKAGE)/
 	cp -v $(distdir).tar.gz $(distdir).tar.gz.sig $(distdir)-src.tar.gz $(distdir)-src.tar.gz.sig ../releases/$(PACKAGE)/
 	scp $(distdir).tar.gz $(distdir).tar.gz.sig $(distdir)-src.tar.gz $(distdir)-src.tar.gz.sig jas@dl.sv.nongnu.org:/releases/oath-toolkit/
-	git push
-	git push --tags
-	sha1sum $(distdir)*.tar.gz
-	sha224sum $(distdir)*.tar.gz
-
-tag: # Use "make tag VERSION=1.2.3"
-	git tag -s -m $(VERSION) $(tag)
-
-release: release-check release-upload-www release-upload-ftp

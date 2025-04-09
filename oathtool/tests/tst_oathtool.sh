@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # tst_oathtool.sh - test that oathtool works
-# Copyright (C) 2009-2024 Simon Josefsson
+# Copyright (C) 2009-2025 Simon Josefsson
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,8 +40,8 @@ dotest()
 	cmp="!="
     fi
 
-    got="$(printf "$STDIN" | $OATHTOOL $params 2> /dev/null | sed 's/\r//')"
-    err="$(printf "$STDIN" | $OATHTOOL $params 2>&1 > /dev/null | sed 's/\r//')"
+    got="$(printf "$STDIN" | $OATHTOOL $params 2> /dev/null | tr -d '\r')"
+    err="$(printf "$STDIN" | $OATHTOOL $params 2>&1 > /dev/null | tr -d '\r')"
 
     if test "`echo $got`" $cmp "`echo $expect`"; then
 	echo FAIL: oathtool $params

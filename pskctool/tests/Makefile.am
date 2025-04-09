@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2024 Simon Josefsson
+# Copyright (C) 2012-2025 Simon Josefsson
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,5 +33,5 @@ EXTRA_DIST += 20120919-test001-4282.xml
 
 # Schema validation needs the XML Schemas, use our non-installed catalog.
 TESTS_ENVIRONMENT = \
-	XML_CATALOG_FILES=$(top_builddir)/../libpskc/schemas/catalog-pskc.xml \
+	XML_CATALOG_FILES=$(builddir)/../../libpskc/schemas/catalog-pskc.xml \
 	PSKCTOOL=../pskctool$(EXEEXT)

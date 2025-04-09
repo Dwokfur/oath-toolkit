@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2024 Simon Josefsson
+# Copyright (C) 2009-2025 Simon Josefsson
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,13 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_INIT([pam_oath],
-  m4_esyscmd([../build-aux/git-version-gen --prefix oath-toolkit- ../.tarball-version]),
+  m4_esyscmd([../build-aux/git-version-gen ../.tarball-version]),
   [oath-toolkit-help@nongnu.org],,
   [https://www.nongnu.org/oath-toolkit/])
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_MACRO_DIRS([m4])
 AM_INIT_AUTOMAKE([1.13 -Wall foreign])
 
 AC_PROG_CC

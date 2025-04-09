@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2024 Simon Josefsson
+# Copyright (C) 2009-2025 Simon Josefsson
 
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as
@@ -15,7 +15,7 @@
 # <https://www.gnu.org/licenses/>.
 
 AC_INIT([liboath],
-  m4_esyscmd([../build-aux/git-version-gen --prefix oath-toolkit- ../.tarball-version]),
+  m4_esyscmd([../build-aux/git-version-gen ../.tarball-version]),
   [oath-toolkit-help@nongnu.org],,
   [https://www.nongnu.org/oath-toolkit/])
 
@@ -35,7 +35,7 @@ AC_SUBST(LT_AGE, 1)
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_MACRO_DIRS([m4 gl/m4 ../m4])
 AM_INIT_AUTOMAKE([1.13 -Wall foreign])
 
 AC_PROG_CC
@@ -44,8 +44,11 @@ AM_PROG_AR
 LT_INIT([win32-dll])
 gl_INIT
 
-# https://developer.gnome.org/gtk-doc-manual/stable/settingup_autoconf.html.en
+m4_ifdef([GTK_DOC_CHECK], [
 GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
+],[
+AM_CONDITIONAL([ENABLE_GTK_DOC], false)
+])
 
 AC_ARG_ENABLE([gcc-warnings],
   [AS_HELP_STRING([--enable-gcc-warnings],

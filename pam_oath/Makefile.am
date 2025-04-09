@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2024 Simon Josefsson
+# Copyright (C) 2009-2025 Simon Josefsson
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SUBDIRS = . tests
-
-ACLOCAL_AMFLAGS = -I m4
 
 AM_CPPFLAGS = -I$(builddir)/../liboath
 
