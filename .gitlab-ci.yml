@@ -34,7 +34,7 @@ default:
 
 .gnulib-fetch:
   script:
-  - GNULIB_REVISION=ba4e57eea99f57370842f8a1dd31ced242ba5598
+  - GNULIB_REVISION=1e72c41b486b3fdd9e523fb4b3b4f523d2743500
   - wget -nv https://gitlab.com/libidn/gnulib-mirror/-/archive/$GNULIB_REVISION/gnulib-mirror-$GNULIB_REVISION.tar.gz
   - gzip -cd gnulib-mirror-$GNULIB_REVISION.tar.gz | tar xf -
   - rm -fv gnulib-mirror-$GNULIB_REVISION.tar.gz
@@ -47,7 +47,7 @@ default:
   - (! command -v git > /dev/null) || git -C $CI_PROJECT_DIR diff --exit-code # nothing should change version controlled files
   - sha256sum *.tar.* || true
   - mkdir -pv $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/{src,log}
-  - find . -name out -prune -o -name '*.log' -print -o -name 'config.h' -print | xargs --no-run-if-empty mv --backup=numbered -v -t $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log
+  - find . -name out -prune -o -name '*.log' -print -o -name 'config.h' -print | xargs --no-run-if-empty mv --backup=numbered -v -t $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log || true
   - mv -v *-src.tar.* $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/src/ || true
   - mv -v *.tar.* $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/ || true
 
@@ -88,38 +88,64 @@ B-Guix:
   - !reference [.save-artifacts, script]
 
 B-gcc:
+  tags: [ saas-linux-medium-amd64 ]
   image: gcc:latest
   stage: build
   before_script:
   - gcc --version
-  - apt-get update -qq
-  - apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt datefudge
+  - cat /etc/os-release
+  - time apt-get update -q
+  - time apt-get install -y -q eatmydata
+  - time eatmydata apt-get install -y -q --no-install-recommends wget ca-certificates make git autoconf automake libtool bison pkgconf libpam0g-dev libxml2-dev libxmlsec1-dev libxml2-utils help2man gengetopt patch valgrind
   script:
   - !reference [.gnulib-fetch, script]
-  - ./bootstrap
-  - ./configure CC="gcc -std=gnu2x" --enable-gcc-warnings WARN_CFLAGS=-Werror
-  - make -j$(nproc) V=1
-  - make -j$(nproc) V=1 check VERBOSE=t
+  - time ./bootstrap
+  - time ./configure -C --enable-gcc-warnings CC="gcc -std=gnu2x -fsanitize=address,undefined -fno-sanitize-recover=all -fsanitize-address-use-after-scope" WARN_CFLAGS=-Werror --with-xmlsec-crypto-engine=no
+  - time make -k syntax-check
+  - time make V=1 VERBOSE=t -j$(nproc) -k check
+  - grep '^PASS tst_totp_validate' liboath/tests/tst_totp_validate.log
+  - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
+  - time make clean; rm config.cache
+  - time ./configure -C --enable-gcc-warnings CC="gcc -std=c23 -D_POSIX_C_SOURCE=200112L -fsanitize=address,undefined -fno-sanitize-recover=all -fsanitize-address-use-after-scope" WARN_CFLAGS=-Werror --with-xmlsec-crypto-engine=no
+  - time make V=1 VERBOSE=t -j$(nproc) -k check
+  - grep '^PASS tst_totp_validate' liboath/tests/tst_totp_validate.log
+  - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
+  - time make clean; rm config.cache
+  - time eatmydata apt-get install -y -q --no-install-recommends datefudge
+  - time ./configure -C --enable-gcc-warnings WARN_CFLAGS=-Werror
+  - time make V=1 VERBOSE=t -j$(nproc) -k check
   - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
-  - git status
-  - git diff --exit-code
+  - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
 
 B-clang:
+  tags: [ saas-linux-medium-amd64 ]
   image: silkeh/clang:latest
   stage: build
   before_script:
   - clang --version
-  - apt-get update -qq
-  - apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt faketime
+  - cat /etc/os-release
+  - time apt-get update -q
+  - time apt-get install -y -q eatmydata
+  - time eatmydata apt-get install -y -q --no-install-recommends wget ca-certificates make git autoconf automake libtool bison pkgconf libpam0g-dev libxml2-dev libxmlsec1-dev libxml2-utils help2man gengetopt patch valgrind
   script:
   - !reference [.gnulib-fetch, script]
-  - ./bootstrap
-  - ./configure CC="clang -std=gnu2x" --enable-gcc-warnings WARN_CFLAGS=-Werror
-  - make -j$(nproc) V=1
-  - make -j$(nproc) V=1 check VERBOSE=t
+  - time ./bootstrap
+  - time ./configure -C --enable-gcc-warnings CC="clang -std=gnu2x -gdwarf-4 -fsanitize=address,undefined -fno-sanitize-recover=all -fsanitize-address-use-after-scope" WARN_CFLAGS=-Werror --with-xmlsec-crypto-engine=no
+  - time make -k syntax-check
+  - time make V=1 VERBOSE=t -j$(nproc) -k check
+  - grep '^PASS tst_totp_validate' liboath/tests/tst_totp_validate.log
+  - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
+  - time make clean; rm config.cache
+  - time ./configure -C --enable-gcc-warnings CC="clang -std=c23 -gdwarf-4 -fsanitize=address,undefined -fno-sanitize-recover=all -fsanitize-address-use-after-scope" WARN_CFLAGS=-Werror --with-xmlsec-crypto-engine=no
+  - time make V=1 VERBOSE=t -j$(nproc) -k check
+  - grep '^PASS tst_totp_validate' liboath/tests/tst_totp_validate.log
+  - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
+  - time make clean; rm config.cache
+  - time eatmydata apt-get install -y -q --no-install-recommends datefudge
+  - time ./configure -C --enable-gcc-warnings CC="clang -gdwarf-4" WARN_CFLAGS=-Werror
+  - time make V=1 VERBOSE=t -j$(nproc) -k check
   - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
-  - git status
-  - git diff --exit-code
+  - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
 
 B-AlmaLinux8:
   image: almalinux:8
@@ -234,12 +260,12 @@ B-RockyLinux9:
   script:
   - !reference [.gnulib-fetch, script]
   - time ./bootstrap
-  - time ./configure --enable-gcc-warnings --enable-valgrind-tests
+  - time ./configure -C --enable-gcc-warnings --enable-valgrind-tests
   - time make syntax-check
   - time make -j$(nproc) V=1 VERBOSE=t check
   - make -C liboath/man compare-makefile
   - make -C libpskc/man compare-makefile
-  - time make -j$(nproc) V=1 VERBOSE=t distcheck AM_DISTCHECK_DVI_TARGET=
+  - time make -j$(nproc) V=1 VERBOSE=t distcheck
   - !reference [.save-artifacts, script]
 
 B-PureOS10:
@@ -258,51 +284,57 @@ B-Debian12:
   image: debian:12-slim
   extends: .pureosdebian
 
+.trisquelubuntu: &trisquelubuntu
+  tags: [ saas-linux-medium-amd64 ]
+  stage: build
+  variables:
+    DEBIAN_FRONTEND: noninteractive
+  before_script:
+  - cat /etc/os-release
+  - sed -i 's,http://archive.trisquel.info/trisquel,http://ftp.acc.umu.se/mirror/trisquel/packages,' /etc/apt/sources.list
+  - time apt-get update -q
+  - time apt-get install -y -q eatmydata
+  - time eatmydata apt-get install -y -q --no-install-recommends wget ca-certificates make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt datefudge patch valgrind
+  script:
+  - !reference [.gnulib-fetch, script]
+  - time ./bootstrap
+  - time ./configure -C --enable-gcc-warnings --enable-valgrind-tests
+  - time make syntax-check
+  - time make -j$(nproc) V=1 VERBOSE=t check
+  - make -C liboath/man compare-makefile
+  - make -C libpskc/man compare-makefile
+  - time make -j$(nproc) V=1 VERBOSE=t distcheck
+  - !reference [.save-artifacts, script]
+
+B-Ubuntu2204:
+  image: ubuntu:22.04
+  extends: .trisquelubuntu
+
 B-Trisquel11:
   image: kpengboy/trisquel:11.0
+  extends: .trisquelubuntu
+
+Website:
+  image: kpengboy/trisquel:11.0
   stage: build
+  variables:
+    DEBIAN_FRONTEND: noninteractive
   before_script:
   - sed -i 's,http://archive.trisquel.info/trisquel,http://ftp.acc.umu.se/mirror/trisquel/packages,' /etc/apt/sources.list
   - time apt-get update -q
   - time apt-get install -y -q eatmydata
-  - time eatmydata env DEBIAN_FRONTEND=noninteractive apt-get install -y -q wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt
-  - time eatmydata env DEBIAN_FRONTEND=noninteractive apt-get install -y -q faketime libpam-wrapper
+  - time eatmydata apt-get install -y -q --no-install-recommends wget ca-certificates make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools gengetopt datefudge patch
   - time eatmydata env DEBIAN_FRONTEND=noninteractive apt-get install -y -q asciidoc groff xsltproc
   script:
-  - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
   - !reference [.gnulib-fetch, script]
-  - ./bootstrap
-  - ./configure -C --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
-  - make -j$(nproc) syntax-check
+  - time ./bootstrap
+  - time ./configure --enable-gcc-warnings -C --enable-gtk-doc --enable-gtk-doc-pdf
   - make -j$(nproc) V=1
   - make -j$(nproc) V=1 check VERBOSE=t
   - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
   - make -j$(nproc) dist
-  - sha224sum oath-toolkit-*.tar.gz
   - cd website; ./build-website.sh; cd ..
   - !reference [.save-artifacts, script]
-  - mv -v website/html out/$CI_JOB_NAME_SLUG/
-
-B-Ubuntu2204:
-  image: ubuntu:22.04
-  stage: build
-  before_script:
-  - apt-get update -qq
-  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt
-  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq faketime libpam-wrapper
-  - env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq asciidoc groff xsltproc
-  script:
-  - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
-  - !reference [.gnulib-fetch, script]
-  - ./bootstrap
-  - ./configure -C --enable-gtk-doc --enable-gtk-doc-pdf --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests
-  - make -j$(nproc) syntax-check
-  - make -j$(nproc) V=1
-  - make -j$(nproc) V=1 check VERBOSE=t
-  - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
-  - make -j$(nproc) dist
-  - !reference [.save-artifacts, script]
-  - cd website; ./build-website.sh; cd ..
   - mv -v website/html out/$CI_JOB_NAME_SLUG/
 
 B-Debian13-arm64:
@@ -352,7 +384,7 @@ B-Debian12-coverage:
   - echo "--suppressions=$(pwd)/libpskc/tests/libpskc.supp" >> ~/.valgrindrc
   - !reference [.gnulib-fetch, script]
   - ./bootstrap
-  - ./configure --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests CFLAGS="-g --coverage"
+  - ./configure -C --enable-gcc-warnings --enable-root-tests --enable-valgrind-tests CFLAGS="-g --coverage"
   - make init-coverage
   - make -j$(nproc) V=1 VERBOSE=t build-coverage
   - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
@@ -372,10 +404,58 @@ B-Fedora39-clanganalyzer:
   script:
   - !reference [.gnulib-fetch, script]
   - ./bootstrap
-  - scan-build ./configure --with-xmlsec-crypto-engine=openssl
+  - scan-build ./configure -C --with-xmlsec-crypto-engine=openssl
   - scan-build -o clang-analyzer make -j$(nproc) V=1
   - !reference [.save-artifacts, script]
   - mv clang-analyzer/ out/$CI_JOB_NAME_SLUG/
+
+# https://clang.llvm.org/docs/AddressSanitizer.html
+# https://github.com/google/sanitizers/wiki/AddressSanitizer
+# https://github.com/google/sanitizers/wiki/AddressSanitizerFlags
+# https://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html
+# https://clang.llvm.org/docs/LeakSanitizer.html
+# https://github.com/google/sanitizers/wiki/AddressSanitizerLeakSanitizer
+# https://lists.gnu.org/archive/html/bug-gnulib/2022-03/msg00016.html
+B-F41-clang-Sanitizer:
+  image: fedora:41
+  stage: build
+  before_script:
+  - time dnf -y update
+  - time dnf install -y wget make patch git autoconf automake libtool bison pam-devel libxml2-devel help2man valgrind gengetopt
+  - time dnf install -y clang
+  script:
+  - !reference [.gnulib-fetch, script]
+  - time ./bootstrap
+  - time env ASAN_OPTIONS=detect_leaks=0 ./configure -C --enable-gcc-warnings CC=clang CFLAGS="-g -O0 -fsanitize=undefined -fsanitize=address -fno-sanitize-recover=all -fsanitize-address-use-after-scope -D_FORTIFY_SOURCE=0"
+  - time env ASAN_OPTIONS=detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 make check VERBOSE=t V=1
+  - grep '^PASS tst_oathtool' oathtool/tests/tst_oathtool.sh.log
+  - grep '^PASS tst_validate' libpskc/tests/tst_validate.log
+  - make clean; rm config.cache
+  - time env ASAN_OPTIONS=detect_leaks=0 ./configure -C --enable-gcc-warnings CC=clang CFLAGS="-g -O1 -fsanitize=undefined -fsanitize=address -fno-sanitize-recover=all -fsanitize-address-use-after-scope"
+  - time env ASAN_OPTIONS=detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 make check VERBOSE=t V=1
+  - grep '^PASS tst_oathtool' oathtool/tests/tst_oathtool.sh.log
+  - grep '^PASS tst_validate' libpskc/tests/tst_validate.log
+  - make clean; rm config.cache
+  - time env ASAN_OPTIONS=detect_leaks=0 ./configure -C --enable-gcc-warnings CC=clang CFLAGS="-g -O2 -fsanitize=undefined -fsanitize=address -fno-sanitize-recover=all -fsanitize-address-use-after-scope"
+  - time env ASAN_OPTIONS=detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 make check VERBOSE=t V=1
+  - grep '^PASS tst_oathtool' oathtool/tests/tst_oathtool.sh.log
+  - grep '^PASS tst_validate' libpskc/tests/tst_validate.log
+
+B-OpenBSD:
+  tags: [ openbsd ]
+  stage: build
+  before_script:
+  - id
+  - uname -a
+  - sysctl hw
+  script:
+  - !reference [.gnulib-fetch, script]
+  - time env AUTOCONF_VERSION=2.72 AUTOMAKE_VERSION=1.16 ./bootstrap
+  - time ./configure -C --enable-gcc-warnings
+  - time make V=1
+  - time make V=1 check VERBOSE=t
+  - grep '^PASS tst_oathtool' oathtool/tests/tst_oathtool.sh.log
+  - grep '^PASS tst_validate' libpskc/tests/tst_validate.log
 
 # https://docs.gitlab.com/ee/ci/runners/saas/macos/environment.html
 B-macOS14Xcode15:
@@ -391,20 +471,47 @@ B-macOS14Xcode15:
     HOMEBREW_NO_INSTALL_CLEANUP: 1
     HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
   before_script:
-  - brew install autoconf automake libtool gengetopt bison gtk-doc help2man libxmlsec1
+  - time brew install autoconf automake libtool gengetopt bison help2man libxmlsec1
   script:
   - PATH="/opt/homebrew/opt/bison/bin:$PATH" # brew bison is keg-only
   - !reference [.gnulib-fetch, script]
-  - ./bootstrap
-  - ./configure --enable-gcc-warnings
-  - make -j$(nproc) syntax-check
-  - make -j$(nproc) V=1
-  - make -j$(nproc) V=1 -k check VERBOSE=t
-  - git status
-  - git restore liboath/gtk-doc.make libpskc/gtk-doc.make
-  - git diff --exit-code
+  - time ./bootstrap
+  - time ./configure --enable-gcc-warnings
+  - time make -j$(nproc) syntax-check
+  - time make -j$(nproc) V=1
+  - time make -j$(nproc) V=1 -k check VERBOSE=t
+  - grep '^PASS tst_sign.sh' pskctool/tests/tst_sign.sh.log
+  - time env XML_CATALOG_FILES="$HOMEBREW_PREFIX/etc/xml/catalog" make V=1 TAR=gtar dist
+  - !reference [.save-artifacts, script]
 
-# https://docs.gitlab.com/ee/ci/runners/saas/windows_saas_runner.html
+# https://docs.gitlab.com/ee/ci/runners/saas/macos/environment.html
+B-macOS15Xcode16:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
+  image: macos-15-xcode-16
+  tags: [ saas-macos-large-m2pro ]
+  stage: build
+  variables:
+    HOMEBREW_NO_AUTO_UPDATE: 1
+    HOMEBREW_NO_INSTALL_UPGRADE: 1
+    HOMEBREW_NO_INSTALL_CLEANUP: 1
+    HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
+  before_script:
+  - time brew install autoconf automake libtool gengetopt bison help2man libxmlsec1
+  script:
+  - PATH="/opt/homebrew/opt/bison/bin:$PATH" # brew bison is keg-only
+  - !reference [.gnulib-fetch, script]
+  - time ./bootstrap
+  - time ./configure --enable-gcc-warnings
+  - time make -j$(nproc) syntax-check
+  - time make -j$(nproc) V=1
+  - time make -j$(nproc) V=1 -k check VERBOSE=t
+  - grep '^PASS tst_sign.sh' pskctool/tests/tst_sign.sh.log
+  - time env XML_CATALOG_FILES="$HOMEBREW_PREFIX/etc/xml/catalog" make V=1 TAR=gtar dist
+  - !reference [.save-artifacts, script]
+
+# https://docs.gitlab.com/ci/runners/hosted_runners/windows/
 B-Windows-UCRT64:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -412,30 +519,83 @@ B-Windows-UCRT64:
   tags: [ saas-windows-medium-amd64 ]
   stage: build
   script: # https://www.msys2.org/docs/ci/#other-systems
-  - wget.exe --no-check-certificate -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - wget.exe -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
   - ./msys2.exe -y -oC:\
   - Remove-Item msys2.exe
   - $env:CHERE_INVOKING = 'yes'
   - $env:MSYSTEM = 'UCRT64' # https://www.msys2.org/docs/environments/
   - C:\msys64\usr\bin\bash -lc ' '
   - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
-  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
   - |
     C:\msys64\usr\bin\bash -lcx '
-    pacman --noconfirm -Syu git autoconf automake libtool make mingw-w64-ucrt-x86_64-gcc bison gtk-doc gengetopt help2man
+    pacman --noconfirm -Syu git autoconf automake libtool patch make mingw-w64-ucrt-x86_64-gcc bison gtk-doc gengetopt help2man
     # https://docs.github.com/en/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
+    git status
+    git describe
     file configure.ac
     git config --global core.autocrlf false
     git config --global core.eol lf
     git rm -rf --cached . | tail
     git reset --hard HEAD
+    git status
+    git describe
     file configure.ac
-    GNULIB_REVISION=c89cd2fbd3b9f3d7c5a146247256599714c91ec7
+    GNULIB_REVISION=$(grep GNULIB_REVISION=[0-9a-f] .gitlab-ci.yml | sed s,.*GNULIB_REVISION=,,)
     wget -nv https://gitlab.com/libidn/gnulib-mirror/-/archive/$GNULIB_REVISION/gnulib-mirror-$GNULIB_REVISION.tar.gz
-    gzip -cd gnulib-mirror-$GNULIB_REVISION.tar.gz | tar xf -
+    tar xfa gnulib-mirror-$GNULIB_REVISION.tar.gz
     rm -fv gnulib-mirror-$GNULIB_REVISION.tar.gz
+    export GNULIB_SRCDIR=gnulib-mirror-$GNULIB_REVISION
     export PATH=$PWD/gnulib-mirror-$GNULIB_REVISION:$PATH
     ./bootstrap
+    ./configure -C --enable-gcc-warnings
+    make -j$(nproc) V=1 -k check VERBOSE=t'
+  - C:\msys64\usr\bin\bash -lc 'grep ^PASS liboath/tests/tst_totp_validate.log'
+
+Windows-MINGW64:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
+  tags: [ saas-windows-medium-amd64 ]
+  stage: test
+  needs: [B-Guix]
+  script: # https://www.msys2.org/docs/ci/#other-systems
+  - wget.exe --no-check-certificate -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - ./msys2.exe -y -oC:\
+  - Remove-Item msys2.exe
+  - $env:CHERE_INVOKING = 'yes'
+  - $env:MSYSTEM = 'MINGW64' # https://www.msys2.org/docs/environments/
+  - C:\msys64\usr\bin\bash -lc ' '
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - |
+    C:\msys64\usr\bin\bash -lcx '
+    pacman --noconfirm -Syu make mingw-w64-x86_64-gcc
+    tar xfa out/b-guix/oath-toolkit-*.tar.gz
+    cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
+    ./configure -C --enable-gcc-warnings
+    make -j$(nproc) V=1 -k check VERBOSE=t'
+
+Windows-MSYS:
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  - when: manual
+  tags: [ saas-windows-medium-amd64 ]
+  stage: test
+  needs: [B-Guix]
+  script: # https://www.msys2.org/docs/ci/#other-systems
+  - wget.exe --no-check-certificate -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
+  - ./msys2.exe -y -oC:\
+  - Remove-Item msys2.exe
+  - $env:CHERE_INVOKING = 'yes'
+  - $env:MSYSTEM = 'MSYS' # https://www.msys2.org/docs/environments/
+  - C:\msys64\usr\bin\bash -lc ' '
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
+  - |
+    C:\msys64\usr\bin\bash -lcx '
+    pacman --noconfirm -Syu make gcc
+    tar xfa out/b-guix/oath-toolkit-*.tar.gz
+    cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
     ./configure -C --enable-gcc-warnings
     make -j$(nproc) V=1 -k check VERBOSE=t'
 
@@ -476,7 +636,7 @@ Coverity:
 0-compare:
   image: alpine:latest
   stage: repro
-  needs: [ B-PureOS10, B-Debian11, B-Devuan5, B-Debian12, B-AlmaLinux8, B-AlmaLinux9, B-RockyLinux8, B-RockyLinux9, B-Trisquel11, B-Ubuntu2204, B-Guix, R-Guix, R-Debian12, R-Ubuntu2404, S-Trisquel10, S-Ubuntu2004, T-Trisquel10, T-Ubuntu2004 ]
+  needs: [ B-PureOS10, B-Debian11, B-Devuan5, B-Debian12, B-AlmaLinux8, B-AlmaLinux9, B-RockyLinux8, B-RockyLinux9, B-Trisquel11, B-Ubuntu2204, B-macOS14Xcode15, B-macOS15Xcode16, B-Guix, R-Guix, R-Debian12, R-Ubuntu2404, S-Trisquel10, S-Ubuntu2004, T-Trisquel10, T-Ubuntu2004 ]
   script:
   - cd out
   - sha256sum */*.tar.* */*/*.tar.* | sort | grep    -- -src.tar.
@@ -492,6 +652,8 @@ Coverity:
   - cmp b-almalinux8/src/*.tar.gz b-devuan5/src/*.tar.gz
   - cmp b-almalinux8/src/*.tar.gz r-guix/src/*.tar.gz
   - cmp b-almalinux8/src/*.tar.gz r-ubuntu2404/src/*v2.*.tar.gz
+  - cmp b-almalinux8/src/*.tar.gz b-macos14xcode15/src/*.tar.gz
+  - cmp b-almalinux8/src/*.tar.gz b-macos15xcode16/src/*.tar.gz
 # Confirm old git-archive (export-subst but long git describe) tarball reproducibility
   - cmp b-trisquel11/src/*.tar.gz b-ubuntu2204/src/*.tar.gz
 # Confirm really old git-archive (no export-subst) tarball reproducibility
@@ -504,6 +666,7 @@ Coverity:
   - cmp b-pureos10/*.tar.gz b-debian11/*.tar.gz
   - cmp b-trisquel11/*.tar.gz b-ubuntu2204/*.tar.gz
   - cmp t-trisquel10/*.tar.gz t-ubuntu2004/*.tar.gz
+  - cmp b-macos14xcode15/*.tar.gz b-macos15xcode16/*.tar.gz
 # Confirm 'make dist' from git-archive tarball reproducibility
   - cmp s-trisquel10/*.tar.gz s-ubuntu2004/*.tar.gz
   artifacts:
@@ -557,7 +720,7 @@ R-Guix:
       reltyp=$(cat NEWS | sed -n -e 's/.*release \([0-9.]\+\) (....-..-..) \[\(.*\)\].*/\2/p' | head -1)
     fi
   - test "$relver" != "97.23.42" || make release-commit RELEASE="$relver $reltyp"
-  - make release RELEASE="$relver $reltyp" V=1 VERBOSE=t AM_DISTCHECK_DVI_TARGET=
+  - make release RELEASE="$relver $reltyp" V=1 VERBOSE=t
   - cat -n ~/announce-*
   - git diff --exit-code # nothing should change version controlled files
   - sha256sum *.tar.*
@@ -735,7 +898,7 @@ S-Trisquel10:
   - time ./configure --enable-gcc-warnings
   - grep '^VERSION = ' Makefile | grep -v UNKNOWN
   - time make -j$(nproc) check V=1 VERBOSE=t
-  - time make -j$(nproc) dist AM_DISTCHECK_DVI_TARGET=
+  - time make -j$(nproc) dist
   - sha256sum *.tar.*
   - mkdir -pv $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/{src,log}
   - find . -name out -prune -o -name '*.log' -print -o -name 'config.h' -print | xargs --no-run-if-empty mv --backup=numbered -v -t $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log
@@ -761,70 +924,22 @@ S-Ubuntu2004:
   - time ./configure --enable-gcc-warnings
   - grep '^VERSION = ' Makefile | grep -v UNKNOWN
   - time make -j$(nproc) check V=1 VERBOSE=t
-  - time make -j$(nproc) dist AM_DISTCHECK_DVI_TARGET=
+  - time make -j$(nproc) dist
   - sha256sum *.tar.*
   - mkdir -pv ../out/$CI_JOB_NAME_SLUG/{src,log}
   - find . -name out -prune -o -name '*.log' -print -o -name 'config.h' -print | xargs --no-run-if-empty mv --backup=numbered -v -t $CI_PROJECT_DIR/out/$CI_JOB_NAME_SLUG/log
   - mv -v *.tar.* ../out/$CI_JOB_NAME_SLUG/
 
-Windows-MSYS:
-  rules:
-  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  - when: manual
-  tags: [ saas-windows-medium-amd64 ]
-  stage: test
-  needs: [B-Trisquel11]
-  script: # https://www.msys2.org/docs/ci/#other-systems
-  - wget.exe --no-check-certificate -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
-  - ./msys2.exe -y -oC:\
-  - Remove-Item msys2.exe
-  - $env:CHERE_INVOKING = 'yes'
-  - $env:MSYSTEM = 'MSYS' # https://www.msys2.org/docs/environments/
-  - C:\msys64\usr\bin\bash -lc ' '
-  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
-  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
-  - |
-    C:\msys64\usr\bin\bash -lcx '
-    pacman --noconfirm -Syu make gcc
-    tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-    cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
-    ./configure -C --enable-gcc-warnings
-    make -j$(nproc) V=1 -k check VERBOSE=t'
-
-Windows-MINGW64:
-  rules:
-  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  - when: manual
-  tags: [ saas-windows-medium-amd64 ]
-  stage: test
-  needs: [B-Trisquel11]
-  script: # https://www.msys2.org/docs/ci/#other-systems
-  - wget.exe --no-check-certificate -nv -O msys2.exe https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe
-  - ./msys2.exe -y -oC:\
-  - Remove-Item msys2.exe
-  - $env:CHERE_INVOKING = 'yes'
-  - $env:MSYSTEM = 'MINGW64' # https://www.msys2.org/docs/environments/
-  - C:\msys64\usr\bin\bash -lc ' '
-  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
-  - C:\msys64\usr\bin\bash -lc 'pacman --noconfirm -Syuu'
-  - |
-    C:\msys64\usr\bin\bash -lcx '
-    pacman --noconfirm -Syu make mingw-w64-x86_64-gcc
-    tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-    cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
-    ./configure -C --enable-gcc-warnings
-    make -j$(nproc) V=1 -k check VERBOSE=t'
-
 Debian12:
   image: debian:12-slim
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   before_script:
   - apt-get update -qq
   - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings --disable-valgrind-tests
@@ -834,13 +949,13 @@ Debian12:
 Debian-testing:
   image: debian:testing-slim
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   before_script:
   - apt-get update -qq
   - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - ./configure --enable-gcc-warnings --disable-valgrind-tests
   - make -j$(nproc) check V=1 VERBOSE=t
   - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
@@ -852,30 +967,30 @@ Ubuntu2410-ppc64:
   image: ubuntu:24.10
   tags: [ ppc64 ]
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   variables:
     DEBIAN_FRONTEND: noninteractive
   before_script:
   - apt-get update -qq
   - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxml2-utils datefudge
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings --disable-valgrind-tests
   - make -j$(nproc) check V=1 VERBOSE=t
 
 Ubuntu2410-xmlsec:
   image: ubuntu:24.10
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   variables:
     DEBIAN_FRONTEND: noninteractive
   before_script:
   - apt-get update -qq
   - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings --disable-valgrind-tests
   - make -j$(nproc) check V=1 VERBOSE=t
   - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
@@ -883,32 +998,33 @@ Ubuntu2410-xmlsec:
 Ubuntu-xmlsec:
   image: ubuntu:20.04
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   variables:
     DEBIAN_FRONTEND: noninteractive
   before_script:
   - apt-get update -qq
   - apt-get install -y -qq make gcc pkg-config libpam0g-dev libxmlsec1-dev libxml2-utils datefudge
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings --disable-valgrind-tests
   - make -j$(nproc) check V=1 VERBOSE=t
+  - grep '^PASS tst_sign.sh' pskctool/tests/tst_sign.sh.log
 
 AlmaLinux8-xmlsec:
   image: almalinux:8
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   before_script:
   - yum -y install make gcc diffutils file pam-devel
   - yum -y install libxml2-devel libtool-ltdl-devel
   - dnf -y install epel-release
   - dnf -y install --enablerepo=powertools indent xmlsec1-openssl-devel
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings --disable-valgrind-tests --with-xmlsec-crypto-engine=openssl
   - make -j$(nproc) syntax-check
   - make -j$(nproc) check V=1 VERBOSE=t
@@ -917,14 +1033,14 @@ AlmaLinux8-xmlsec:
 AlmaLinux9-openssl:
   image: almalinux:9
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   before_script:
   - dnf -y install make gcc diffutils file pam-devel openssl-devel
   - dnf -y install epel-release
   - dnf -y --enablerepo=crb install libtool-ltdl-devel indent
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings --disable-valgrind-tests --with-openssl
   - make -j$(nproc) syntax-check
   - make -j$(nproc) check V=1 VERBOSE=t
@@ -936,25 +1052,25 @@ RockyLinux9-ppc64:
   image: rockylinux:9
   tags: [ ppc64 ]
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   before_script:
   - dnf -y install make gcc diffutils file pam-devel
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings
   - make -j$(nproc) check V=1 VERBOSE=t
 
 Alpine-mold:
   image: alpine:latest
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   before_script:
   - apk update
   - apk add build-base datefudge xmlsec-dev mold
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings CC='cc -fuse-ld=mold'
   - make -j$(nproc) check V=1 VERBOSE=t 2>&1 | tee build.log
   - (! grep -E 'mold. warning' build.log)
@@ -967,25 +1083,25 @@ Alpine-arm64:
   image: alpine:latest
   tags: [ saas-linux-medium-arm64 ]
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   before_script:
   - apk update
   - apk add build-base datefudge xmlsec-dev
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings
   - make -j$(nproc) check V=1 VERBOSE=t
 
 ArchLinux-xmlsec:
   image: archlinux:latest
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   before_script:
   - pacman -Suy --noconfirm make gcc diffutils file xmlsec pkg-config
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings
@@ -999,23 +1115,24 @@ Fedora39-arm64:
   image: fedora:39
   tags: [ saas-linux-medium-arm64 ]
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   before_script:
   - dnf install -y make gcc diffutils file pam-devel
   - dnf install -y libxml2-devel xmlsec1-devel xmlsec1-openssl libtool-ltdl-devel
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - ./configure -C --enable-gcc-warnings
   - make -j$(nproc) check V=1 VERBOSE=t
+  - grep '^PASS tst_sign.sh' pskctool/tests/tst_sign.sh.log
 
 Gentoo:
-  image: registry.gitlab.com/oath-toolkit/build-images:Gentoo
+  image: gentoo/stage3
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - mkdir b
   - cd b
   - ../configure --enable-gcc-warnings
@@ -1028,35 +1145,35 @@ macOS15Xcode16:
   image: macos-15-xcode-16
   tags: [ saas-macos-medium-m1 ]
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   variables:
     HOMEBREW_NO_AUTO_UPDATE: 1
     HOMEBREW_NO_INSTALL_UPGRADE: 1
     HOMEBREW_NO_INSTALL_CLEANUP: 1
     HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
   before_script:
-  - brew install libxmlsec1
+  - time brew install libxmlsec1
   script:
-  - gzip -cd out/b-trisquel11/oath-toolkit-*.tar.gz | tar xf -
-  - cd $(gzip -cd out/b-trisquel11/oath-toolkit-*.tar.gz | tar tf - | head -n1)
+  - gzip -cd out/b-guix/oath-toolkit-*.tar.gz | tar xf -
+  - cd $(gzip -cd out/b-guix/oath-toolkit-*.tar.gz | tar tf - | head -n1)
   - mkdir b
   - cd b
-  - ../configure --enable-gcc-warnings
+  - time ../configure --enable-gcc-warnings
   - make -j$(nproc) syntax-check
-  - make -j$(nproc) V=1 check VERBOSE=t
+  - time make -j$(nproc) V=1 check VERBOSE=t
 
 Mingw32:
   image: debian:11-slim
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   before_script:
   - dpkg --add-architecture i386
   - apt-get update -qq
   - apt-get install -y -qq make mingw-w64 wine wine32 wine64 libwine libwine:i386 binfmt-support wine-binfmt
   - update-binfmts --enable wine
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - ./configure --host=i686-w64-mingw32 CC='i686-w64-mingw32-gcc -static-libgcc' CPPFLAGS=-D_FORTIFY_SOURCE=0
   - make -j$(nproc) V=1
   - make -j$(nproc) -C liboath/tests check VERBOSE=t
@@ -1065,28 +1182,42 @@ Mingw32:
 Mingw64:
   image: debian:11-slim
   stage: test
-  needs: [B-Trisquel11]
+  needs: [B-Guix]
   before_script:
   - apt-get update -qq
   - apt-get install -y -qq make mingw-w64 wine wine64 binfmt-support wine-binfmt
   - update-binfmts --enable wine
   script:
-  - tar xfa out/b-trisquel11/oath-toolkit-*.tar.gz
-  - cd $(tar tfa out/b-trisquel11/oath-toolkit-*.tar.gz | head -n1)
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
   - ./configure --host=x86_64-w64-mingw32 CPPFLAGS=-D_FORTIFY_SOURCE=0
   - make -j$(nproc) V=1
   - make -j$(nproc) -C liboath/tests check VERBOSE=t
   - make -j$(nproc) -C oathtool/tests check VERBOSE=T
 
+OpenBSD:
+  tags: [ openbsd ]
+  needs: [B-Guix]
+  stage: test
+  before_script:
+  - id
+  - uname -a
+  - sysctl hw
+  script:
+  - tar xfz out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfz out/b-guix/oath-toolkit-*.tar.gz | head -n1)
+  - time ./configure --enable-gcc-warnings
+  - time make check V=1 VERBOSE=t
+
 .pages:
   image: alpine:latest
   stage: build
-  needs: ["B-Trisquel11", "B-Debian12-coverage", "B-Fedora39-clanganalyzer"]
+  needs: ["Website", "B-Debian12-coverage", "B-Fedora39-clanganalyzer"]
   script:
   - mkdir public
   - mv out/b-debian12-coverage/coverage/ public/
   - mv out/b-fedora39-clanganalyzer/clang-analyzer public/
-  - mv out/b-trisquel11/html/* public/
+  - mv out/website/html/* public/
   artifacts:
     paths:
     - public
