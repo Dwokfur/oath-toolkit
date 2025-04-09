@@ -273,14 +273,18 @@ pam_sm_authenticate (pam_handle_t *pamh,
   int nargs = 1;
   struct cfg cfg;
   char *query_prompt = NULL;
-  char *onlypasswd = strdup ("");	/* empty passwords never match */
+  char *onlypasswd;
   uid_t pamuid = 0, old_euid = geteuid ();
   gid_t pamgid = 0, old_egid = getegid ();
+
+  if (pamh == NULL)
+    return PAM_SYSTEM_ERR;
 
   /* this has to be first in this function to avoid that cfg contain
      uninitialized variables. */
   parse_cfg (flags, argc, argv, &cfg);
 
+  onlypasswd = strdup ("");	/* empty passwords never match */
   if (!onlypasswd)
     {
       retval = PAM_BUF_ERR;
