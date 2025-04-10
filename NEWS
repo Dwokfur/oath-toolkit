@@ -1,6 +1,6 @@
 OATH Toolkit NEWS -- History of user-visible changes.           -*- outline -*-
 
-* Version 2.6.13 (unreleased)
+* Noteworthy changes in release ?.? (????-??-??) [?]
 
 ** liboath/libpskc: Fix _FORTIFY_SOURCE build problem and allow configuration.
 Some platforms (e.g., Ubuntu 24.10) set _FORTIFY_SOURCE in the default
@@ -18,7 +18,7 @@ Gnulib files are no longer stored in git version control.  As a
 consequence, gnulib is a required build dependency when building from
 git, see CONTRIBUTING.md.
 
-* Version 2.6.12 (released 2024-10-03)
+* Noteworthy changes in release 2.6.12 (2024-10-03) [stable]
 
 ** pam_oath: Drop privs when ${HOME} is used in the usersfile= setting.
 Reported by Fabian Vogt (SUSE), and associated with CVE-2024-47191.
@@ -104,7 +104,7 @@ regression testing.
 ** Various build fixes including updated gnulib files.
 Fixes Windows tzset build errors, among other things.
 
-* Version 2.6.11 (released 2024-01-11)
+* Noteworthy changes in release 2.6.11 (2024-01-11) [stable]
 
 ** liboath: Handle invalid base32 encoded secrets.  Fixes: #41.
 The gnulib update in version 2.6.10 made the base32 encoding functions
@@ -112,7 +112,7 @@ reject invalid encodings, but it appears as if these are wildly used.
 We now accept invalid encodings again.  Thanks to Dorancé Martínez and
 Seres Bendegúz for reports.
 
-* Version 2.6.10 (released 2024-01-03)
+* Noteworthy changes in release 2.6.10 (2024-01-03) [stable]
 
 ** Building from git uses a ./bootstrap script instead of 'make bootstrap'.
 
@@ -125,13 +125,13 @@ badly with the AUX special filename.
 ** Various build fixes including updated gnulib files.
 One remaining gnulib self-test disabled.
 
-* Version 2.6.9 (released 2023-07-09)
+* Noteworthy changes in release 2.6.9 (2023-07-09) [stable]
 
 ** Improve compatibility with recent libxmlsec.
 
 ** Update gnulib files, dropping gnulib self-tests.
 
-* Version 2.6.8 (released 2023-07-09)
+* Noteworthy changes in release 2.6.8 (2023-07-09) [stable]
 
 ** libpskc: Fixes for recent libxmlsec releases.
 
@@ -162,7 +162,7 @@ Thanks to David Woodhouse, see
 ** Codespell typo fixes.
 Patch by Dimitri Papadopoulos.
 
-* Version 2.6.7 (released 2021-05-01)
+* Noteworthy changes in release 2.6.7 (2021-05-01) [stable]
 
 ** pam_oath: Support variables in usersfile string parameter.
 These changes introduce the ${USER} and ${HOME} placeholder values for
@@ -192,7 +192,7 @@ rebuilding from source more safe with future automake versions.
 
 ** Updated gnulib files.
 
-* Version 2.6.6 (released 2021-01-20)
+* Noteworthy changes in release 2.6.6 (2021-01-20) [stable]
 
 ** oathtool: Handle HOTP --counter values larger than 0x7FFFFFFFFFFFFFFF.
 Thanks to Jason Lai <jason99.lai@gmail.com> for report.
@@ -203,7 +203,7 @@ Thanks to Jason Lai <jason99.lai@gmail.com> for report.
 Fixes test-parse-datetime self-check.  Fixes
 <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/20>.
 
-* Version 2.6.5 (released 2020-12-29)
+* Noteworthy changes in release 2.6.5 (2020-12-29) [stable]
 
 ** oathtool: Support for reading KEY and OTP from standard input or filename.
 KEY and OTP may now be given as '-' to mean stdin, or @FILE to read
@@ -216,7 +216,7 @@ Patch from Matthias Gerstner.
 
 ** Doc fixes.
 
-* Version 2.6.4 (released 2020-11-11)
+* Noteworthy changes in release 2.6.4 (2020-11-11) [stable]
 
 ** libpskc: New --with-xmlsec-crypto-engine to hard-code crypto engine.
 Fixes <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/16>.
@@ -249,7 +249,7 @@ Jaroslav Škarvada for the patch.
 
 ** Build fixes.
 
-* Version 2.6.3 (released 2020-11-07)
+* Noteworthy changes in release 2.6.3 (2020-11-07) [stable]
 
 ** pam_oath: Fix self-tests.
 
@@ -257,16 +257,16 @@ Jaroslav Škarvada for the patch.
 
 ** Doc fixes.
 
-* Version 2.6.2 (released 2016-08-27)
+* Noteworthy changes in release 2.6.2 (2016-08-27) [stable]
 
 ** doc: Version controlled source code repository moved to GitLab.
 
-* Version 2.6.1 (released 2015-07-31)
+* Noteworthy changes in release 2.6.1 (2015-07-31) [stable]
 
 ** liboath: Fix 'make check' on 32-bit systems.
 Report and patch by Christian Hesse.
 
-* Version 2.6.0 (released 2015-05-19)
+* Noteworthy changes in release 2.6.0 (2015-05-19) [stable]
 
 ** liboath: Support TOTP with HMAC-SHA256 and HMAC-SHA512.
 This adds new APIs oath_totp_generate2, oath_totp_validate4 and
@@ -285,7 +285,7 @@ Patch by Eero Häkkinen.
 ** The files 'gdoc' and 'expect.oath' are now included in the tarball.
 Suggested by Jaroslav Škarvada.
 
-* Version 2.4.1 (released 2014-02-12)
+* Noteworthy changes in release 2.4.1 (2014-02-12) [stable]
 
 ** liboath: Fix usersfile bug that caused it to update the wrong line.
 When an usersfile contain multiple lines for the same user but with an
@@ -296,7 +296,7 @@ multiple times which is a security vulnerability.  Reported by Bas van
 Schaik <bas@sj-vs.net> and patch provided by Ilkka Virta
 <itvirta@iki.fi>.  CVE-2013-7322
 
-* Version 2.4.0 (released 2013-07-21)
+* Noteworthy changes in release 2.4.0 (2013-07-21) [stable]
 
 ** liboath: Add new API methods for validating TOTP OTPs
 The new methods (oath_totp_validate3 and oath_totp_validate3_callback)
@@ -305,7 +305,7 @@ counter used to calculate the OTP (unless it is a NULL pointer). This
 allows for easier OTP replay detection in applications using liboath.
 Patch from Fabian Grünbichler <fabian.gruenbichler@tuwien.ac.at>.
 
-* Version 2.2.0 (released 2013-07-07)
+* Noteworthy changes in release 2.2.0 (2013-07-07) [stable]
 
 ** libpskc: Add functions for setting PSKC data.
 The new functions are pskc_add_keypackage and all pskc_set_* functions
@@ -327,7 +327,7 @@ Hesse <list@eworm.de>.
 ** liboath: Make header file usable from C++ (extern "C" guard).
 Reported by Alan Markus <alan.markus@gmail.com>.
 
-* Version 2.0.2 (released 2013-01-08)
+* Noteworthy changes in release 2.0.2 (2013-01-08) [stable]
 
 ** oathtool: Base32 decoding of keys are now more liberal in what accepts.
 It can now accept keys on the "gr6d 5br7 25s6 vnck v4vl hlao re"
@@ -345,7 +345,7 @@ The last release would only complete 'make check' during a 30 day window.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 2.0.1 (released 2012-10-24)
+* Noteworthy changes in release 2.0.1 (2012-10-24) [stable]
 
 ** libpskc, pskctool: Support sign and verify of PSKC data using XML DigSig.
 
@@ -359,7 +359,7 @@ Quin for hints about XML catalogs.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 2.0.0 (released 2012-10-10)
+* Noteworthy changes in release 2.0.0 (2012-10-10) [stable]
 
 ** libpskc, pskctool: New components.
 The OATH Toolkit now supports the Portable Symmetric Key Container
@@ -375,7 +375,7 @@ disabled unconditionally using the ./configure-parameter
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.12.6 (released 2012-09-04)
+* Noteworthy changes in release 1.12.6 (2012-09-04) [stable]
 
 ** liboath: The usersfile is now fflush'ed and fsync'ed.
 ** liboath: A memory leak fixed.
@@ -389,7 +389,7 @@ OATH_FILE_SYNC_ERROR: Added.
 OATH_FILE_CLOSE_ERROR: Added.
 OATH_LAST_ERROR: Added.
 
-* Version 1.12.5 (released 2012-08-19)
+* Noteworthy changes in release 1.12.5 (2012-08-19) [stable]
 
 ** oathtool: The --counter parameter now supports larger values.
 Before it used an 'int' type and now it uses a 'longlong' type.
@@ -401,7 +401,7 @@ initial counter.  Reported by <cameron.bradley@wiretap.net.nz> see
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.12.4 (released 2012-06-17)
+* Noteworthy changes in release 1.12.4 (2012-06-17) [stable]
 
 ** liboath: Usersfile code handles multiple lines for a single user.
 This can be used when a single user carries multiple tokens (with
@@ -410,14 +410,14 @@ Suggested by Tim Eggleston <lists@timeggleston.co.uk>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.12.3 (released 2012-05-31)
+* Noteworthy changes in release 1.12.3 (2012-05-31) [stable]
 
 ** pam_oath: Fix "try_first_pass".
 Patch from Christian Hesse <list@eworm.de>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.12.2 (released 2012-04-04)
+* Noteworthy changes in release 1.12.2 (2012-04-04) [stable]
 
 ** liboath: usersfile function now works on FreeBSD.
 Reported by Fredrik Lindgren <fredrik@lindgren.pp.se>.
@@ -427,14 +427,14 @@ Reported by Fredrik Lindgren <fredrik@lindgren.pp.se>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.12.1 (released 2012-04-01)
+* Noteworthy changes in release 1.12.1 (2012-04-01) [stable]
 
 ** liboath, oathtool: Base32 decoding now permit lowercase characters.
 Reported by Martin Michlmayr <tbm@cyrius.com>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.12.0 (released 2012-04-01)
+* Noteworthy changes in release 1.12.0 (2012-04-01) [stable]
 
 ** oathtool: Added --base32 parameter to decode base32 keys.
 Suggested by Martin Michlmayr <tbm@cyrius.com>.
@@ -457,7 +457,7 @@ OATH_INVALID_BASE32: New error code.
 OATH_BASE32_OVERFLOW: New error code.
 OATH_MALLOC_ERROR: New error code.
 
-* Version 1.10.5 (released 2012-01-03)
+* Noteworthy changes in release 1.10.5 (2012-01-03) [stable]
 
 ** Build fixes.
 From Linus Nordberg <linus@nordberg.se> and Arno Hautala
@@ -467,7 +467,7 @@ From Linus Nordberg <linus@nordberg.se> and Arno Hautala
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.10.4 (released 2011-08-12)
+* Noteworthy changes in release 1.10.4 (2011-08-12) [stable]
 
 ** liboath: Fix build so that OATH_VERSION_NUMBER is actually defined.
 It was an empty value in the last release due to a bug in the build
@@ -475,7 +475,7 @@ scripts.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.10.3 (released 2011-08-12)
+* Noteworthy changes in release 1.10.3 (2011-08-12) [stable]
 
 ** liboath: Allow strcmp callback to return negative to signal errors.
 Patch by Daniel Pocock <daniel@pocock.com.au>.
@@ -486,7 +486,7 @@ Patch by Daniel Pocock <daniel@pocock.com.au>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.10.2 (released 2011-06-12)
+* Noteworthy changes in release 1.10.2 (2011-06-12) [stable]
 
 ** liboath: Fix self tests to cope with slow build hosts.
 Reported by Christoph Egger <christoph@debian.org> in
@@ -494,7 +494,7 @@ Reported by Christoph Egger <christoph@debian.org> in
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.10.1 (released 2011-06-12)
+* Noteworthy changes in release 1.10.1 (2011-06-12) [stable]
 
 ** liboath: Fix self tests to work regardless of local time zone.
 
@@ -502,7 +502,7 @@ Reported by Christoph Egger <christoph@debian.org> in
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.10.0 (released 2011-05-24)
+* Noteworthy changes in release 1.10.0 (2011-05-24) [stable]
 
 ** liboath: Added new TOTP validation functions that return search position.
 Before the absolute value of the search position was in the return
@@ -519,21 +519,21 @@ Supported algorithms are HOTP/T30/D and HOTP/T60/D where D is 6, 7, or
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.8.2 (released 2011-05-04)
+* Noteworthy changes in release 1.8.2 (2011-05-04) [stable]
 
 ** build: Fix conflict between ACLOCAL_AMFLAGS and AC_CONFIG_MACRO_DIR.
 Reported by Mitya <mitya@cargosoft.ru>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.8.1 (released 2011-05-03)
+* Noteworthy changes in release 1.8.1 (2011-05-03) [stable]
 
 ** build: Make autoreconf work again.
 Reported by Christian Hesse <list@eworm.de>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.8.0 (released 2011-05-03)
+* Noteworthy changes in release 1.8.0 (2011-05-03) [stable]
 
 ** liboath: Add new APIs oath_strerror and oath_strerror_name.
 The functions are used to get a human readable description of liboath
@@ -543,7 +543,7 @@ error codes.  Suggested by Christian Hesse <mail@eworm.de>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.6.4 (released 2011-05-01)
+* Noteworthy changes in release 1.6.4 (2011-05-01) [stable]
 
 ** liboath: Increase usersfile max secret length to 32 bytes.
 Reported by Mitya <mitya@cargosoft.ru>.
@@ -568,7 +568,7 @@ Reported by Mitya <mitya@cargosoft.ru>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.6.3 (released 2011-04-25)
+* Noteworthy changes in release 1.6.3 (2011-04-25) [stable]
 
 ** pam_oath: Work under SSH by no-op'ing the setcred function.
 Reported by Fanis Dokianakis <fanis@infloop.gr>.
@@ -580,7 +580,7 @@ Patches from Linus Nordberg <linus@nordberg.se>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.6.2 (released 2011-03-10)
+* Noteworthy changes in release 1.6.2 (2011-03-10) [stable]
 
 ** pam_oath: Add ./configure --enable-root-tests parameter.
 Now this configure parameter is needed to run the self-tests that
@@ -589,14 +589,14 @@ sufficient.  Reported by Jean-Michel Pouré - GOOZE <jmpoure@gooze.eu>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.6.1 (released 2011-02-22)
+* Noteworthy changes in release 1.6.1 (2011-02-22) [stable]
 
 ** pam_oath: Improve reliability of root self test when /etc is not writable.
 Reported by Jean-Michel Pouré - GOOZE <jmpoure@gooze.eu>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.6.0 (released 2011-02-22)
+* Noteworthy changes in release 1.6.0 (2011-02-22) [stable]
 
 ** liboath: Added APIs to perform TOTP validation.
 The APIs are oath_totp_validate and oath_totp_validate_callback,
@@ -611,7 +611,7 @@ continue to work through a compatibility-#define.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.4.6 (released 2011-02-07)
+* Noteworthy changes in release 1.4.6 (2011-02-07) [stable]
 
 ** liboath: Improve portability by using more gnulib modules.
 Some non-portable constructions were fixed.  From now on gnulib will
@@ -621,14 +621,14 @@ warn for some non-portable constructs.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.4.5 (released 2011-01-27)
+* Noteworthy changes in release 1.4.5 (2011-01-27) [stable]
 
 ** liboath: Make sure gnulib files are licensed under the LGPLv2.1+.
 Thanks to Tollef Fog Heen <tfheen@debian.org>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.4.4 (released 2011-01-27)
+* Noteworthy changes in release 1.4.4 (2011-01-27) [stable]
 
 ** liboath: Fix OATH_VERSION and OATH_VERSION_NUMBER.
 I forgot to increment these symbols for the last release.  From now
@@ -639,7 +639,7 @@ Patch from Linus Nordberg <linus@nordberg.se>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.4.3 (released 2011-01-20)
+* Noteworthy changes in release 1.4.3 (2011-01-20) [stable]
 
 ** liboath: Really make usersfile logic for '-' passwords work.
 Reported by Michael Stevens <mstevens@etla.org>.
@@ -648,7 +648,7 @@ Reported by Michael Stevens <mstevens@etla.org>.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.4.2 (released 2011-01-16)
+* Noteworthy changes in release 1.4.2 (2011-01-16) [stable]
 
 ** oathtool: Really replace - with \- in man page, pointed out by lintian.
 We now also have a self check to catch any regressions in this area.
@@ -658,7 +658,7 @@ The final test requires >32 bit time_t.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.4.1 (released 2011-01-16)
+* Noteworthy changes in release 1.4.1 (2011-01-16) [stable]
 
 ** liboath: New configure parameter --enable-gcc-warnings.
 Use to enable many compiler warnings.  Enabled by default during
@@ -668,7 +668,7 @@ development.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.4.0 (released 2011-01-15)
+* Noteworthy changes in release 1.4.0 (2011-01-15) [stable]
 
 ** liboath: Added pkg-config script.
 
@@ -689,20 +689,20 @@ specify TOTP configuration.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.2.2 (released 2011-01-01)
+* Noteworthy changes in release 1.2.2 (2011-01-01) [stable]
 
 ** Cleanups related to name change.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.2.1 (released 2010-12-28)
+* Noteworthy changes in release 1.2.1 (2010-12-28) [stable]
 
 ** liboath: Install header file "oath.h".
 And various other namespace cleanups.
 
 ** API and ABI is backwards compatible with the previous version.
 
-* Version 1.2.0 (released 2010-12-27)
+* Noteworthy changes in release 1.2.0 (2010-12-27) [stable]
 
 ** Project renamed from "HOTP Toolkit" to "OATH Toolkit".
 
@@ -717,7 +717,7 @@ This is to plan for the future when the tool will also support TOTP/OCRA.
 
 ** API and ABI is not backwards compatible.
 
-* Version 1.0.1 (released 2010-12-27)
+* Noteworthy changes in release 1.0.1 (2010-12-27) [stable]
 
 ** libhotp: Fix build failure due to missing sys/stat.h include on FreeBSD 7.2.
 Reported by Kevin Quinlan <Kevin.Quinlan@polidoris.com>.
@@ -729,7 +729,7 @@ Reported by Rick van Rein <rick@openfortress.nl>.
 
 ** build: Gnulib files were updated.
 
-* Version 1.0.0 (released 2009-12-08)
+* Noteworthy changes in release 1.0.0 (2009-12-08) [stable]
 
 ** Initial release.
 
