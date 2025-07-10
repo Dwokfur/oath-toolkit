@@ -115,10 +115,8 @@ int
 main (void)
 {
   oath_rc rc;
-  char nulls[1] = "\x00";
-  char secret[32] = "\x31\x32\x33\x34\x35\x36\x37\x38\x39\x30"
-    "\x31\x32\x33\x34\x35\x36\x37\x38\x39\x30"
-    "\x31\x32\x33\x34\x35\x36\x37\x38\x39\x30\x31\x32";
+  char nulls[] = "";
+  char secret[] = "12345678901234567890123456789012";
   size_t secretlen = 20;
   char otp[10];
   uint64_t moving_factor;
