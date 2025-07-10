@@ -575,7 +575,7 @@ Windows-MINGW64:
     cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
     ./configure -C --enable-gcc-warnings
     make -j$(nproc) V=1 -k check VERBOSE=t'
-  - C:\msys64\usr\bin\bash -lc 'grep ^PASS liboath/tests/tst_totp_validate.log'
+  - C:\msys64\usr\bin\bash -lc 'grep ^PASS oath-toolkit-*/liboath/tests/tst_totp_validate.log'
 
 Windows-MSYS:
   allow_failure: true # gnulib wint_t issue, last worked in b1c8aaa5c
@@ -601,7 +601,7 @@ Windows-MSYS:
     cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
     ./configure -C --enable-gcc-warnings
     make -j$(nproc) V=1 -k check VERBOSE=t'
-  - C:\msys64\usr\bin\bash -lc 'grep ^PASS liboath/tests/tst_totp_validate.log'
+  - C:\msys64\usr\bin\bash -lc 'grep ^PASS oath-toolkit-*/liboath/tests/tst_totp_validate.log'
 
 # https://www.synopsys.com/blogs/software-security/integrating-coverity-scan-with-gitlab-ci/
 Coverity:
