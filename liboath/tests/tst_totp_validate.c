@@ -57,9 +57,8 @@ int
 main (void)
 {
   int rc;
-  char secret[20] = "\x31\x32\x33\x34\x35\x36\x37\x38\x39\x30"
-    "\x31\x32\x33\x34\x35\x36\x37\x38\x39\x30";
-  size_t secretlen = sizeof (secret);
+  char secret[] = "12345678901234567890";
+  size_t secretlen = strlen (secret);
   unsigned time_step_size = 30;
   time_t start_offset = 0;
   size_t i;
