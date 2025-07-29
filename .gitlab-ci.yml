@@ -16,10 +16,6 @@
 variables:
   GIT_DEPTH: 250
 
-workflow:
-  rules:
-  - if: $CI_COMMIT_BRANCH
-
 stages:
  - build
  - repro
