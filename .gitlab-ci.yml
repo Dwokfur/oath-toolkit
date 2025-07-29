@@ -34,7 +34,7 @@ default:
 
 .gnulib-fetch:
   script:
-  - GNULIB_REVISION=9297749090b01720888dceeb5f6dab3d52dcef40
+  - GNULIB_REVISION=e8cc0791e6bb0814cf4e88395c06d5e06655d8b5
   - wget -nv https://gitlab.com/libidn/gnulib-mirror/-/archive/$GNULIB_REVISION/gnulib-mirror-$GNULIB_REVISION.tar.gz
   - gzip -cd gnulib-mirror-$GNULIB_REVISION.tar.gz | tar xf -
   - rm -fv gnulib-mirror-$GNULIB_REVISION.tar.gz
