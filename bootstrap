@@ -138,3 +138,15 @@ gnulib-tool --import \
 cd ..
 
 autoreconf --force --install
+
+# Without running 'automake' after 'autoreconf', you will get the
+# following diff between a 'make dist' and a 'make release' tarball
+# when building GitLab CI/CD for a tag event.
+#
+# │ ├── oath-toolkit-2.6.13/Makefile.in
+# │ │ -   build-aux/config.guess build-aux/config.sub build-aux/depcomp \
+# │ │ -   build-aux/install-sh build-aux/ltmain.sh build-aux/missing \
+# │ │ -   build-aux/ylwrap
+# │ │ +   build-aux/config.guess build-aux/config.sub \
+# │ │ +   build-aux/install-sh build-aux/ltmain.sh build-aux/missing
+automake --no-force
