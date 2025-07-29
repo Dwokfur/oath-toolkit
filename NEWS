@@ -1,6 +1,6 @@
 OATH Toolkit NEWS -- History of user-visible changes.           -*- outline -*-
 
-* Noteworthy changes in release ?.? (????-??-??) [?]
+* Noteworthy changes in release 2.6.13 (2025-07-29) [stable]
 
 ** liboath/libpskc: Fix _FORTIFY_SOURCE build problem and allow configuration.
 Some platforms (e.g., Ubuntu 24.10) set _FORTIFY_SOURCE in the default
