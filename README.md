@@ -18,9 +18,8 @@ The following components are included:
 
 For updates on the project please visit our web sites:
 
- * [OATH Toolkit webpage](https://www.nongnu.org/oath-toolkit/)
- * [Savannah project page](https://savannah.nongnu.org/projects/oath-toolkit/)
- * [GitLab project page](https://gitlab.com/oath-toolkit/oath-toolkit)
+ * [OATH Toolkit webpage](https://oath-toolkit.codeberg.page/)
+ * [Codeberg project page](https://codeberg.org/oath-toolkit/oath-toolkit)
 
 # License
 
@@ -61,8 +60,8 @@ where you can find an archive of earlier posts.
 
 # Contributing
 
-To report a problem please open an issue on the GitLab OATH Toolkit
-project page: https://gitlab.com/oath-toolkit/oath-toolkit/-/issues
+To report a problem please open an issue on the OATH Toolkit issue
+tracker: https://codeberg.org/oath-toolkit/oath-toolkit/issues
 
 To build from version controlled sources, and other information for
 developers, read the file [CONTRIBUTING.md](CONTRIBUTING.md).

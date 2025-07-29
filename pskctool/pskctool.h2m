@@ -4,4 +4,4 @@ Copyright (C) 2012-2025 Simon Josefsson.  Licensed under the GPLv3+.
 pskctool \- Portable Symmetric Key Container (PSKC) tool
 [EXAMPLES]
 See
-<https://www.nongnu.org/oath-toolkit/libpskc-api/pskc-tutorial-pskctool.html>.
+<https://oath-toolkit.codeberg.page/libpskc-api/pskc-tutorial-pskctool.html>.

@@ -32,4 +32,4 @@ Selecting one of the following modes is required:
       --verify-crt=FILE  Trusted X.509 certificate for verification
 
 Report bugs to: oath-toolkit-help@nongnu.org
-OATH Toolkit home page: <https://www.nongnu.org/oath-toolkit/>
+OATH Toolkit home page: <https://oath-toolkit.codeberg.page/>

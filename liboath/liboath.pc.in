@@ -22,7 +22,7 @@ includedir=@includedir@/liboath
 
 Name: Liboath
 Description: Library for Open AuTHentication (OATH) HOTP etc support.
-URL: https://www.nongnu.org/oath-toolkit/
+URL: https://oath-toolkit.codeberg.page/
 Version: @VERSION@
 Libs: -L${libdir} -loath
 Cflags: -I${includedir}

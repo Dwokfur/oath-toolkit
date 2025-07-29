@@ -33,8 +33,8 @@
       Version &package_string;.
       The latest version of this documentation can be found on-line at
       <ulink role="online-location"
-	     url="https://www.nongnu.org/oath-toolkit/libpskc/">
-	https://www.nongnu.org/oath-toolkit/libpskc/</ulink>.
+	     url="https://oath-toolkit.codeberg.page/libpskc/">
+	https://oath-toolkit.codeberg.page/libpskc/</ulink>.
     </releaseinfo>
   </bookinfo>
 

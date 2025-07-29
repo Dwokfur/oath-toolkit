@@ -17,7 +17,7 @@
 AC_INIT([liboath],
   m4_esyscmd([../build-aux/git-version-gen ../.tarball-version]),
   [oath-toolkit-help@nongnu.org],,
-  [https://www.nongnu.org/oath-toolkit/])
+  [https://oath-toolkit.codeberg.page/])
 
 MAJOR=$(echo $PACKAGE_VERSION | cut -d. -f1)
 MINOR=$(echo $PACKAGE_VERSION | cut -d. -f2)

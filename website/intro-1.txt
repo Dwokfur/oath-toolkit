@@ -4,7 +4,7 @@ list of changes.  See the link:download.html[Download page] for
 download links.
 
 IMPORTANT: Security advisory
-https://www.nongnu.org/oath-toolkit/CVE-2024-47191.html[CVE-2024-47191]
+https://oath-toolkit.codeberg.page/CVE-2024-47191.html[CVE-2024-47191]
 about bug in OATH Toolkit version 2.6.7 to 2.6.11 inclusive.
 
 ************************************************************************

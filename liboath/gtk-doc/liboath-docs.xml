@@ -19,8 +19,8 @@
     <releaseinfo>
       Version &package_string;.
       The latest version of this documentation can be found on-line at
-      <ulink role="online-location" url="https://www.nongnu.org/oath-toolkit/liboath/">
-	https://www.nongnu.org/oath-toolkit/liboath/</ulink>.
+      <ulink role="online-location" url="https://oath-toolkit.codeberg.page/liboath/">
+	https://oath-toolkit.codeberg.page/liboath/</ulink>.
     </releaseinfo>
   </bookinfo>
 

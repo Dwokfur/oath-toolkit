@@ -209,7 +209,7 @@ dotest "--base32 @$tmpfile @$tmpfile2" "0"
 echo 993210 >> "$tmpfile"
 dotest "--base32 @$tmpfile @$tmpfile" "0"
 
-# https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/41
+# https://codeberg.org/oath-toolkit/oath-toolkit/issues/41
 # v2.6.10 regression: invalid base32 encoded string
 dotest "--base32 XBK55CIOSR2TO6VUZX7KB2NJX2" "386584"
 

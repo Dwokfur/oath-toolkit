@@ -5,7 +5,7 @@ Copyright (C) 2009-2025 Simon Josefsson.  Licensed under the GPLv3+.
 Download, build and self-check version controlled sources:
 
 ```
-git clone https://gitlab.com/oath-toolkit/oath-toolkit.git
+git clone https://codeberg.org/oath-toolkit/oath-toolkit.git
 cd oath-toolkit
 ./bootstrap
 ./configure
@@ -17,11 +17,9 @@ Links to resources that may be useful if you want to get involved the
 project:
 
 - Mailing list: https://lists.nongnu.org/mailman/listinfo/oath-toolkit-help
+- Codeberg OATH Toolkit Project: https://codeberg.org/oath-toolkit/oath-toolkit
 - Savannah OATH Toolkit Project: https://savannah.nongnu.org/projects/oath-toolkit/
-- GitLab OATH Toolkit Project: https://gitlab.com/oath-toolkit/oath-toolkit
-- GitLab Bug tracker: https://gitlab.com/oath-toolkit/oath-toolkit/issues
-- Savannah bug tracker: https://savannah.nongnu.org/support/?group=oath-toolkit
-- Code browser: https://gitlab.com/oath-toolkit/oath-toolkit/tree/master
+- GitLab Pipeline: https://gitlab.com/oath-toolkit/oath-toolkit/-/pipelines
 - Code coverage report: https://oath-toolkit.gitlab.io/oath-toolkit/coverage/
 - Clang code analysis: https://oath-toolkit.gitlab.io/oath-toolkit/clang-analyzer/
 - Pre-release version of website: https://oath-toolkit.gitlab.io/oath-toolkit/
@@ -98,11 +96,11 @@ and the steps below are inspired by gnulib's README-release.
 
 Here are most of the steps we (maintainers) follow when making a release.
 
-* Start from a clean, up-to-date git directory on "master":
+* Start from a clean, up-to-date git directory on "main":
 
 ```
-git checkout master
-git pull origin master
+git checkout main
+git pull origin main
 git clean -d -x -f
 git restore --staged .
 git reset --hard
@@ -132,7 +130,7 @@ git diff
 * Ensure that you've pushed all changes that belong in the release:
 
 ```
-git push origin master
+git push origin main
 ```
 
 * Check that the GitLab CI/CD Pipeline is reporting all is well:
@@ -155,20 +153,17 @@ make check syntax-check distcheck
 make release-commit RELEASE='X.Y.Z TYPE'
 ```
 
-* Run the following to create release tarballs.
-
-```
-make release RELEASE='X.Y.Z TYPE'
-```
-
-* Test the tarball.  Copy it to a few odd-ball systems and ensure that
-  it builds and passes all tests.
-
 * Push the NEWS-updating changes and the new tag:
 
 ```
 v=$(cat .prev-version)
-git push origin master tag v$v
+git push origin main tag v$v
+```
+
+* Run the following to create release tarballs.
+
+```
+make release RELEASE='X.Y.Z TYPE' gnulib_dir=../gnulib
 ```
 
 * Write the release announcement that you will soon post.  Start with
@@ -185,13 +180,11 @@ make release-upload-ftp
 ```
 
 * Make sure ../www-oath-toolkit/ contains a git checkout of the
-  website git repository, and ../www-oath-toolkit-cvs/ contains a CVS
-  checkout of the website.
+  website git repository.
 
 ```
 cd ..
-git clone git@gitlab.com:oath-toolkit/website.git www-oath-toolkit
-cvs -z3 -d:ext:USER@cvs.savannah.nongnu.org:/web/oath-toolkit co -d www-oath-toolkit-cvs oath-toolkit
+git clone ssh://git@codeberg.org/oath-toolkit/pages.git www-oath-toolkit
 ```
 
 * Run the following to upload the website:
@@ -200,24 +193,12 @@ cvs -z3 -d:ext:USER@cvs.savannah.nongnu.org:/web/oath-toolkit co -d www-oath-too
 make release-upload-www
 ```
 
-* Manually update the CVS website that will be synchronized to the
-  main website via savannah
-
-```
-cd ../www-oath-toolkit-cvs/
-sh -x ./synk-from-git.sh
-cvs update # figure out what to 'cvs add' and what to 'cvs rm -f'
-cvs add ...
-cvs rm -f ...
-cvs commit -mUpdate.
-```
-
 * Send the announcement email message.
 
 * Start next development cycle by pushing the post-release commit.
 
 ```
-git push master
+git push main
 ```
 
 * Commit and push updates of the release process depending on your

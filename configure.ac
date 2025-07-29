@@ -17,7 +17,7 @@ AC_INIT([OATH Toolkit],
   m4_esyscmd([build-aux/git-version-gen .tarball-version]),
   [oath-toolkit-help@nongnu.org],
   [oath-toolkit],
-  [https://www.nongnu.org/oath-toolkit/])
+  [https://oath-toolkit.codeberg.page/])
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_HEADERS([config.h])

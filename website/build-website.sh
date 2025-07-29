@@ -4,7 +4,7 @@
     echo 'OATH Toolkit NEWS'
     echo '================='
     echo ''
-    cat ../NEWS | sed -n '/(released/,$ p' | sed 's/^* Version/.Version/g'
+    cat ../NEWS | sed -n '/(20/,$ p' | sed 's/^* Noteworthy changes in release/.Version/g'
 ) > NEWS.txt
 
 (
@@ -22,8 +22,8 @@
 ) > pam_oath.txt
 
 (
-    LAST_VERSION=$(grep '^\* Version.*(released' ../NEWS |head -1|sed -n -e 's/^* Version \(.*\) (released \(.*\))/\1/;p')
-    LAST_DATE=$(grep '^\* Version.*(released' ../NEWS |head -1|sed -n -e 's/^* Version \(.*\) (released \(.*\))/\2/;p')
+    LAST_VERSION=$(grep '^\* Noteworthy.*(20' ../NEWS |head -1|sed -n -e 's/.* \(.*\) (.*/\1/p')
+    LAST_DATE=$(grep '^\* Noteworthy.*(20' ../NEWS |head -1|sed -n -e 's/.*(\(.*\)).*/\1/p')
     echo 'OATH Toolkit'
     echo '============'
     echo ''

@@ -11,7 +11,12 @@ CPPFLAGS=-D_FORTIFY_SOURCE=3 or CPPFLAGS=-D_FORTIFY_SOURCE=0.
 
 ** liboath: Fix --with-openssl builds, and test for it in pipeline.
 Reported by Tomasz Kłoczko in
-<https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/36>.
+<https://codeberg.org/oath-toolkit/oath-toolkit/issues/36>.
+
+** Git hosting moved from gitlab.com to codeberg.org.
+The new URL is https://codeberg.org/oath-toolkit/oath-toolkit although
+the old GitLab project will continue to be used for pipelines:
+https://gitlab.com/oath-toolkit/oath-toolkit/-/pipelines
 
 ** Various build fixes including updated gnulib files.
 Gnulib files are no longer stored in git version control.  As a
@@ -22,7 +27,7 @@ git, see CONTRIBUTING.md.
 
 ** pam_oath: Drop privs when ${HOME} is used in the usersfile= setting.
 Reported by Fabian Vogt (SUSE), and associated with CVE-2024-47191.
-See <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/43>.
+See <https://codeberg.org/oath-toolkit/oath-toolkit/issues/43>.
 Security bug triggered by new feature in pam_oath v2.6.7 released on
 2021-05-01 with the USER/HOME placeholder strings, see
 <https://gitlab.com/oath-toolkit/oath-toolkit/-/merge_requests/12>.
@@ -44,7 +49,7 @@ affect files beyond their control via liboath.
 
 ** liboath: Don't follow symbolic links for usersfile updates.
 Reported by Fabian Vogt (SUSE), and associated with CVE-2024-47191.
-See <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/43>.
+See <https://codeberg.org/oath-toolkit/oath-toolkit/issues/43>.
 Security bug triggered by new feature in pam_oath v2.6.7 released on
 2021-05-01 with the USER/HOME placeholder strings, see
 <https://gitlab.com/oath-toolkit/oath-toolkit/-/merge_requests/12>.
@@ -88,7 +93,7 @@ and Ubuntu 22.04 should all produce an identical tarball.  These two
 ** oathtool: Fix test suite on 32-bit big-endian platforms.  Fixes: #44.
 Patch by Helge Deller and thanks to Jan Zerebecki.  See
 <https://lists.nongnu.org/archive/html/oath-toolkit-help/2024-04/msg00000.html>
-and <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/44>.
+and <https://codeberg.org/oath-toolkit/oath-toolkit/issues/44>.
 
 ** libpskc: Don't call deprecated xmlMemoryDump.
 
@@ -136,7 +141,7 @@ One remaining gnulib self-test disabled.
 ** libpskc: Fixes for recent libxmlsec releases.
 
 ** pam_oath: Provide fallback pam_modutil_getpwnam implementation.
-Fixes <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/26> on
+Fixes <https://codeberg.org/oath-toolkit/oath-toolkit/issues/26> on
 Mac OS.  Patch from Nick Gaya <nicholasgaya+github@gmail.com>.
 
 ** pam_oath: Don't fail authentication when pam_modutil_getpwnam doesn't
@@ -182,7 +187,7 @@ Thanks to Jason Graham <jgraham@compukix.net> for the patch.  See
 
 ** doc: Fix project URL in man pages.
 Thanks to Jason Graham <jgraham@compukix.net> for the patch.  Fixes
-<https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/19>.
+<https://codeberg.org/oath-toolkit/oath-toolkit/issues/19>.
 
 ** build: Drop use of libxml's AM_PATH_XML2 in favor of pkg-config.
 
@@ -201,7 +206,7 @@ Thanks to Jason Lai <jason99.lai@gmail.com> for report.
 
 ** Updated gnulib files.
 Fixes test-parse-datetime self-check.  Fixes
-<https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/20>.
+<https://codeberg.org/oath-toolkit/oath-toolkit/issues/20>.
 
 * Noteworthy changes in release 2.6.5 (2020-12-29) [stable]
 
@@ -219,16 +224,16 @@ Patch from Matthias Gerstner.
 * Noteworthy changes in release 2.6.4 (2020-11-11) [stable]
 
 ** libpskc: New --with-xmlsec-crypto-engine to hard-code crypto engine.
-Fixes <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/16>.
+Fixes <https://codeberg.org/oath-toolkit/oath-toolkit/issues/16>.
 Use it like --with-xmlsec-crypto-engine=gnutls or
 --with-xmlsec-crypto-engine=openssl if the default dynamic loading
 fails because of runtime linker search path issues.
 
 ** oathtool --totp --verbose now prints TOTP hash mode.
-Fixes <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/4>.
+Fixes <https://codeberg.org/oath-toolkit/oath-toolkit/issues/4>.
 
 ** oathtool: Hash names (e.g., SHA256) for --totp are now upper case.
-Fixes <https://gitlab.com/oath-toolkit/oath-toolkit/-/issues/3>.
+Fixes <https://codeberg.org/oath-toolkit/oath-toolkit/issues/3>.
 Lower/mixed case hash names are supported for compatibility.
 
 ** pam_oath: Fail gracefully for missing users.
