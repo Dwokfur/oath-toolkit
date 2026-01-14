@@ -290,6 +290,8 @@ experiment with disabling SELinux by doing "/usr/sbin/setenforce 0".
 Alternatively, instead of "ChallengeResponseAuthentication" it should
 work to enable "PasswordAuthentication" instead.
 
+If ChallengeResponseAuthentication is a deprecated. Use KbdInteractiveAuthentication instead.
+
 Debug hint
 ----------
 
