@@ -963,11 +963,11 @@ Debian-testing:
   - make -j$(nproc) check V=1 VERBOSE=t
   - grep '^PASS tst_pskctool' pskctool/tests/tst_pskctool.sh.log
 
-Ubuntu2410-ppc64:
+Ubuntu-rolling-ppc64:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   - when: manual
-  image: ubuntu:24.10
+  image: ubuntu:rolling
   tags: [ ppc64 ]
   stage: test
   needs: [B-Guix]
@@ -982,8 +982,8 @@ Ubuntu2410-ppc64:
   - ./configure -C --enable-gcc-warnings --disable-valgrind-tests
   - make -j$(nproc) check V=1 VERBOSE=t
 
-Ubuntu2410-xmlsec:
-  image: ubuntu:24.10
+Ubuntu-rolling-xmlsec:
+  image: ubuntu:rolling
   stage: test
   needs: [B-Guix]
   variables:
