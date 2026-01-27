@@ -2,6 +2,14 @@ OATH Toolkit NEWS -- History of user-visible changes.           -*- outline -*-
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** pam_oath README: Suggest `KbdInteractiveAuthentication`.
+Instead of deprecated `ChallengeResponseAuthentication`.  Patch by
+lvgenggeng, see
+<https://codeberg.org/oath-toolkit/oath-toolkit/pulls/112>.
+
+** Various build fixes including updated gnulib files.
+Fixes building with glibc 2.43, see
+<https://codeberg.org/oath-toolkit/oath-toolkit/issues/113>.
 
 * Noteworthy changes in release 2.6.13 (2025-07-29) [stable]
 
