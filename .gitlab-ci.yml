@@ -449,7 +449,7 @@ B-OpenBSD:
   script:
   - !reference [.gnulib-fetch, script]
   - time env AUTOCONF_VERSION=2.72 AUTOMAKE_VERSION=1.18 ./bootstrap
-  - time ./configure -C --enable-gcc-warnings
+  - time ./configure -C --enable-gcc-warnings --with-xmlsec-crypto-engine=gnutls
   - time make V=1
   - time make V=1 check VERBOSE=t
   - grep '^PASS tst_oathtool' oathtool/tests/tst_oathtool.sh.log
@@ -1209,8 +1209,10 @@ OpenBSD:
   script:
   - tar xfz out/b-guix/oath-toolkit-*.tar.gz
   - cd $(tar tfz out/b-guix/oath-toolkit-*.tar.gz | head -n1)
-  - time ./configure --enable-gcc-warnings
+  - time ./configure --enable-gcc-warnings --with-xmlsec-crypto-engine=gnutls
   - time make check V=1 VERBOSE=t
+  - grep '^PASS tst_oathtool' oathtool/tests/tst_oathtool.sh.log
+  - grep '^PASS tst_validate' libpskc/tests/tst_validate.log
 
 .pages:
   image: alpine:latest
