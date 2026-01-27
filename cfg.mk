@@ -66,25 +66,3 @@ review-diff:
 	| grep -v -e ^index -e '^diff --git' \
 	| filterdiff -p 1 -x 'build-aux/*' -x '*/build-aux/*' -x 'gl/*' -x '*/gl/*' -x 'gltests/*' -x '*/gltests/*' -x 'maint.mk' -x '.gitignore' -x '.x-sc*' -x 'ChangeLog' -x 'GNUmakefile' \
 	| less
-
-website:
-	cd website && ./build-website.sh
-
-website-copy:
-	rsync -av --exclude .git --exclude coverage --exclude clang-analyzer --delete website/html/ $(htmldir)/
-	ln -s liboath-oath.h.html $(htmldir)/liboath/liboath-oath.html
-	ln -s liboath-oath.h.html $(htmldir)/liboath-api/liboath-oath.html
-	ln -s liboath $(htmldir)/reference
-
-website-upload:
-	cd $(htmldir) && \
-		git add . && \
-		git commit -m "Auto-update." && \
-		git push
-
-release-upload-www: website website-copy website-upload
-
-release-upload-ftp:
-	mkdir -p ../releases/$(PACKAGE)/
-	cp -v $(distdir).tar.gz $(distdir).tar.gz.sig $(distdir)-src.tar.gz $(distdir)-src.tar.gz.sig ../releases/$(PACKAGE)/
-	scp $(distdir).tar.gz $(distdir).tar.gz.sig $(distdir)-src.tar.gz $(distdir)-src.tar.gz.sig jas@dl.sv.nongnu.org:/releases/oath-toolkit/
