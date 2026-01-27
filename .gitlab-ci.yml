@@ -479,7 +479,8 @@ B-macOS14Xcode15:
   - time make -j$(nproc) V=1
   - time make -j$(nproc) V=1 -k check VERBOSE=t
   - grep '^PASS tst_sign.sh' pskctool/tests/tst_sign.sh.log
-  - time env XML_CATALOG_FILES="$HOMEBREW_PREFIX/etc/xml/catalog" gmake V=1 AMTAR=gtar dist
+  - PATH="$HOMEBREW_PREFIX/opt/gnu-tar/libexec/gnubin:$PATH"
+  - time env XML_CATALOG_FILES="$HOMEBREW_PREFIX/etc/xml/catalog" gmake V=1 dist
   - !reference [.save-artifacts, script]
 
 B-macOS15Xcode16:
@@ -505,7 +506,8 @@ B-macOS15Xcode16:
   - time make -j$(nproc) V=1
   - time make -j$(nproc) V=1 -k check VERBOSE=t
   - grep '^PASS tst_sign.sh' pskctool/tests/tst_sign.sh.log
-  - time env XML_CATALOG_FILES="$HOMEBREW_PREFIX/etc/xml/catalog" gmake V=1 AMTAR=gtar dist
+  - PATH="$HOMEBREW_PREFIX/opt/gnu-tar/libexec/gnubin:$PATH"
+  - time env XML_CATALOG_FILES="$HOMEBREW_PREFIX/etc/xml/catalog" gmake V=1 dist
   - !reference [.save-artifacts, script]
 
 # https://docs.gitlab.com/ci/runners/hosted_runners/windows/
