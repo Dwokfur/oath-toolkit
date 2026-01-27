@@ -448,7 +448,7 @@ B-OpenBSD:
   - sysctl hw
   script:
   - !reference [.gnulib-fetch, script]
-  - time env AUTOCONF_VERSION=2.72 AUTOMAKE_VERSION=1.16 ./bootstrap
+  - time env AUTOCONF_VERSION=2.72 AUTOMAKE_VERSION=1.18 ./bootstrap
   - time ./configure -C --enable-gcc-warnings
   - time make V=1
   - time make V=1 check VERBOSE=t
