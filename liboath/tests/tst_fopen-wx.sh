@@ -1,6 +1,6 @@
 #!/bin/sh
 # tst_fopen-wx.sh - Setup and invoke tst_fopen-wx and check output.
-# Copyright (C) 2009-2025 Simon Josefsson
+# Copyright (C) 2009-2026 Simon Josefsson
 
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as

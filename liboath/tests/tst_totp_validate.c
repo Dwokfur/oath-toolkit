@@ -1,6 +1,6 @@
 /*
  * tst_totp_validate.c - self-tests for liboath TOTP validate functions
- * Copyright (C) 2009-2025 Simon Josefsson
+ * Copyright (C) 2009-2026 Simon Josefsson
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License

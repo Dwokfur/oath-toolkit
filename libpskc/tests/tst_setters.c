@@ -1,6 +1,6 @@
 /*
  * tst_setters.c - self-tests for libpskc field setter functions
- * Copyright (C) 2013-2025 Simon Josefsson
+ * Copyright (C) 2013-2026 Simon Josefsson
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License

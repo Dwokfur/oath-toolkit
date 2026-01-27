@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # tst_libexamples2.sh - keep pskctool output in GTK-DOC manual up to date
-# Copyright (C) 2012-2025 Simon Josefsson
+# Copyright (C) 2012-2026 Simon Josefsson
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

@@ -1,6 +1,6 @@
 /*
  * tst_fopen-wx.c - helper code to trigger fopen(wx) bug CVE-2024-47191
- * Copyright (C) 2009-2025 Simon Josefsson
+ * Copyright (C) 2009-2026 Simon Josefsson
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License

@@ -1,7 +1,7 @@
 /*
  * tst_invalidread.c - regression tests for libpskc memory bug
  * Copyright (C) 2014-2020 David Woodhouse
- * Copyright (C) 2020-2025 Simon Josefsson
+ * Copyright (C) 2020-2026 Simon Josefsson
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License

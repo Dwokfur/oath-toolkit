@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2025 Simon Josefsson
+# Copyright (C) 2012-2026 Simon Josefsson
 
 # This library is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as
@@ -168,7 +168,7 @@ stamp-gdoc: $(top_srcdir)/../.version $(GDOC_SRC)
 			-pkg-name "$(PACKAGE_NAME)" \
 			-pkg-url "$(PACKAGE_URL)" \
 			-includefuncprefix \
-		        -copyright "2009-2025 Simon Josefsson" \
+		        -copyright "2009-2026 Simon Josefsson" \
 		        -verbatimcopying \
 			-function $$i \
 			$(GDOC_SRC) > $$i.3 && \
