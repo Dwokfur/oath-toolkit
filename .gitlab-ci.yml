@@ -371,8 +371,8 @@ B-Ubuntu2204-ppc64:
   - make -j$(nproc) V=1
   - make -j$(nproc) V=1 check VERBOSE=t
 
-B-Debian12-coverage:
-  image: debian:12-slim
+B-Debian13-coverage:
+  image: debian:13-slim
   stage: build
   before_script:
   - apt-get update -qq
@@ -1213,10 +1213,10 @@ OpenBSD:
 .pages:
   image: alpine:latest
   stage: build
-  needs: ["Website", "B-Debian12-coverage", "B-Fedora39-clanganalyzer"]
+  needs: ["Website", "B-Debian13-coverage", "B-Fedora39-clanganalyzer"]
   script:
   - mkdir public
-  - mv out/b-debian12-coverage/coverage/ public/
+  - mv out/b-debian13-coverage/coverage/ public/
   - mv out/b-fedora39-clanganalyzer/clang-analyzer public/
   - mv out/website/html/* public/
   artifacts:
