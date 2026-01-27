@@ -449,9 +449,9 @@ Fedora-rawhide:
   script:
   - tar xfa out/b-guix/oath-toolkit-*.tar.gz
   - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
-  - ./configure -C --enable-gcc-warnings
+  - ./configure -C --enable-gcc-warnings --with-xmlsec-crypto-engine=no
   - make -j$(nproc) check V=1 VERBOSE=t
-  - grep '^PASS tst_sign.sh' pskctool/tests/tst_sign.sh.log
+  - grep '^SKIP tst_sign.sh' pskctool/tests/tst_sign.sh.log
 
 B-OpenBSD:
   tags: [ openbsd ]
