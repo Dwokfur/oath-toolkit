@@ -52,7 +52,7 @@ default:
 sast:
   stage: build
   variables:
-    SAST_EXCLUDED_PATHS: oathtool/gl, pskctool/gl, liboath/gl, libpskc/gl
+    SAST_EXCLUDED_PATHS: liboath/gl, libpskc/gl
 include:
 - template: Security/SAST.gitlab-ci.yml
 
@@ -387,7 +387,7 @@ B-Debian13-coverage:
   - make -j$(nproc) V=1 VERBOSE=t build-coverage
   - grep '^PASS tst_usersfile.sh' liboath/tests/tst_usersfile.log
   - grep '^PASS run-root-tests.sh' pam_oath/tests/run-root-tests.sh.log
-  - lcov --remove doc/coverage/oath-toolkit.info '/usr/include/*' '*/liboath/gl/*' '*/liboath/tests/*' '*/libpskc/gl/*' '*/libpskc/tests/*' '*/oathtool/gl/*' '*/pam_oath/tests/*' '*/pskctool/gl/*' -o doc/coverage/oath-toolkit-filtered.info
+  - lcov --remove doc/coverage/oath-toolkit.info '/usr/include/*' '*/liboath/gl/*' '*/liboath/tests/*' '*/libpskc/gl/*' '*/libpskc/tests/*' '*/pam_oath/tests/*' -o doc/coverage/oath-toolkit-filtered.info
   - make gen-coverage PACKAGE=oath-toolkit-filtered
   - !reference [.save-artifacts, script]
   - mv doc/coverage/ out/$CI_JOB_NAME_SLUG/
