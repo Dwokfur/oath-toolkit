@@ -2,6 +2,15 @@ OATH Toolkit NEWS -- History of user-visible changes.           -*- outline -*-
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** pam_oath: Support null_usersfile_okay parameter.
+The argument no_usersfile_okay forces the module to act as if the user
+is not present in the config, if the config file does not exist. This
+has security implications only use if you know what you are
+doing. E.g.  if the file is in a mount like home and that fails to be
+mounted, then this will succeed even if the OTP if configured for that
+user.  Patch by Luna, Jan Zerebecki, and Miika Alikirri; see
+<https://codeberg.org/oath-toolkit/oath-toolkit/pulls/94>.
+
 ** pam_oath README: Suggest `KbdInteractiveAuthentication`.
 Instead of deprecated `ChallengeResponseAuthentication`.  Patch by
 lvgenggeng, see
