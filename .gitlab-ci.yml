@@ -439,6 +439,20 @@ B-F41-clang-Sanitizer:
   - grep '^PASS tst_oathtool' oathtool/tests/tst_oathtool.sh.log
   - grep '^PASS tst_validate' libpskc/tests/tst_validate.log
 
+Fedora-rawhide:
+  image: fedora:rawhide
+  stage: test
+  needs: [B-Guix]
+  before_script:
+  - dnf install -y make gcc diffutils file pam-devel
+  - dnf install -y libxml2-devel xmlsec1-devel xmlsec1-openssl libtool-ltdl-devel
+  script:
+  - tar xfa out/b-guix/oath-toolkit-*.tar.gz
+  - cd $(tar tfa out/b-guix/oath-toolkit-*.tar.gz | head -n1)
+  - ./configure -C --enable-gcc-warnings
+  - make -j$(nproc) check V=1 VERBOSE=t
+  - grep '^PASS tst_sign.sh' pskctool/tests/tst_sign.sh.log
+
 B-OpenBSD:
   tags: [ openbsd ]
   stage: build
