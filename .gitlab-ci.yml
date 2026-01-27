@@ -740,7 +740,7 @@ R-Debian12:
   - cat /etc/os-release
   - time apt-get update -q
   - time apt-get install -y -q eatmydata
-  - time eatmydata apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt
+  - time eatmydata apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt libdigest-sha3-perl
   script:
   - !reference [.gnulib-fetch, script]
   - time ./bootstrap
@@ -787,7 +787,7 @@ R-Ubuntu2404:
   - cat /etc/os-release
   - time apt-get update -q
   - time apt-get install -y -q eatmydata
-  - time eatmydata apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt
+  - time eatmydata apt-get install -y -qq wget make git autoconf automake libtool bison libpam0g-dev libxmlsec1-dev libxml2-utils help2man gtk-doc-tools valgrind gengetopt libdigest-sha3-perl
   script:
   - !reference [.gnulib-fetch, script]
   - time ./bootstrap
