@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-old_NEWS_hash = dd89ce6fa4b2679afd19475670b3ffb2
+old_NEWS_hash = 1f325b5789d4190340fcc0bf2713200b
 
 guix = $(shell command -v guix > /dev/null && echo ,guix)
 bootstrap-tools = git,gnulib,autoconf,automake,libtoolize,make,bison,help2man,gengetopt,gtkdocize,tar,gzip$(guix)
