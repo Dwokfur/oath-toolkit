@@ -1,6 +1,6 @@
 OATH Toolkit NEWS -- History of user-visible changes.           -*- outline -*-
 
-* Noteworthy changes in release ?.? (????-??-??) [?]
+* Noteworthy changes in release 2.6.14 (2026-01-27) [stable]
 
 ** pam_oath: Support null_usersfile_okay parameter.
 The argument no_usersfile_okay forces the module to act as if the user
