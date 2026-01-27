@@ -455,7 +455,7 @@ B-OpenBSD:
   - grep '^PASS tst_oathtool' oathtool/tests/tst_oathtool.sh.log
   - grep '^PASS tst_validate' libpskc/tests/tst_validate.log
 
-# https://docs.gitlab.com/ee/ci/runners/saas/macos/environment.html
+# https://docs.gitlab.com/ci/runners/hosted_runners/macos/
 B-macOS14Xcode15:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -469,7 +469,7 @@ B-macOS14Xcode15:
     HOMEBREW_NO_INSTALL_CLEANUP: 1
     HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
   before_script:
-  - time brew install autoconf automake libtool gengetopt bison help2man libxmlsec1
+  - time brew install make gnu-tar autoconf automake libtool gengetopt bison help2man libxmlsec1
   script:
   - PATH="/opt/homebrew/opt/bison/bin:$PATH" # brew bison is keg-only
   - !reference [.gnulib-fetch, script]
@@ -479,10 +479,9 @@ B-macOS14Xcode15:
   - time make -j$(nproc) V=1
   - time make -j$(nproc) V=1 -k check VERBOSE=t
   - grep '^PASS tst_sign.sh' pskctool/tests/tst_sign.sh.log
-  - time env XML_CATALOG_FILES="$HOMEBREW_PREFIX/etc/xml/catalog" make V=1 TAR=gtar dist
+  - time env XML_CATALOG_FILES="$HOMEBREW_PREFIX/etc/xml/catalog" gmake V=1 TAR=gtar dist
   - !reference [.save-artifacts, script]
 
-# https://docs.gitlab.com/ee/ci/runners/saas/macos/environment.html
 B-macOS15Xcode16:
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -496,7 +495,7 @@ B-macOS15Xcode16:
     HOMEBREW_NO_INSTALL_CLEANUP: 1
     HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
   before_script:
-  - time brew install autoconf automake libtool gengetopt bison help2man libxmlsec1
+  - time brew install make gnu-tar autoconf automake libtool gengetopt bison help2man libxmlsec1
   script:
   - PATH="/opt/homebrew/opt/bison/bin:$PATH" # brew bison is keg-only
   - !reference [.gnulib-fetch, script]
@@ -506,7 +505,7 @@ B-macOS15Xcode16:
   - time make -j$(nproc) V=1
   - time make -j$(nproc) V=1 -k check VERBOSE=t
   - grep '^PASS tst_sign.sh' pskctool/tests/tst_sign.sh.log
-  - time env XML_CATALOG_FILES="$HOMEBREW_PREFIX/etc/xml/catalog" make V=1 TAR=gtar dist
+  - time env XML_CATALOG_FILES="$HOMEBREW_PREFIX/etc/xml/catalog" gmake V=1 TAR=gtar dist
   - !reference [.save-artifacts, script]
 
 # https://docs.gitlab.com/ci/runners/hosted_runners/windows/
