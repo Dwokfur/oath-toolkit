@@ -281,16 +281,19 @@ should make sure the /etc/ssh/sshd_config file contains the following:
 
 ---------
 UsePAM yes
-ChallengeResponseAuthentication yes
+KbdInteractiveAuthentication yes
 ---------
 
 Another reported cause of problems has been SELinux, and you could
 experiment with disabling SELinux by doing "/usr/sbin/setenforce 0".
 
-Alternatively, instead of "ChallengeResponseAuthentication" it should
-work to enable "PasswordAuthentication" instead.
+If you are using an old SSH version, it may be that you need to
+replace `KbdInteractiveAuthentication` with the now deprecated keyword
+`ChallengeResponseAuthentication`.
 
-If ChallengeResponseAuthentication is a deprecated. Use KbdInteractiveAuthentication instead.
+Alternatively, instead of `KbdInteractiveAuthentication` or
+`ChallengeResponseAuthentication it may work to enable
+`PasswordAuthentication` instead.
 
 Debug hint
 ----------
