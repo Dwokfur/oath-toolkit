@@ -50,6 +50,9 @@
 #ifdef HAVE_SECURITY_PAM_MODULES_H
 # include <security/pam_modules.h>
 #endif
+#ifdef HAVE_SECURITY_PAM_EXT_H
+# include <security/pam_ext.h>
+#endif
 
 #define D(x) do {							\
     printf ("[%s:%s(%d)] ", __FILE__, __FUNCTION__, __LINE__);		\
@@ -278,10 +281,6 @@ pam_sm_authenticate (pam_handle_t *pamh,
   char *usersfile = NULL;
   char otp[MAX_OTP_LEN + 1];
   int password_len = 0;
-  struct pam_conv *conv;
-  struct pam_message *pmsg[1], msg[1];
-  struct pam_response *resp;
-  int nargs = 1;
   struct cfg cfg;
   char *query_prompt = NULL;
   char *onlypasswd;
@@ -386,17 +385,39 @@ pam_sm_authenticate (pam_handle_t *pamh,
       }
   }
 
-  if (cfg.try_first_pass || cfg.use_first_pass)
+  {
+    const char *query_template = "One-time password (OATH) for `%s': ";
+    size_t len = strlen (query_template) + strlen (user) + 1;
+    size_t wrote;
+
+    query_prompt = malloc (len);
+    if (!query_prompt)
+      {
+	retval = PAM_BUF_ERR;
+	goto done;
+      }
+
+    wrote = snprintf (query_prompt, len, query_template, user);
+    if (wrote < 0 || wrote >= len)
+      {
+	retval = PAM_BUF_ERR;
+	goto done;
+      }
+  }
+
+  /* pam_get_authtok() first returns any cached PAM_AUTHTOK (satisfying
+     try_first_pass/use_first_pass semantics), and if not already set it
+     retrieves the token via the PAM conversation function.  This correctly
+     handles daemon clients such as dovecot passdb pam that supply the
+     password through the conversation mechanism rather than pre-populating
+     PAM_AUTHTOK.  */
+  retval = pam_get_authtok (pamh, PAM_AUTHTOK, &password, query_prompt);
+  if (retval != PAM_SUCCESS)
     {
-      retval = pam_get_item (pamh, PAM_AUTHTOK, (const void **) &password);
-      if (retval != PAM_SUCCESS)
-	{
-	  DBG (("get password returned error: %s",
-		pam_strerror (pamh, retval)));
-	  goto done;
-	}
-      DBG (("get password returned: %s", password));
+      DBG (("pam_get_authtok returned error: %s", pam_strerror (pamh, retval)));
+      goto done;
     }
+  DBG (("pam_get_authtok returned: %s", password));
 
   if (cfg.use_first_pass && password == NULL)
     {
@@ -411,57 +432,6 @@ pam_sm_authenticate (pam_handle_t *pamh,
       DBG (("oath_init() failed (%d)", rc));
       retval = PAM_AUTHINFO_UNAVAIL;
       goto done;
-    }
-
-  if (password == NULL)
-    {
-      retval = pam_get_item (pamh, PAM_CONV, (const void **) &conv);
-      if (retval != PAM_SUCCESS)
-	{
-	  DBG (("get conv returned error: %s", pam_strerror (pamh, retval)));
-	  goto done;
-	}
-
-      pmsg[0] = &msg[0];
-      {
-	const char *query_template = "One-time password (OATH) for `%s': ";
-	size_t len = strlen (query_template) + strlen (user);
-	size_t wrote;
-
-	query_prompt = malloc (len);
-	if (!query_prompt)
-	  {
-	    retval = PAM_BUF_ERR;
-	    goto done;
-	  }
-
-	wrote = snprintf (query_prompt, len, query_template, user);
-	if (wrote < 0 || wrote >= len)
-	  {
-	    retval = PAM_BUF_ERR;
-	    goto done;
-	  }
-
-	msg[0].msg = query_prompt;
-      }
-      msg[0].msg_style = PAM_PROMPT_ECHO_OFF;
-      resp = NULL;
-
-      retval = conv->conv (nargs, (const struct pam_message **) pmsg,
-			   &resp, conv->appdata_ptr);
-
-      free (query_prompt);
-      query_prompt = NULL;
-
-      if (retval != PAM_SUCCESS)
-	{
-	  DBG (("conv returned error: %s", pam_strerror (pamh, retval)));
-	  goto done;
-	}
-
-      DBG (("conv returned: %s", resp->resp));
-
-      password = resp->resp;
     }
 
   if (password)
