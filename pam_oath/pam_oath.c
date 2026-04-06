@@ -64,7 +64,7 @@ static void
 _pam_oath_syslog (pam_handle_t *pamh, const char *file,
 		  const char *func, int line, const char *fmt, ...)
 {
-  char buf[1024];
+  char buf[4096];
   va_list ap;
 
   va_start (ap, fmt);
@@ -575,7 +575,7 @@ done:
 	}
       if (pamuid && seteuid (old_euid) != 0)
 	{
-	  DBG (pamh, "Restoring setegid failed: %d", errno);
+	  DBG (pamh, "Restoring seteuid failed: %d", errno);
 	  retval = PAM_SERVICE_ERR;
 	}
 
