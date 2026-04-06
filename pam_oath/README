@@ -198,6 +198,38 @@ One-time password (OATH) for `root':
 mocca:/home/jas#
 ---------
 
+Single-prompt services (su, dovecot) with Unix password via pam_unix
+---------------------------------------------------------------------
+
+Some services (e.g. su, dovecot) provide only a single password prompt.
+With digits=N and ignore_userfile_password, pam_oath splits the combined
+"unixpassword+OTP" input, verifies only the OTP against the usersfile
+secret, and stores the password prefix in PAM_AUTHTOK for a subsequent
+pam_unix call.  The usersfile entry should use '-' in the password field
+to indicate that no static password is stored there.
+
+Example usersfile entry (no static password stored):
+
+---------
+# cat /etc/users.oath
+HOTP/T30 root - SECRET
+# chmod go-rw /etc/users.oath
+---------
+
+Example PAM configuration for /etc/pam.d/su (or /etc/pam.d/dovecot):
+
+---------
+auth  requisite pam_oath.so usersfile=/etc/users.oath digits=6 window=5 ignore_userfile_password
+auth  required  pam_unix.so use_first_pass
+---------
+
+With this stack the user enters their Unix password immediately followed
+by the 6-digit OTP (e.g. "MyPassword123456").  pam_oath validates the
+OTP only (ignoring the '-' password field in the usersfile) and places
+"MyPassword" into PAM_AUTHTOK.  pam_unix then validates "MyPassword"
+against /etc/shadow.  No plaintext Unix password is ever stored in the
+usersfile.
+
 List of all parameters
 ----------------------
 
@@ -231,6 +263,21 @@ List of all parameters
                       and that fails to be mounted, then this will succeed
                       even if the OTP if configured for that user.
 
+  "ignore_userfile_password": When set, pam_oath passes an empty string
+                      as the password argument to
+                      oath_authenticate_usersfile(), so the static
+                      password/PIN field in the usersfile is ignored
+                      during OTP verification.  Use this when the
+                      usersfile contains a '-' (no password) entry and
+                      you want the Unix password to be validated by a
+                      later PAM module (e.g. pam_unix with
+                      use_first_pass) rather than being checked by
+                      liboath.  When digits=N is also set, pam_oath
+                      still splits the combined input, stores the
+                      password-only prefix in PAM_AUTHTOK, and
+                      validates only the OTP portion against the
+                      usersfile secret.
+
   "usersfile": Specify filename where credentials are stored, for
                example "/etc/users.oath". The placeholder values
                "${USER}" and "${HOME}" may be used to specify the
@@ -244,6 +291,35 @@ List of all parameters
 
   "window": Specify search depth, an integer typically from 5 to 50
             but other values can be useful too.
+
+Token retrieval via pam_get_authtok
+------------------------------------
+
+pam_oath retrieves the authentication token using the Linux-PAM
+pam_get_authtok() API.  This function first returns any token that was
+already cached in the PAM stack by a previous module (satisfying the
+try_first_pass and use_first_pass semantics), and if no cached token is
+present it retrieves one through the PAM conversation function.
+
+This approach correctly handles daemon clients such as dovecot passdb
+pam, which supply the password through the conversation mechanism
+instead of pre-populating PAM_AUTHTOK before the module stack runs.
+With the older pam_get_item(PAM_AUTHTOK) approach, such clients would
+fail silently when use_first_pass was set, because PAM_AUTHTOK would be
+NULL even though the client had the password available via conv.
+
+Once pam_get_authtok() obtains the token it is cached in PAM_AUTHTOK,
+so subsequent modules in the stack (e.g. pam_unix with use_first_pass)
+can retrieve it with pam_get_item() as usual.
+
+Example dovecot configuration in /etc/pam.d/dovecot (the ${HOME}
+placeholder is expanded by pam_oath itself, not by the shell):
+
+---------
+auth  requisite  pam_oath.so usersfile=${HOME}/.oath_toolkit window=20 digits=6
+auth  required   pam_nologin.so
+auth  include    system-auth
+---------
 
 Usersfile protection
 --------------------

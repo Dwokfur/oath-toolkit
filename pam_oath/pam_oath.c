@@ -100,6 +100,7 @@ struct cfg
   int try_first_pass;
   int use_first_pass;
   int no_usersfile_okay;
+  int ignore_userfile_password;
   char *usersfile;
   unsigned digits;
   unsigned window;
@@ -116,6 +117,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
   cfg->try_first_pass = 0;
   cfg->use_first_pass = 0;
   cfg->no_usersfile_okay = 0;
+  cfg->ignore_userfile_password = 0;
   cfg->usersfile = NULL;
   cfg->digits = -1;
   cfg->window = 5;
@@ -134,6 +136,8 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
 	cfg->use_first_pass = 1;
       if (strcmp (argv[i], "no_usersfile_okay") == 0)
 	cfg->no_usersfile_okay = 1;
+      if (strcmp (argv[i], "ignore_userfile_password") == 0)
+	cfg->ignore_userfile_password = 1;
       if (strncmp (argv[i], "usersfile=", 10) == 0)
 	cfg->usersfile = (char *) argv[i] + 10;
       if (strncmp (argv[i], "digits=", 7) == 0)
@@ -162,6 +166,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
       D ("try_first_pass=%d", cfg->try_first_pass);
       D ("use_first_pass=%d", cfg->use_first_pass);
       D ("no_usersfile_okay=%d", cfg->no_usersfile_okay);
+      D ("ignore_userfile_password=%d", cfg->ignore_userfile_password);
       D ("usersfile=%s", cfg->usersfile ? cfg->usersfile : "(null)");
       D ("digits=%d", cfg->digits);
       D ("window=%d", cfg->window);
@@ -301,10 +306,6 @@ pam_sm_authenticate (pam_handle_t *pamh,
   char *usersfile = NULL;
   char otp[MAX_OTP_LEN + 1];
   int password_len = 0;
-  struct pam_conv *conv;
-  struct pam_message *pmsg[1], msg[1];
-  struct pam_response *resp;
-  int nargs = 1;
   struct cfg cfg;
   char *query_prompt = NULL;
   char *onlypasswd;
@@ -394,7 +395,10 @@ pam_sm_authenticate (pam_handle_t *pamh,
     otp[0] = '\0';
     rc = oath_authenticate_usersfile (usersfile,
 				      user,
-				      otp, cfg.window, onlypasswd, &last_otp);
+				      otp, cfg.window,
+				      cfg.ignore_userfile_password
+				      ? "" : onlypasswd,
+				      &last_otp);
 
     DBG (pamh, "authenticate first pass rc %d (%s: %s) last otp %s", rc,
 	  oath_strerror_name (rc) ? oath_strerror_name (rc) : "UNKNOWN",
@@ -406,17 +410,45 @@ pam_sm_authenticate (pam_handle_t *pamh,
       }
   }
 
-  if (cfg.try_first_pass || cfg.use_first_pass)
+  {
+    const char *query_template = "One-time password (OATH) for `%s': ";
+    size_t len = strlen (query_template) + strlen (user) + 1;
+    size_t wrote;
+
+    query_prompt = malloc (len);
+    if (!query_prompt)
+      {
+	retval = PAM_BUF_ERR;
+	goto done;
+      }
+
+    wrote = snprintf (query_prompt, len, query_template, user);
+    if (wrote < 0 || wrote >= len)
+      {
+	retval = PAM_BUF_ERR;
+	goto done;
+      }
+  }
+
+  /* pam_get_authtok() first returns any cached PAM_AUTHTOK (satisfying
+     try_first_pass/use_first_pass semantics), and if not already set it
+     retrieves the token via the PAM conversation function.  This correctly
+     handles daemon clients such as dovecot passdb pam that supply the
+     password through the conversation mechanism rather than pre-populating
+     PAM_AUTHTOK.  */
+  retval = pam_get_authtok (pamh, PAM_AUTHTOK, &password, query_prompt);
+  if (retval != PAM_SUCCESS)
     {
-      retval = pam_get_item (pamh, PAM_AUTHTOK, (const void **) &password);
+      retval = pam_get_authtok (pamh, PAM_AUTHTOK, &password, query_prompt);
       if (retval != PAM_SUCCESS)
-	{
-	  DBG (pamh, "get password returned error: %s",
-		pam_strerror (pamh, retval));
-	  goto done;
-	}
-      DBG (pamh, "get password returned: %s", password);
+	  {
+	    DBG (pamh, "pam_get_authtok returned error: %s",
+  		     pam_strerror (pamh, retval));
+  	  goto done;
+  	}
+      DBG (pamh, "pam_get_authtok returned: %s", password);
     }
+  DBG (("pam_get_authtok returned: %s", password));
 
   if (cfg.use_first_pass && password == NULL)
     {
@@ -431,57 +463,6 @@ pam_sm_authenticate (pam_handle_t *pamh,
       DBG (pamh, "oath_init() failed (%d)", rc);
       retval = PAM_AUTHINFO_UNAVAIL;
       goto done;
-    }
-
-  if (password == NULL)
-    {
-      retval = pam_get_item (pamh, PAM_CONV, (const void **) &conv);
-      if (retval != PAM_SUCCESS)
-	{
-	  DBG (pamh, "get conv returned error: %s", pam_strerror (pamh, retval));
-	  goto done;
-	}
-
-      pmsg[0] = &msg[0];
-      {
-	const char *query_template = "One-time password (OATH) for `%s': ";
-	size_t len = strlen (query_template) + strlen (user);
-	size_t wrote;
-
-	query_prompt = malloc (len);
-	if (!query_prompt)
-	  {
-	    retval = PAM_BUF_ERR;
-	    goto done;
-	  }
-
-	wrote = snprintf (query_prompt, len, query_template, user);
-	if (wrote < 0 || wrote >= len)
-	  {
-	    retval = PAM_BUF_ERR;
-	    goto done;
-	  }
-
-	msg[0].msg = query_prompt;
-      }
-      msg[0].msg_style = PAM_PROMPT_ECHO_OFF;
-      resp = NULL;
-
-      retval = conv->conv (nargs, (const struct pam_message **) pmsg,
-			   &resp, conv->appdata_ptr);
-
-      free (query_prompt);
-      query_prompt = NULL;
-
-      if (retval != PAM_SUCCESS)
-	{
-	  DBG (pamh, "conv returned error: %s", pam_strerror (pamh, retval));
-	  goto done;
-	}
-
-      DBG (pamh, "conv returned: %s", resp->resp);
-
-      password = resp->resp;
     }
 
   if (password)
@@ -550,7 +531,10 @@ pam_sm_authenticate (pam_handle_t *pamh,
 
     rc = oath_authenticate_usersfile (usersfile,
 				      user,
-				      otp, cfg.window, onlypasswd, &last_otp);
+				      otp, cfg.window,
+				      cfg.ignore_userfile_password
+				      ? "" : onlypasswd,
+				      &last_otp);
     DBG (pamh, "authenticate rc %d (%s: %s) last otp %s", rc,
 	  oath_strerror_name (rc) ? oath_strerror_name (rc) : "UNKNOWN",
 	  oath_strerror (rc), ctime (&last_otp));
