@@ -198,6 +198,38 @@ One-time password (OATH) for `root':
 mocca:/home/jas#
 ---------
 
+Single-prompt services (su, dovecot) with Unix password via pam_unix
+---------------------------------------------------------------------
+
+Some services (e.g. su, dovecot) provide only a single password prompt.
+With digits=N and ignore_userfile_password, pam_oath splits the combined
+"unixpassword+OTP" input, verifies only the OTP against the usersfile
+secret, and stores the password prefix in PAM_AUTHTOK for a subsequent
+pam_unix call.  The usersfile entry should use '-' in the password field
+to indicate that no static password is stored there.
+
+Example usersfile entry (no static password stored):
+
+---------
+# cat /etc/users.oath
+HOTP/T30 root - SECRET
+# chmod go-rw /etc/users.oath
+---------
+
+Example PAM configuration for /etc/pam.d/su (or /etc/pam.d/dovecot):
+
+---------
+auth  requisite pam_oath.so usersfile=/etc/users.oath digits=6 window=5 ignore_userfile_password
+auth  required  pam_unix.so use_first_pass
+---------
+
+With this stack the user enters their Unix password immediately followed
+by the 6-digit OTP (e.g. "MyPassword123456").  pam_oath validates the
+OTP only (ignoring the '-' password field in the usersfile) and places
+"MyPassword" into PAM_AUTHTOK.  pam_unix then validates "MyPassword"
+against /etc/shadow.  No plaintext Unix password is ever stored in the
+usersfile.
+
 List of all parameters
 ----------------------
 
@@ -223,6 +255,21 @@ List of all parameters
                       are doing. E.g.  if the file is in a mount like home
                       and that fails to be mounted, then this will succeed
                       even if the OTP if configured for that user.
+
+  "ignore_userfile_password": When set, pam_oath passes an empty string
+                      as the password argument to
+                      oath_authenticate_usersfile(), so the static
+                      password/PIN field in the usersfile is ignored
+                      during OTP verification.  Use this when the
+                      usersfile contains a '-' (no password) entry and
+                      you want the Unix password to be validated by a
+                      later PAM module (e.g. pam_unix with
+                      use_first_pass) rather than being checked by
+                      liboath.  When digits=N is also set, pam_oath
+                      still splits the combined input, stores the
+                      password-only prefix in PAM_AUTHTOK, and
+                      validates only the OTP portion against the
+                      usersfile secret.
 
   "usersfile": Specify filename where credentials are stored, for
                example "/etc/users.oath". The placeholder values

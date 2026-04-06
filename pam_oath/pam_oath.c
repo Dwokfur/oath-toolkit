@@ -76,6 +76,7 @@ struct cfg
   int try_first_pass;
   int use_first_pass;
   int no_usersfile_okay;
+  int ignore_userfile_password;
   char *usersfile;
   unsigned digits;
   unsigned window;
@@ -91,6 +92,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
   cfg->try_first_pass = 0;
   cfg->use_first_pass = 0;
   cfg->no_usersfile_okay = 0;
+  cfg->ignore_userfile_password = 0;
   cfg->usersfile = NULL;
   cfg->digits = -1;
   cfg->window = 5;
@@ -107,6 +109,8 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
 	cfg->use_first_pass = 1;
       if (strcmp (argv[i], "no_usersfile_okay") == 0)
 	cfg->no_usersfile_okay = 1;
+      if (strcmp (argv[i], "ignore_userfile_password") == 0)
+	cfg->ignore_userfile_password = 1;
       if (strncmp (argv[i], "usersfile=", 10) == 0)
 	cfg->usersfile = (char *) argv[i] + 10;
       if (strncmp (argv[i], "digits=", 7) == 0)
@@ -134,6 +138,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
       D (("try_first_pass=%d", cfg->try_first_pass));
       D (("use_first_pass=%d", cfg->use_first_pass));
       D (("no_usersfile_okay=%d", cfg->no_usersfile_okay));
+      D (("ignore_userfile_password=%d", cfg->ignore_userfile_password));
       D (("usersfile=%s", cfg->usersfile ? cfg->usersfile : "(null)"));
       D (("digits=%d", cfg->digits));
       D (("window=%d", cfg->window));
@@ -366,7 +371,10 @@ pam_sm_authenticate (pam_handle_t *pamh,
     otp[0] = '\0';
     rc = oath_authenticate_usersfile (usersfile,
 				      user,
-				      otp, cfg.window, onlypasswd, &last_otp);
+				      otp, cfg.window,
+				      cfg.ignore_userfile_password
+				      ? "" : onlypasswd,
+				      &last_otp);
 
     DBG (("authenticate first pass rc %d (%s: %s) last otp %s", rc,
 	  oath_strerror_name (rc) ? oath_strerror_name (rc) : "UNKNOWN",
@@ -522,7 +530,10 @@ pam_sm_authenticate (pam_handle_t *pamh,
 
     rc = oath_authenticate_usersfile (usersfile,
 				      user,
-				      otp, cfg.window, onlypasswd, &last_otp);
+				      otp, cfg.window,
+				      cfg.ignore_userfile_password
+				      ? "" : onlypasswd,
+				      &last_otp);
     DBG (("authenticate rc %d (%s: %s) last otp %s", rc,
 	  oath_strerror_name (rc) ? oath_strerror_name (rc) : "UNKNOWN",
 	  oath_strerror (rc), ctime (&last_otp)));
