@@ -203,6 +203,13 @@ List of all parameters
 
   "debug": Enable debug output to stdout.
 
+  "debug_syslog": When combined with "debug", also send the debug
+                  messages to syslog using pam_syslog() at LOG_DEBUG
+                  priority, in addition to the stdout output.  This is
+                  useful for PAM clients that run as daemons (e.g.,
+                  dovecot, sshd) where stdout is not captured but
+                  syslog messages appear in /var/log/auth.log.
+
   "alwaysok": Enable that all authentication attempts should succeed
               (aka presentation mode).
 

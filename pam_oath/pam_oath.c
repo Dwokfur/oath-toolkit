@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
+#include <syslog.h>
 
 /* Libtool defines PIC for shared objects */
 #ifndef PIC
@@ -50,13 +51,35 @@
 #ifdef HAVE_SECURITY_PAM_MODULES_H
 # include <security/pam_modules.h>
 #endif
+#ifdef HAVE_SECURITY_PAM_EXT_H
+# include <security/pam_ext.h>
+#endif
 
-#define D(x) do {							\
-    printf ("[%s:%s(%d)] ", __FILE__, __FUNCTION__, __LINE__);		\
-    printf x;								\
-    printf ("\n");							\
+#define D(fmt, ...) do {						\
+    printf ("[%s:%s(%d)] " fmt "\n",					\
+            __FILE__, __FUNCTION__, __LINE__, ##__VA_ARGS__);		\
   } while (0)
-#define DBG(x) if (cfg.debug) { D(x); }
+
+static void
+_pam_oath_syslog (pam_handle_t *pamh, const char *file,
+		  const char *func, int line, const char *fmt, ...)
+{
+  char buf[1024];
+  va_list ap;
+
+  va_start (ap, fmt);
+  vsnprintf (buf, sizeof (buf), fmt, ap);
+  va_end (ap);
+  pam_syslog (pamh, LOG_DEBUG, "[%s:%s(%d)] %s", file, func, line, buf);
+}
+
+#define DBG(pamh, fmt, ...) do {					\
+    if (cfg.debug)							\
+      D(fmt, ##__VA_ARGS__);						\
+    if (cfg.debug_syslog)						\
+      _pam_oath_syslog (pamh, __FILE__, __FUNCTION__, __LINE__,		\
+			fmt, ##__VA_ARGS__);				\
+  } while (0)
 
 #ifndef PAM_EXTERN
 # ifdef PAM_STATIC
@@ -72,6 +95,7 @@
 struct cfg
 {
   int debug;
+  int debug_syslog;
   int alwaysok;
   int try_first_pass;
   int use_first_pass;
@@ -87,6 +111,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
   int i;
 
   cfg->debug = 0;
+  cfg->debug_syslog = 0;
   cfg->alwaysok = 0;
   cfg->try_first_pass = 0;
   cfg->use_first_pass = 0;
@@ -99,6 +124,8 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
     {
       if (strcmp (argv[i], "debug") == 0)
 	cfg->debug = 1;
+      if (strcmp (argv[i], "debug_syslog") == 0)
+	cfg->debug_syslog = 1;
       if (strcmp (argv[i], "alwaysok") == 0)
 	cfg->alwaysok = 1;
       if (strcmp (argv[i], "try_first_pass") == 0)
@@ -118,25 +145,26 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
   if (cfg->digits != 6 && cfg->digits != 7 && cfg->digits != 8)
     {
       if (cfg->digits != -1)
-	D (("only 6, 7, and 8 OTP lengths are supported: invalid value %d",
-	    cfg->digits));
+	D ("only 6, 7, and 8 OTP lengths are supported: invalid value %d",
+	    cfg->digits);
       cfg->digits = 0;
     }
 
   if (cfg->debug)
     {
-      D (("called."));
-      D (("flags %d argc %d", flags, argc));
+      D ("called.");
+      D ("flags %d argc %d", flags, argc);
       for (i = 0; i < argc; i++)
-	D (("argv[%d]=%s", i, argv[i]));
-      D (("debug=%d", cfg->debug));
-      D (("alwaysok=%d", cfg->alwaysok));
-      D (("try_first_pass=%d", cfg->try_first_pass));
-      D (("use_first_pass=%d", cfg->use_first_pass));
-      D (("no_usersfile_okay=%d", cfg->no_usersfile_okay));
-      D (("usersfile=%s", cfg->usersfile ? cfg->usersfile : "(null)"));
-      D (("digits=%d", cfg->digits));
-      D (("window=%d", cfg->window));
+	D ("argv[%d]=%s", i, argv[i]);
+      D ("debug=%d", cfg->debug);
+      D ("debug_syslog=%d", cfg->debug_syslog);
+      D ("alwaysok=%d", cfg->alwaysok);
+      D ("try_first_pass=%d", cfg->try_first_pass);
+      D ("use_first_pass=%d", cfg->use_first_pass);
+      D ("no_usersfile_okay=%d", cfg->no_usersfile_okay);
+      D ("usersfile=%s", cfg->usersfile ? cfg->usersfile : "(null)");
+      D ("digits=%d", cfg->digits);
+      D ("window=%d", cfg->window);
     }
 }
 
@@ -300,38 +328,38 @@ pam_sm_authenticate (pam_handle_t *pamh,
   retval = pam_get_user (pamh, &user, NULL);
   if (retval != PAM_SUCCESS)
     {
-      DBG (("get user returned error: %s", pam_strerror (pamh, retval)));
+      DBG (pamh, "get user returned error: %s", pam_strerror (pamh, retval));
       goto done;
     }
-  DBG (("get user returned: %s", user));
+  DBG (pamh, "get user returned: %s", user);
 
   retval = parse_usersfile_str (pamh, &cfg, user, &usersfile,
 				&pamuid, &pamgid);
   if (retval != PAM_SUCCESS)
     {
-      DBG (("parse usersfile string returned error: %s",
-	    pam_strerror (pamh, retval)));
+      DBG (pamh, "parse usersfile string returned error: %s",
+	    pam_strerror (pamh, retval));
       goto done;
     }
-  DBG (("usersfile is %s (id %d/%d)", usersfile, pamuid, pamgid));
+  DBG (pamh, "usersfile is %s (id %d/%d)", usersfile, pamuid, pamgid);
 
   if (pamuid || pamgid)
     {
       if (pamgid && setegid (pamgid) != 0)
 	{
-	  DBG (("setegid failed: %d", errno));
+	  DBG (pamh, "setegid failed: %d", errno);
 	  retval = PAM_SERVICE_ERR;
 	  goto done;
 	}
 
       if (pamuid && seteuid (pamuid) != 0)
 	{
-	  DBG (("seteuid failed: %d", errno));
+	  DBG (pamh, "seteuid failed: %d", errno);
 	  retval = PAM_SERVICE_ERR;
 	  goto done;
 	}
 
-      DBG (("Successfully dropped effective id to %d/%d", pamuid, pamgid));
+      DBG (pamh, "Successfully dropped effective id to %d/%d", pamuid, pamgid);
     }
 
   if (cfg.no_usersfile_okay)
@@ -346,14 +374,14 @@ pam_sm_authenticate (pam_handle_t *pamh,
       free (ucopy);
       if (rc != 0)
 	{
-	  DBG (("Basepath of file cannot be accessed '%s'", usersfile));
+	  DBG (pamh, "Basepath of file cannot be accessed '%s'", usersfile);
 	  retval = PAM_AUTH_ERR;
 	  goto done;
 	}
 
       if (access (usersfile, F_OK) != 0)
 	{
-	  DBG (("no_usersfile_okay set and no userfile was found, authenticating..."));
+	  DBG (pamh, "no_usersfile_okay set and no userfile was found, authenticating...");
 	  retval = PAM_SUCCESS;
 	  goto done;
 	}
@@ -368,9 +396,9 @@ pam_sm_authenticate (pam_handle_t *pamh,
 				      user,
 				      otp, cfg.window, onlypasswd, &last_otp);
 
-    DBG (("authenticate first pass rc %d (%s: %s) last otp %s", rc,
+    DBG (pamh, "authenticate first pass rc %d (%s: %s) last otp %s", rc,
 	  oath_strerror_name (rc) ? oath_strerror_name (rc) : "UNKNOWN",
-	  oath_strerror (rc), ctime (&last_otp)));
+	  oath_strerror (rc), ctime (&last_otp));
     if (rc == OATH_UNKNOWN_USER)
       {
 	retval = PAM_USER_UNKNOWN;
@@ -383,16 +411,16 @@ pam_sm_authenticate (pam_handle_t *pamh,
       retval = pam_get_item (pamh, PAM_AUTHTOK, (const void **) &password);
       if (retval != PAM_SUCCESS)
 	{
-	  DBG (("get password returned error: %s",
-		pam_strerror (pamh, retval)));
+	  DBG (pamh, "get password returned error: %s",
+		pam_strerror (pamh, retval));
 	  goto done;
 	}
-      DBG (("get password returned: %s", password));
+      DBG (pamh, "get password returned: %s", password);
     }
 
   if (cfg.use_first_pass && password == NULL)
     {
-      DBG (("use_first_pass set and no password, giving up"));
+      DBG (pamh, "use_first_pass set and no password, giving up");
       retval = PAM_AUTH_ERR;
       goto done;
     }
@@ -400,7 +428,7 @@ pam_sm_authenticate (pam_handle_t *pamh,
   rc = oath_init ();
   if (rc != OATH_OK)
     {
-      DBG (("oath_init() failed (%d)", rc));
+      DBG (pamh, "oath_init() failed (%d)", rc);
       retval = PAM_AUTHINFO_UNAVAIL;
       goto done;
     }
@@ -410,7 +438,7 @@ pam_sm_authenticate (pam_handle_t *pamh,
       retval = pam_get_item (pamh, PAM_CONV, (const void **) &conv);
       if (retval != PAM_SUCCESS)
 	{
-	  DBG (("get conv returned error: %s", pam_strerror (pamh, retval)));
+	  DBG (pamh, "get conv returned error: %s", pam_strerror (pamh, retval));
 	  goto done;
 	}
 
@@ -447,11 +475,11 @@ pam_sm_authenticate (pam_handle_t *pamh,
 
       if (retval != PAM_SUCCESS)
 	{
-	  DBG (("conv returned error: %s", pam_strerror (pamh, retval)));
+	  DBG (pamh, "conv returned error: %s", pam_strerror (pamh, retval));
 	  goto done;
 	}
 
-      DBG (("conv returned: %s", resp->resp));
+      DBG (pamh, "conv returned: %s", resp->resp);
 
       password = resp->resp;
     }
@@ -460,26 +488,26 @@ pam_sm_authenticate (pam_handle_t *pamh,
     password_len = strlen (password);
   else
     {
-      DBG (("Could not read password"));
+      DBG (pamh, "Could not read password");
       retval = PAM_AUTH_ERR;
       goto done;
     }
 
   if (password_len < MIN_OTP_LEN)
     {
-      DBG (("OTP too short: %s", password));
+      DBG (pamh, "OTP too short: %s", password);
       retval = PAM_AUTH_ERR;
       goto done;
     }
   else if (cfg.digits != 0 && password_len < cfg.digits)
     {
-      DBG (("OTP shorter than digits=%d: %s", cfg.digits, password));
+      DBG (pamh, "OTP shorter than digits=%d: %s", cfg.digits, password);
       retval = PAM_AUTH_ERR;
       goto done;
     }
   else if (cfg.digits == 0 && password_len > MAX_OTP_LEN)
     {
-      DBG (("OTP too long (and no digits=): %s", password));
+      DBG (pamh, "OTP too long (and no digits=): %s", password);
       retval = PAM_AUTH_ERR;
       goto done;
     }
@@ -497,7 +525,7 @@ pam_sm_authenticate (pam_handle_t *pamh,
 
       onlypasswd[password_len - cfg.digits] = '\0';
 
-      DBG (("Password: %s ", onlypasswd));
+      DBG (pamh, "Password: %s ", onlypasswd);
 
       memcpy (otp, password + password_len - cfg.digits, cfg.digits);
       otp[cfg.digits] = '\0';
@@ -505,7 +533,7 @@ pam_sm_authenticate (pam_handle_t *pamh,
       retval = pam_set_item (pamh, PAM_AUTHTOK, onlypasswd);
       if (retval != PAM_SUCCESS)
 	{
-	  DBG (("set_item returned error: %s", pam_strerror (pamh, retval)));
+	  DBG (pamh, "set_item returned error: %s", pam_strerror (pamh, retval));
 	  goto done;
 	}
     }
@@ -515,7 +543,7 @@ pam_sm_authenticate (pam_handle_t *pamh,
       password = NULL;
     }
 
-  DBG (("OTP: %s", otp));
+  DBG (pamh, "OTP: %s", otp);
 
   {
     time_t last_otp;
@@ -523,14 +551,14 @@ pam_sm_authenticate (pam_handle_t *pamh,
     rc = oath_authenticate_usersfile (usersfile,
 				      user,
 				      otp, cfg.window, onlypasswd, &last_otp);
-    DBG (("authenticate rc %d (%s: %s) last otp %s", rc,
+    DBG (pamh, "authenticate rc %d (%s: %s) last otp %s", rc,
 	  oath_strerror_name (rc) ? oath_strerror_name (rc) : "UNKNOWN",
-	  oath_strerror (rc), ctime (&last_otp)));
+	  oath_strerror (rc), ctime (&last_otp));
   }
 
   if (rc != OATH_OK)
     {
-      DBG (("One-time password not authorized to login as user '%s'", user));
+      DBG (pamh, "One-time password not authorized to login as user '%s'", user);
       retval = PAM_AUTH_ERR;
       goto done;
     }
@@ -542,17 +570,17 @@ done:
     {
       if (pamgid && setegid (old_egid) != 0)
 	{
-	  DBG (("Restoring setegid failed: %d", errno));
+	  DBG (pamh, "Restoring setegid failed: %d", errno);
 	  retval = PAM_SERVICE_ERR;
 	}
       if (pamuid && seteuid (old_euid) != 0)
 	{
-	  DBG (("Restoring setegid failed: %d", errno));
+	  DBG (pamh, "Restoring setegid failed: %d", errno);
 	  retval = PAM_SERVICE_ERR;
 	}
 
-      DBG (("Successfully restored effective id to %d/%d",
-	    old_euid, old_egid));
+      DBG (pamh, "Successfully restored effective id to %d/%d",
+	    old_euid, old_egid);
     }
   oath_done ();
   free (usersfile);
@@ -560,10 +588,10 @@ done:
   free (onlypasswd);
   if (cfg.alwaysok && retval != PAM_SUCCESS)
     {
-      DBG (("alwaysok needed (otherwise return with %d)", retval));
+      DBG (pamh, "alwaysok needed (otherwise return with %d)", retval);
       retval = PAM_SUCCESS;
     }
-  DBG (("done. [%s]", pam_strerror (pamh, retval)));
+  DBG (pamh, "done. [%s]", pam_strerror (pamh, retval));
 
   return retval;
 }
