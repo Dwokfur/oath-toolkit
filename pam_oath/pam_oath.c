@@ -105,6 +105,7 @@ struct cfg
   unsigned digits;
   unsigned window;
   int allow_replayed_otp_within;
+  char *ignore_replayed_otp_for_service;
 };
 
 static void
@@ -123,6 +124,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
   cfg->digits = -1;
   cfg->window = 5;
   cfg->allow_replayed_otp_within = 0;
+  cfg->ignore_replayed_otp_for_service = NULL;
 
   for (i = 0; i < argc; i++)
     {
@@ -155,6 +157,8 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
 	  else
 	    cfg->allow_replayed_otp_within = 0;
 	}
+      if (strncmp (argv[i], "ignore_replayed_otp_for_service=", 32) == 0)
+	cfg->ignore_replayed_otp_for_service = (char *) argv[i] + 32;
     }
 
   if (cfg->digits != 6 && cfg->digits != 7 && cfg->digits != 8)
@@ -182,6 +186,9 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
       D ("digits=%d", cfg->digits);
       D ("window=%d", cfg->window);
       D ("allow_replayed_otp_within=%d", cfg->allow_replayed_otp_within);
+      D ("ignore_replayed_otp_for_service=%s",
+	  cfg->ignore_replayed_otp_for_service
+	  ? cfg->ignore_replayed_otp_for_service : "(null)");
     }
 }
 
@@ -566,6 +573,20 @@ pam_sm_authenticate (pam_handle_t *pamh,
 	    DBG (pamh, "Replayed OTP accepted within window "
 		  "(allow_replayed_otp_within=%d, delta=%ld seconds)",
 		  cfg.allow_replayed_otp_within, (long) delta);
+	    rc = OATH_OK;
+	  }
+      }
+
+    if (rc == OATH_REPLAYED_OTP && cfg.ignore_replayed_otp_for_service != NULL)
+      {
+	const char *service = NULL;
+	int src = pam_get_item (pamh, PAM_SERVICE, (const void **) &service);
+	if (src == PAM_SUCCESS && service != NULL
+	    && strcmp (service, cfg.ignore_replayed_otp_for_service) == 0)
+	  {
+	    DBG (pamh, "Replayed OTP accepted for service '%s' "
+		  "(ignore_replayed_otp_for_service=%s)",
+		  service, cfg.ignore_replayed_otp_for_service);
 	    rc = OATH_OK;
 	  }
       }
