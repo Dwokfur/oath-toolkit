@@ -230,6 +230,28 @@ OTP only (ignoring the '-' password field in the usersfile) and places
 against /etc/shadow.  No plaintext Unix password is ever stored in the
 usersfile.
 
+Dovecot multiple-passdb-lookup workaround
+-----------------------------------------
+
+Dovecot 2.x with a PAM passdb may invoke PAM authentication more than
+once for a single login attempt.  The first call succeeds and marks the
+OTP as used; the second call (same credentials) then receives
+OATH_REPLAYED_OTP and fails.
+
+To work around this, add allow_replayed_otp_within=N (e.g., 2 seconds)
+to the pam_oath line.  The module will then accept a replayed OTP
+provided the previous successful authentication was recorded within N
+seconds of the current time.  Replayed OTPs outside that window are
+still rejected.
+
+Example /etc/pam.d/dovecot:
+
+---------
+auth  requisite pam_oath.so usersfile=/etc/users.oath window=20 digits=6 \
+                ignore_userfile_password allow_replayed_otp_within=2
+auth  required  pam_unix.so use_first_pass
+---------
+
 List of all parameters
 ----------------------
 
@@ -291,6 +313,24 @@ List of all parameters
 
   "window": Specify search depth, an integer typically from 5 to 50
             but other values can be useful too.
+
+  "allow_replayed_otp_within=N": Accept a replayed OTP (one that was
+                already used) if the previous successful authentication
+                occurred within N seconds of the current time.  Default
+                is 0 (disabled), which preserves the standard replay
+                protection behaviour.  Set to a positive integer to
+                enable; invalid or negative values are treated as
+                disabled.
+
+                This option is intended as a workaround for services
+                such as Dovecot 2.x that may call PAM authentication
+                more than once per login attempt (e.g., a second passdb
+                lookup immediately after the first).  When the first
+                call succeeds and consumes the OTP, the second call with
+                the same credentials would normally be rejected with
+                OATH_REPLAYED_OTP; with this option set to a small value
+                (e.g., 2) the second call is accepted provided it
+                arrives within that many seconds of the first.
 
 Token retrieval via pam_get_authtok
 ------------------------------------

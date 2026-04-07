@@ -104,6 +104,7 @@ struct cfg
   char *usersfile;
   unsigned digits;
   unsigned window;
+  int allow_replayed_otp_within;
 };
 
 static void
@@ -121,6 +122,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
   cfg->usersfile = NULL;
   cfg->digits = -1;
   cfg->window = 5;
+  cfg->allow_replayed_otp_within = 0;
 
   for (i = 0; i < argc; i++)
     {
@@ -144,6 +146,15 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
 	cfg->digits = atoi (argv[i] + 7);
       if (strncmp (argv[i], "window=", 7) == 0)
 	cfg->window = atoi (argv[i] + 7);
+      if (strncmp (argv[i], "allow_replayed_otp_within=", 26) == 0)
+	{
+	  char *endptr;
+	  long v = strtol (argv[i] + 26, &endptr, 10);
+	  if (*endptr == '\0' && v > 0)
+	    cfg->allow_replayed_otp_within = (int) v;
+	  else
+	    cfg->allow_replayed_otp_within = 0;
+	}
     }
 
   if (cfg->digits != 6 && cfg->digits != 7 && cfg->digits != 8)
@@ -170,6 +181,7 @@ parse_cfg (int flags, int argc, const char **argv, struct cfg *cfg)
       D ("usersfile=%s", cfg->usersfile ? cfg->usersfile : "(null)");
       D ("digits=%d", cfg->digits);
       D ("window=%d", cfg->window);
+      D ("allow_replayed_otp_within=%d", cfg->allow_replayed_otp_within);
     }
 }
 
@@ -400,7 +412,7 @@ pam_sm_authenticate (pam_handle_t *pamh,
 				      ? "" : onlypasswd,
 				      &last_otp);
 
-    DBG (pamh, "authenticate first pass rc %d (%s: %s) last otp %s", rc,
+    DBG (pamh, "pre-auth user check rc %d (%s: %s) last otp %s", rc,
 	  oath_strerror_name (rc) ? oath_strerror_name (rc) : "UNKNOWN",
 	  oath_strerror (rc), ctime (&last_otp));
     if (rc == OATH_UNKNOWN_USER)
@@ -448,7 +460,7 @@ pam_sm_authenticate (pam_handle_t *pamh,
   	}
       DBG (pamh, "pam_get_authtok returned: %s", password);
     }
-  DBG (("pam_get_authtok returned: %s", password));
+  DBG (pamh, "pam_get_authtok returned: %s", password);
 
   if (cfg.use_first_pass && password == NULL)
     {
@@ -538,6 +550,25 @@ pam_sm_authenticate (pam_handle_t *pamh,
     DBG (pamh, "authenticate rc %d (%s: %s) last otp %s", rc,
 	  oath_strerror_name (rc) ? oath_strerror_name (rc) : "UNKNOWN",
 	  oath_strerror (rc), ctime (&last_otp));
+
+    if (rc == OATH_REPLAYED_OTP && cfg.allow_replayed_otp_within > 0)
+      {
+	time_t now = time (NULL);
+	time_t delta = now - last_otp;
+
+	if (delta < 0)
+	  {
+	    DBG (pamh, "Replayed OTP window check skipped: last_otp is in the "
+		  "future (delta=%ld seconds, possible clock skew)", (long) delta);
+	  }
+	else if (delta <= (time_t) cfg.allow_replayed_otp_within)
+	  {
+	    DBG (pamh, "Replayed OTP accepted within window "
+		  "(allow_replayed_otp_within=%d, delta=%ld seconds)",
+		  cfg.allow_replayed_otp_within, (long) delta);
+	    rc = OATH_OK;
+	  }
+      }
   }
 
   if (rc != OATH_OK)
