@@ -332,6 +332,25 @@ List of all parameters
                 (e.g., 2) the second call is accepted provided it
                 arrives within that many seconds of the first.
 
+  "ignore_replayed_otp_for_service=NAME": Accept a replayed OTP
+                unconditionally when the PAM service name matches NAME.
+                Default is unset (disabled), which preserves the
+                standard replay protection behaviour.
+
+                This option is a service-scoped workaround for the same
+                double-authentication problem addressed by
+                allow_replayed_otp_within.  Unlike that option, it does
+                not impose a time constraint — any replayed OTP is
+                accepted as long as the authentication request comes
+                from the named service.  Use this when the service name
+                is known and a time window is impractical.
+
+                Example /etc/pam.d/dovecot:
+
+                auth requisite pam_oath.so usersfile=/etc/users.oath \
+                               window=20 digits=6 \
+                               ignore_replayed_otp_for_service=dovecot
+
 Token retrieval via pam_get_authtok
 ------------------------------------
 
